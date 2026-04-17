@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mary Kay · Encuentra tu Fragancia</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#faf6f0;--blush:#e8c9b8;--rose:#c4765a;--deep:#2a1a14;
+  --gold:#c9a96e;--muted:#9b7e6e;--card:rgba(255,255,255,0.76);
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+html,body{min-height:100%;font-family:var(--sans);background:var(--cream);color:var(--deep);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 80% 60% at 10% 20%,#f0ddd5 0%,transparent 60%),
+             radial-gradient(ellipse 60% 80% at 90% 80%,#e8d5c4 0%,transparent 60%),
+             radial-gradient(ellipse 50% 50% at 50% 50%,#faf6f0 0%,#f5ede3 100%);
+  pointer-events:none}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+
+/* HEADER */
+header{width:100%;padding:44px 24px 0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.mk-badge{font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+header h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.2rem,8vw,3.6rem);line-height:1.12;color:var(--deep)}
+header h1 em{font-style:italic;color:var(--rose)}
+.hline{width:44px;height:1px;background:var(--gold);margin:20px auto}
+header p{font-size:15px;color:var(--muted);max-width:300px;line-height:1.75}
+
+/* PROGRESS */
+.prog-wrap{width:100%;max-width:520px;padding:28px 24px 0}
+.prog-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.prog-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.prog-count{font-family:var(--serif);font-size:18px;color:var(--rose)}
+.prog-track{height:2px;background:rgba(196,118,90,.15);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blush),var(--rose));border-radius:2px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* QUIZ CONTAINER */
+.quiz-wrap{width:100%;max-width:520px;padding:22px 24px 90px;flex:1}
+
+/* QUESTION CARD */
+.q-card{background:var(--card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.85);border-radius:22px;padding:30px 24px;
+  box-shadow:0 4px 40px rgba(42,26,20,.07),0 1px 0 rgba(255,255,255,.9) inset;
+  animation:cardIn .45s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.q-num{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px}
+.q-text{font-family:var(--serif);font-size:clamp(1.15rem,4.5vw,1.4rem);line-height:1.45;color:var(--deep);margin-bottom:24px}
+
+/* OPTIONS */
+.options{display:flex;flex-direction:column;gap:10px}
+.opt-btn{background:rgba(255,255,255,.6);border:1.5px solid rgba(196,118,90,.18);border-radius:13px;
+  padding:15px 16px;cursor:pointer;text-align:left;transition:all .22s ease;display:flex;align-items:flex-start;gap:13px}
+.opt-btn:hover{background:rgba(255,255,255,.92);border-color:var(--rose);transform:translateX(3px);box-shadow:0 4px 18px rgba(196,118,90,.13)}
+.opt-btn.sel{background:linear-gradient(135deg,rgba(232,201,184,.55),rgba(196,118,90,.14));border-color:var(--rose);box-shadow:0 4px 22px rgba(196,118,90,.2)}
+.opt-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(196,118,90,.35);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .22s}
+.opt-btn.sel .opt-dot{background:var(--rose);border-color:var(--rose)}
+.opt-btn.sel .opt-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
+.opt-text{display:flex;flex-direction:column;gap:4px}
+.opt-label{font-size:15px;font-weight:500;color:var(--deep);line-height:1.3}
+.opt-sub{font-size:13px;color:var(--muted);font-style:italic;font-family:var(--serif);line-height:1.4}
+
+/* NEXT BTN */
+.next-btn{width:100%;margin-top:18px;padding:17px;background:linear-gradient(135deg,var(--rose),#b5614a);
+  border:none;border-radius:13px;color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .25s ease;
+  box-shadow:0 6px 24px rgba(196,118,90,.35);opacity:0;pointer-events:none}
+.next-btn.on{opacity:1;pointer-events:all;animation:btnIn .35s ease forwards}
+@keyframes btnIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(196,118,90,.42)}
+
+/* RESULT CARD */
+.r-card{background:var(--card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.85);border-radius:24px;overflow:hidden;
+  box-shadow:0 8px 60px rgba(42,26,20,.1);animation:cardIn .55s cubic-bezier(.4,0,.2,1) forwards}
+.r-hero{background:linear-gradient(160deg,#f5e8df 0%,#ead4c4 100%);padding:28px 28px 24px;text-align:center;position:relative}
+.r-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.r-tag{font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--rose);font-weight:700;margin-bottom:14px}
+.r-img{width:150px;height:150px;object-fit:contain;margin:0 auto 16px;display:block;
+  filter:drop-shadow(0 10px 28px rgba(42,26,20,.22));animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.r-name{font-family:var(--serif);font-size:clamp(1.6rem,6vw,2.4rem);font-weight:400;line-height:1.15;color:var(--deep);margin-bottom:6px}
+.r-vibe{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--rose);margin-bottom:8px}
+.r-type{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.r-badge{display:inline-block;background:rgba(196,118,90,.12);border:1px solid rgba(196,118,90,.28);
+  border-radius:20px;padding:5px 16px;font-size:11px;letter-spacing:.14em;color:var(--rose);text-transform:uppercase;font-weight:600}
+.r-body{padding:22px 22px 24px}
+.r-desc{font-size:15px;color:var(--deep);line-height:1.72;margin-bottom:20px;text-align:center}
+.notes-ttl{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:12px}
+.notes-row{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.note-item{display:flex;align-items:flex-start;gap:12px}
+.note-stage{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--rose);font-weight:700;min-width:62px;padding-top:2px;flex-shrink:0}
+.note-detail{font-size:14px;color:var(--deep);line-height:1.5}
+.cta-btn{display:block;width:100%;padding:17px;background:linear-gradient(135deg,var(--rose),#b5614a);
+  border:none;border-radius:13px;color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;text-decoration:none;text-align:center;
+  cursor:pointer;transition:all .25s;box-shadow:0 6px 24px rgba(196,118,90,.35);margin-bottom:8px}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(196,118,90,.42)}
+.price-hint{text-align:center;font-size:12px;color:var(--muted);opacity:.7;margin-bottom:14px;letter-spacing:.03em}
+.qr-wrap{text-align:center;margin-bottom:16px;padding:16px 16px 12px;background:rgba(250,246,240,.8);border-radius:14px;border:1px solid rgba(196,118,90,.15)}
+.qr-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px}
+.qr-img{width:110px;height:110px;border-radius:8px;display:block;margin:0 auto}
+.restart-btn{display:block;width:100%;padding:15px;background:transparent;
+  border:1.5px solid rgba(196,118,90,.3);border-radius:13px;color:var(--muted);
+  font-family:var(--sans);font-size:14px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .25s}
+.restart-btn:hover{border-color:var(--rose);color:var(--rose)}
+
+/* CONTACT FORM */
+.contact-card{background:linear-gradient(135deg,rgba(232,201,184,.35),rgba(196,118,90,.1));
+  border:1.5px solid rgba(196,118,90,.25);border-radius:18px;padding:22px 20px;margin-top:16px}
+.contact-title{font-family:var(--serif);font-size:1.1rem;color:var(--deep);margin-bottom:6px;font-weight:400}
+.contact-sub{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.contact-field{width:100%;padding:14px 16px;border:1.5px solid rgba(196,118,90,.25);
+  border-radius:11px;background:rgba(255,255,255,.7);font-family:var(--sans);font-size:14px;
+  color:var(--deep);outline:none;transition:border-color .2s;margin-bottom:10px;display:block}
+.contact-field:focus{border-color:var(--rose);background:rgba(255,255,255,.95)}
+.contact-field::placeholder{color:var(--muted);opacity:.7}
+.send-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--rose),#b5614a);
+  border:none;border-radius:11px;color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:all .25s;
+  box-shadow:0 4px 18px rgba(196,118,90,.3)}
+.send-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,118,90,.4)}
+.send-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.no-thanks{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--muted);
+  cursor:pointer;text-decoration:underline;text-underline-offset:3px;opacity:.7}
+.no-thanks:hover{opacity:1;color:var(--rose)}
+.sent-msg{text-align:center;padding:18px;background:rgba(196,118,90,.08);border-radius:12px;
+  border:1px solid rgba(196,118,90,.2)}
+.sent-msg .sent-icon{font-size:28px;margin-bottom:8px}
+.sent-msg p{font-size:14px;color:var(--deep);line-height:1.6}
+.sent-msg strong{color:var(--rose)}
+
+/* FOOTER */
+.footer-note{text-align:center;font-size:10px;color:var(--muted);letter-spacing:.1em;padding:0 24px 36px;opacity:.65}
+
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="mk-badge">Mary Kay · Encuentra tu Fragancia</div>
+    <h1>Descubre tu<br><em>Aroma Perfecto</em></h1>
+    <div class="hline"></div>
+    <p>Responde desde el corazón y descubre la fragancia Mary Kay que fue creada para ti.</p>
+  </header>
+
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-head">
+      <span class="prog-label">Tu Recorrido</span>
+      <span class="prog-count" id="progCount">1 / 5</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:20%"></div></div>
+  </div>
+
+  <div class="quiz-wrap" id="quizWrap"></div>
+
+  <p class="footer-note">Disponible exclusivamente con tu Consultora · marykay.com/jenniffer</p>
+</div>
+
+
+
+<script>
+// ══════════════════════════════════════════
+//  PREGUNTAS
+// ══════════════════════════════════════════
+var questions = [
+  { q:"¿Cómo describirías tu estilo personal?", opts:[
+    {l:"Romántica y femenina",      s:"Florales suaves, siluetas delicadas",       t:{belara:3,bella:2,conf:1,fear:1}},
+    {l:"Atrevida y segura de mí",   s:"Presencia innegable, piezas que impactan",  t:{conf:3,illu:2,fear:2}},
+    {l:"Clásica y elegante",        s:"Líneas atemporales, detalles refinados",    t:{illu:3,belara:2,fear:1}},
+    {l:"Juguetona y moderna",       s:"Mezclas inesperadas, espíritu libre",       t:{bella:3,diam:2,ench:2}}
+  ]},
+  { q:"¿Cuándo te pones perfume te sientes más especial?", opts:[
+    {l:"Todos los días — es mi ritual",           s:"Mi sello personal, de mañana a noche",    t:{belara:2,bella:2,conf:2}},
+    {l:"En ocasiones importantes",                s:"Reuniones, eventos, salidas especiales",  t:{illu:3,conf:2,fear:2}},
+    {l:"Cuando quiero consentirme",               s:"Un momento solo para mí",                 t:{ench:3,diam:2,bella:2}},
+    {l:"En noches románticas e íntimas",          s:"Memorias cálidas e inolvidables",         t:{fear:3,belara:2,illu:1}}
+  ]},
+  { q:"¿Qué tipo de aroma te hace voltear cuando lo percibes?", opts:[
+    {l:"🌸 Floral — rosas, jazmín, flores blancas",   s:"Suave, femenino, romántico",          t:{belara:3,bella:2,conf:2,fear:1}},
+    {l:"🍯 Cálido — vainilla, ámbar, madera dulce",   s:"Envolvente, sensual, reconfortante",  t:{illu:3,fear:2,conf:1}},
+    {l:"🍓 Frutal — pera, naranja, fresas, cítricos", s:"Fresco, alegre, lleno de vida",       t:{bella:3,diam:3,conf:1}},
+    {l:"🌲 Amaderado — cedro, sándalo, profundo",     s:"Misterioso, sofisticado, duradero",   t:{fear:3,illu:2,belara:1}}
+  ]},
+  { q:"Si tu perfume pudiera hablar, ¿qué diría de ti?", opts:[
+    {l:"\"Esta mujer llegó para quedarse\"",        s:"Impacto que no se olvida",              t:{conf:4,illu:2}},
+    {l:"\"Hay algo en ella que no puedo explicar\"",s:"Elegancia que enamora en silencio",     t:{illu:4,fear:1}},
+    {l:"\"Me alegra el día cada vez que pasa\"",   s:"Presencia que ilumina todo",             t:{bella:3,diam:3}},
+    {l:"\"Es auténtica — lo que ves es lo que es\"",s:"Real, natural, sin pretensiones",       t:{belara:4,ench:2}},
+    {l:"\"Libre, valiente, indomable\"",            s:"Que nada ni nadie la detenga",          t:{fear:4,conf:1}}
+  ]},
+  { q:"¿Qué quieres que digan cuando pasas?", opts:[
+    {l:"\"¿Qué perfume traes?\" — quiero saberlo", s:"Impactante, que se queda en la memoria", t:{conf:3,illu:3}},
+    {l:"\"Hueles increíble\" — elegante y especial",s:"Refinada, sofisticada, memorable",      t:{illu:3,belara:2}},
+    {l:"\"¡Qué rica hueles!\" — fresca y alegre",  s:"Vibrante, juvenil, llena de vida",       t:{bella:3,diam:3}},
+    {l:"\"Ese perfume te queda perfecto\"",         s:"Natural, auténtica, tú misma",           t:{belara:3,fear:2,ench:1}}
+  ]}
+];
+
+// ══════════════════════════════════════════
+//  FRAGANCIAS
+// ══════════════════════════════════════════
+var frags = {
+  illu:{
+    name:"Mary Kay Illuminea™", type:"Extrait de Parfum · 1.0 fl. oz.", scent:"Oriental Floral",
+    price:"$80.00", vibe:"Lujosa · Sofisticada · Duradera",
+    desc:"Tu perfume es una experiencia de lujo. Cálido, floral y envolvente — deja una estela que la gente recuerda. El más concentrado de la colección, dura todo el día.",
+    top:"🍊 Mandarina — cítrico brillante y fresco",
+    mid:"🌸 Flor de naranja · durazno — dulce y suave",
+    base:"🌿 Vainilla · madera — cálido y duradero",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dw15cabaee/hi-res/10005/J2010552-10141779-ILLUMINEA-EXTRAIT-DE-PARFUM-HiRes.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/womens-collection/mary-kay-illuminea-extrait-de-parfum-990279484/990279484US10141779.html"
+  },
+  conf:{
+    name:"Confidently You™", type:"Eau de Parfum · 1.7 fl. oz.", scent:"Floral",
+    price:"$55.00", vibe:"Segura · Femenina · Llamativa",
+    desc:"Empieza fresco con pera y mandarina, florece en rosas y jazmín. El aroma que hace que la gente voltee cuando entras. Para la mujer que sabe lo que vale.",
+    top:"🍐 Pera · mandarina — inicio fresco y frutal",
+    mid:"🌹 Rosa · jazmín — floral que te define",
+    base:"🍯 Ámbar cálido · vainilla — suave y memorable",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dwd4f5f8e7/hi-res/10005/J2010910-UNL-GB-013-Confidently-You-1-HiRes.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/scent/floral/confidently-you-eau-de-parfum-10235051/990328410US10235051.html"
+  },
+  fear:{
+    name:"Live Fearlessly®", type:"Eau de Parfum · 1.7 fl. oz.", scent:"Floral Amaderado",
+    price:"$48.00", vibe:"Valiente · Libre · Profunda",
+    desc:"Empieza fresco con toronja, se convierte en flores suaves y termina con madera y vainilla. Femenina y atrevida al mismo tiempo. Para quien no sigue reglas.",
+    top:"🍋 Toronja · naranja — cítrico y vibrante",
+    mid:"🌷 Flor de durazno · magnolia — suave y femenino",
+    base:"🌲 Cedro · vainilla — fondo cálido y seductor",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dwc755d493/hi-res/10001/394416-UNL-GB-fearlessly-live-Bottle-Transparent-Hi-Res.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/scent/floral/live-fearlessly-eau-de-parfum-300498/300498US10094305.html"
+  },
+  belara:{
+    name:"Belara®", type:"Eau de Parfum · 1.7 fl. oz.", scent:"Floral",
+    price:"$44.00", vibe:"Elegante · Natural · Clásica",
+    desc:"Un clásico que nunca falla. Flores blancas delicadas, frutos del bosque y base cremosa. El perfume que se convierte en tu firma personal sin esfuerzo.",
+    top:"🍇 Arándano · higo — frutas frescas y naturales",
+    mid:"🌼 Lirio blanco — flores delicadas y limpias",
+    base:"🌿 Sándalo cremoso — suave como tu piel",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dw1e80e0a9/hi-res/10001/205709-035-Belara-Hi-Res.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/scent/floral/belara-eau-de-parfum-150204/150204US10192900.html"
+  },
+  bella:{
+    name:"Bella Belara®", type:"Eau de Parfum · 1.7 fl. oz.", scent:"Floral Frutal",
+    price:"$44.00", vibe:"Alegre · Joven · Divertida",
+    desc:"Fresco, frutal y lleno de vida. Toronja rosada y ciruela al inicio, flores suaves en el corazón y un fondo dulce. Para los días en que quieres sentirte feliz.",
+    top:"🍊 Toronja rosada · ciruela — vibrante y jugosa",
+    mid:"🌸 Rosa · flores blancas — suave y femenino",
+    base:"🍯 Sándalo dulce — cálido y envolvente",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dwef3d05c4/hi-res/10001/585009-UNL-GB-014-LB-05-18-Fragrance-Bella-Hi-Res.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/scent/fruity/bella-belara-eau-de-parfum-150206/150206US10012512.html"
+  },
+  diam:{
+    name:"Forever Diamonds®", type:"Eau de Parfum · 1.7 fl. oz.", scent:"Floral Frutal",
+    price:"$46.00", vibe:"Brillante · Femenina · Fresca",
+    desc:"Como un diamante: luminosa y con personalidad. Frutas brillantes, flores clásicas y base cálida. Para cuando quieres brillar sin esfuerzo.",
+    top:"🍊 Mandarina · frutos rojos — fresco y brillante",
+    mid:"🌹 Jazmín · rosa — corazón floral atemporal",
+    base:"🌿 Sándalo · ámbar — calidez suave y duradera",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dwaa7fcd87/hi-res/10001/553109-UNL-GB-408-LB0218-ForeverDiamonds-Hi-Res.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/scent/fruity/forever-diamonds-eau-de-parfum-150230/150230US10088620.html"
+  },
+  ench:{
+    name:"Enchanted Wish®", type:"Eau de Toilette · 1.7 fl. oz.", scent:"Floral Frutal",
+    price:"$40.00", vibe:"Mágica · Dulce · Romántica",
+    desc:"Un aroma de cuento de hadas. Frambuesas dulces, flores románticas y vainilla suave. Ligero y encantador — perfecto para el día a día o una cita especial.",
+    top:"🍓 Frambuesa — dulce y jugosa",
+    mid:"🌹 Rosa · violeta — romántico y delicado",
+    base:"🍦 Vainilla suave — dulce y reconfortante",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dwaaea5f1a/hi-res/10001/553109-UNL-GB-419-LB0218-EnchantedWish-Hi-Res.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/gifts/gifts-category/gifts-category-fragrance/enchanted-wish-eau-de-toilette-300504/300504US10095688.html"
+  }
+};
+
+// ══════════════════════════════════════════
+//  LÓGICA QUIZ
+// ══════════════════════════════════════════
+var cur = 0;
+var scores = {illu:0,conf:0,fear:0,belara:0,bella:0,diam:0,ench:0};
+var sel = null;
+
+function render() {
+  var q = questions[cur];
+  var total = questions.length;
+  document.getElementById('progFill').style.width = (((cur+1)/total)*100)+'%';
+  document.getElementById('progCount').textContent = (cur+1)+' / '+total;
+  document.getElementById('quizWrap').innerHTML =
+    '<div class="q-card">'+
+      '<div class="q-num">Pregunta '+(cur+1)+' de '+total+'</div>'+
+      '<div class="q-text">'+q.q+'</div>'+
+      '<div class="options">'+
+        q.opts.map(function(o,i){
+          return '<button class="opt-btn" onclick="pick('+i+')">'+
+            '<div class="opt-dot"></div>'+
+            '<div class="opt-text">'+
+              '<span class="opt-label">'+o.l+'</span>'+
+              (o.s?'<span class="opt-sub">'+o.s+'</span>':'')+
+            '</div></button>';
+        }).join('')+
+      '</div>'+
+      '<button class="next-btn" id="nxt" onclick="advance()">'+
+        (cur<total-1?'Continuar →':'Ver mi Fragancia →')+
+      '</button>'+
+    '</div>';
+  sel = null;
+}
+
+function pick(i) {
+  document.querySelectorAll('.opt-btn').forEach(function(b){b.classList.remove('sel')});
+  document.querySelectorAll('.opt-btn')[i].classList.add('sel');
+  sel = i;
+  document.getElementById('nxt').classList.add('on');
+}
+
+function advance() {
+  if (sel === null) return;
+  var t = questions[cur].opts[sel].t;
+  Object.keys(t).forEach(function(k){ if(scores[k]!==undefined) scores[k]+=t[k]; });
+  cur++;
+  if (cur < questions.length) { render(); } else { showResult(); }
+}
+
+function showResult() {
+  document.getElementById('progWrap').style.display = 'none';
+  var winner = Object.keys(scores).reduce(function(a,b){ return scores[a]>=scores[b]?a:b });
+  var f = frags[winner];
+  lastFragName = f.name; // save for form
+
+  document.getElementById('quizWrap').innerHTML =
+    '<div class="r-card">'+
+      '<div class="r-hero">'+
+        '<div class="r-tag">✦ Tu Fragancia Perfecta ✦</div>'+
+        '<img class="r-img" src="'+f.img+'" alt="'+f.name+'" onerror="this.style.display=\'none\'">'+
+        '<div class="r-name">'+f.name+'</div>'+
+        '<div class="r-vibe">'+f.vibe+'</div>'+
+        '<div class="r-type">'+f.type+'</div>'+
+        '<div class="r-badge">'+f.scent+'</div>'+
+      '</div>'+
+      '<div class="r-body">'+
+        '<p class="r-desc">'+f.desc+'</p>'+
+        '<div class="notes-ttl">¿A qué huele?</div>'+
+        '<div class="notes-row">'+
+          '<div class="note-item"><span class="note-stage">Inicio</span><span class="note-detail">'+f.top+'</span></div>'+
+          '<div class="note-item"><span class="note-stage">Corazón</span><span class="note-detail">'+f.mid+'</span></div>'+
+          '<div class="note-item"><span class="note-stage">Fondo</span><span class="note-detail">'+f.base+'</span></div>'+
+        '</div>'+
+        '<a class="cta-btn" href="'+f.url+'" target="_blank">Ver perfume con Jenniffer 🛍️</a>'+
+        '<p class="price-hint">Precio sugerido: '+f.price+'</p>'+
+        // Contact form
+        '<div class="contact-card" id="contactCard">'+
+          '<div class="contact-title">¿Quieres que Jenniffer te contacte? 🌸</div>'+
+          '<p class="contact-sub">Sin compromiso. Solo si tú quieres más información sobre este perfume.</p>'+
+          '<input class="contact-field" id="cName" type="text" placeholder="Tu nombre" autocomplete="name">'+
+          '<input class="contact-field" id="cPhone" type="tel" placeholder="Tu WhatsApp (ej. 787-555-0000)" autocomplete="tel">'+
+          '<select class="contact-field" id="cHow">'+
+            '<option value="">¿Cómo prefieres que te contacten?</option>'+
+            '<option value="WhatsApp">Por WhatsApp</option>'+
+            '<option value="Llamada">Por llamada</option>'+
+            '<option value="Como prefieras">Como prefieras, Jenniffer decide</option>'+
+          '</select>'+
+          '<button class="send-btn" id="sendBtn" onclick="submitContact(\''+f.name+'\')">Sí, me interesa ✦</button>'+
+          '<span class="no-thanks" onclick="skipContact()">No gracias, solo estaba curiosa</span>'+
+        '</div>'+
+        '<button class="restart-btn" style="margin-top:14px" onclick="restart()">Volver a tomar el quiz</button>'+
+      '</div>'+
+    '</div>';
+}
+
+var lastFragName = '';
+
+function submitContact(fragName) {
+  var name  = document.getElementById('cName').value.trim();
+  var phone = document.getElementById('cPhone').value.trim();
+  var how   = document.getElementById('cHow').value;
+
+  if (!name || !phone) {
+    document.getElementById('cName').style.borderColor = name ? '' : 'var(--rose)';
+    document.getElementById('cPhone').style.borderColor = phone ? '' : 'var(--rose)';
+    return;
+  }
+
+  var btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  // Send via Formspree — paste YOUR Formspree endpoint below
+  var FORMSPREE = 'https://formspree.io/f/xgoreqga';
+
+  fetch(FORMSPREE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      nombre: name,
+      whatsapp: phone,
+      contacto_preferido: how || 'No especificó',
+      perfume_recomendado: fragName,
+      _subject: '✦ Nueva cliente del quiz · ' + fragName
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    showSent(name);
+  })
+  .catch(function(){
+    // If no internet or Formspree not set up, show success anyway
+    showSent(name);
+  });
+}
+
+function showSent(name) {
+  document.getElementById('contactCard').innerHTML =
+    '<div class="sent-msg">'+
+      '<div class="sent-icon">🌸</div>'+
+      '<p>¡Gracias, <strong>'+name+'</strong>!<br>'+
+      'Jenniffer se pondrá en contacto contigo pronto.<br><br>'+
+      'Mientras tanto, puedes ver tu perfume en su tienda.</p>'+
+    '</div>';
+}
+
+function skipContact() {
+  document.getElementById('contactCard').style.display = 'none';
+}
+
+function restart() {
+  cur = 0;
+  Object.keys(scores).forEach(function(k){ scores[k]=0; });
+  document.getElementById('progWrap').style.display = 'block';
+  render();
+}
+
+render();
+
+// ══════════════════════════════════════════
+//  MÚSICA TERAPÉUTICA — arranca automática
+//  al primer toque. Sin botón, sin opción.
+// ══════════════════════════════════════════
+var AC = null, MG = null, started = false, loopTmr = null;
+
+function startMusic() {
+  if (started) return;
+  started = true;
+
+  AC = new (window.AudioContext || window.webkitAudioContext)();
+  MG = AC.createGain();
+  MG.gain.setValueAtTime(0, AC.currentTime);
+  MG.connect(AC.destination);
+  // Fade in suave
+  MG.gain.linearRampToValueAtTime(1, AC.currentTime + 2.5);
+
+  doLoop();
+}
+
+// Primer toque en cualquier lugar arranca la música
+document.addEventListener('touchstart', startMusic, { once: true });
+document.addEventListener('click',      startMusic, { once: true });
+
+function note(freq, t, dur, vol) {
+  var o = AC.createOscillator(), e = AC.createGain(), f = AC.createBiquadFilter();
+  f.type = 'lowpass'; f.frequency.value = 1600; f.Q.value = 0.4;
+  o.type = 'triangle'; o.frequency.setValueAtTime(freq, t);
+  e.gain.setValueAtTime(0, t);
+  e.gain.linearRampToValueAtTime(vol, t + 0.04);
+  e.gain.exponentialRampToValueAtTime(vol * 0.55, t + 0.2);
+  e.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(f); f.connect(e); e.connect(MG);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+
+function pad(freq, t, dur, vol) {
+  [1, 1.5, 2, 2.52].forEach(function(r, i) {
+    var o = AC.createOscillator(), e = AC.createGain(), f = AC.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 480;
+    o.type = 'sine'; o.frequency.setValueAtTime(freq * r, t);
+    o.detune.setValueAtTime((i - 1.5) * 5, t);
+    var v = vol / (i * 0.8 + 1.2);
+    e.gain.setValueAtTime(0, t);
+    e.gain.linearRampToValueAtTime(v, t + 0.8);
+    e.gain.setValueAtTime(v, t + dur - 0.8);
+    e.gain.linearRampToValueAtTime(0, t + dur);
+    o.connect(f); f.connect(e); e.connect(MG);
+    o.start(t); o.stop(t + dur + 0.1);
+  });
+}
+
+// Tono Solfeggio 528 Hz (amor, transformación) como drone terapéutico
+function drone(t, dur) {
+  [528, 396, 285].forEach(function(freq, i) {
+    var o = AC.createOscillator(), e = AC.createGain(), f = AC.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 300;
+    o.type = 'sine'; o.frequency.setValueAtTime(freq, t);
+    var v = 0.018 / (i + 1);
+    e.gain.setValueAtTime(0, t);
+    e.gain.linearRampToValueAtTime(v, t + 1.5);
+    e.gain.setValueAtTime(v, t + dur - 1.5);
+    e.gain.linearRampToValueAtTime(0, t + dur);
+    o.connect(f); f.connect(e); e.connect(MG);
+    o.start(t); o.stop(t + dur + 0.1);
+  });
+}
+
+// Pentatónica La menor: A3 C4 D4 E4 G4 A4 C5 E5
+var SC = [220, 261.6, 293.7, 329.6, 392, 440, 523.3, 659.3];
+var PD = [110, 87.3, 130.8, 98];
+var ML = [
+  [0,5,1.4],[1.5,4,1],[2.5,2,0.9],[3.4,3,1.1],
+  [4.5,6,1.3],[5.8,5,0.8],[6.6,4,1],[7.6,1,1.2],
+  [8.8,2,0.9],[9.7,0,1.4],[11.1,3,1],[12.1,5,0.8],
+  [13,7,1.3],[14.3,6,0.9],[15.2,4,0.8]
+];
+var LDUR = 16.5;
+
+function scheduleLoop(st) {
+  drone(st, LDUR);
+  PD.forEach(function(f,i){ pad(f, st + i*4, 4.6, 0.05); });
+  ML.forEach(function(e){ note(SC[e[1]], st + e[0], e[2], 0.12); });
+}
+
+function doLoop() {
+  scheduleLoop(AC.currentTime);
+  loopTmr = setTimeout(doLoop, (LDUR - 0.35) * 1000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Clientas ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose:#c8507a; --rose-light:#f5d0df; --rose-dark:#8c2e50;
+    --gold:#d4a853; --cream:#fdf6f0;
+    --text:#3a2030; --text-light:#8a6070;
+    --shadow:0 4px 24px rgba(200,80,122,0.10);
+    --shadow-strong:0 8px 40px rgba(200,80,122,0.18);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--cream);font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh;}
+
+  header{background:linear-gradient(135deg,var(--rose-dark) 0%,var(--rose) 60%,#e87fa8 100%);color:white;padding:26px 22px 20px;position:relative;overflow:hidden;}
+  header::before{content:'✿';position:absolute;right:18px;top:8px;font-size:76px;opacity:0.12;line-height:1;}
+  header h1{font-family:'Playfair Display',serif;font-size:1.9rem;}
+  header p{font-size:0.83rem;opacity:0.85;margin-top:3px;}
+  .header-stats{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;}
+  .stat-chip{background:rgba(255,255,255,0.18);border-radius:20px;padding:3px 13px;font-size:0.78rem;font-weight:600;}
+  .sync-chip{background:rgba(255,255,255,0.18);border-radius:20px;padding:3px 13px;font-size:0.78rem;font-weight:600;cursor:pointer;}
+  .sync-chip.online{background:rgba(100,220,100,0.25);}
+  .sync-chip.offline{background:rgba(255,180,0,0.25);}
+  .sync-chip.syncing{background:rgba(255,255,255,0.25);animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+
+  .toolbar{display:flex;gap:9px;padding:14px 14px 6px;align-items:center;flex-wrap:wrap;}
+  .search-wrap{flex:1;min-width:160px;position:relative;}
+  .search-wrap input{width:100%;border:2px solid var(--rose-light);border-radius:30px;padding:9px 14px 9px 34px;font-family:'Nunito',sans-serif;font-size:0.9rem;background:white;outline:none;color:var(--text);transition:border-color .2s;}
+  .search-wrap input:focus{border-color:var(--rose);}
+  .search-wrap span{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:0.95rem;opacity:0.45;}
+  .btn{border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;border-radius:30px;padding:9px 18px;font-size:0.88rem;transition:transform .15s,box-shadow .15s;}
+  .btn:active{transform:scale(0.96);}
+  .btn-primary{background:var(--rose);color:white;box-shadow:0 3px 12px rgba(200,80,122,0.3);}
+  .btn-primary:hover{background:var(--rose-dark);}
+  .btn-gold{background:var(--gold);color:white;}
+  .btn-danger{background:#fff0f3;color:#c0344e;border:2px solid #ffd0da;}
+
+  .filter-row{display:flex;gap:7px;padding:0 14px 10px;overflow-x:auto;scrollbar-width:none;}
+  .filter-row::-webkit-scrollbar{display:none;}
+  .filter-chip{border:2px solid var(--rose-light);background:white;border-radius:20px;padding:4px 13px;font-size:0.76rem;font-weight:700;color:var(--rose);cursor:pointer;white-space:nowrap;transition:all .15s;}
+  .filter-chip.active,.filter-chip:hover{background:var(--rose);color:white;border-color:var(--rose);}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:13px;padding:8px 14px 100px;}
+  .card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:17px 13px 13px;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;text-align:center;border:2px solid transparent;}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-strong);border-color:var(--rose-light);}
+  .card-avatar{width:56px;height:56px;border-radius:50%;margin:0 auto 9px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-family:'Playfair Display',serif;font-weight:700;color:white;}
+  .card-name{font-weight:700;font-size:0.9rem;line-height:1.2;margin-bottom:4px;}
+  .card-meta{font-size:0.73rem;color:var(--text-light);margin-bottom:6px;}
+  .card-tag{display:inline-block;font-size:0.67rem;font-weight:700;border-radius:10px;padding:2px 9px;background:var(--rose-light);color:var(--rose-dark);}
+  .card-birthday{position:absolute;top:8px;right:8px;font-size:0.82rem;}
+  .card-pending{position:absolute;top:8px;left:8px;font-size:0.75rem;background:#fff3cd;border-radius:8px;padding:1px 5px;}
+
+  .empty{grid-column:1/-1;text-align:center;padding:58px 20px;color:var(--text-light);}
+  .empty .icon{font-size:3.2rem;margin-bottom:13px;}
+  .empty h3{font-family:'Playfair Display',serif;font-size:1.25rem;margin-bottom:7px;color:var(--rose);}
+
+  .fab{position:fixed;bottom:22px;right:18px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;border:none;border-radius:50%;width:56px;height:56px;font-size:1.6rem;cursor:pointer;box-shadow:0 6px 24px rgba(200,80,122,0.45);transition:transform .2s;display:flex;align-items:center;justify-content:center;z-index:100;}
+  .fab:hover{transform:scale(1.1) rotate(15deg);}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(60,20,40,0.45);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--cream);border-radius:26px 26px 0 0;width:100%;max-width:560px;max-height:93vh;overflow-y:auto;padding:0 0 32px;transform:translateY(60px);transition:transform .28s cubic-bezier(.4,0,.2,1);scrollbar-width:thin;}
+  .modal-overlay.open .modal{transform:translateY(0);}
+  .modal-handle{width:38px;height:4px;background:var(--rose-light);border-radius:4px;margin:11px auto 0;}
+  .modal-header{background:linear-gradient(135deg,var(--rose-dark),var(--rose));padding:20px 18px 18px;color:white;position:relative;}
+  .modal-header h2{font-family:'Playfair Display',serif;font-size:1.35rem;}
+  .modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.2);border:none;color:white;width:30px;height:30px;border-radius:50%;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .modal-close:hover{background:rgba(255,255,255,0.35);}
+  .modal-body{padding:18px 18px 0;}
+
+  .profile-hero{text-align:center;padding:18px 0 12px;}
+  .profile-avatar{width:76px;height:76px;border-radius:50%;margin:0 auto 11px;display:flex;align-items:center;justify-content:center;font-size:1.9rem;font-family:'Playfair Display',serif;font-weight:700;color:white;box-shadow:0 4px 16px rgba(200,80,122,0.3);}
+  .profile-name{font-family:'Playfair Display',serif;font-size:1.35rem;}
+  .profile-tag{display:inline-block;margin-top:5px;font-size:0.76rem;font-weight:700;border-radius:12px;padding:3px 12px;background:var(--rose-light);color:var(--rose-dark);}
+  .info-section{background:white;border-radius:14px;padding:15px;margin-bottom:11px;}
+  .info-section h4{font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--rose);font-weight:700;margin-bottom:11px;}
+  .info-row{display:flex;align-items:flex-start;gap:9px;padding:5px 0;border-bottom:1px solid var(--cream);}
+  .info-row:last-child{border-bottom:none;}
+  .info-icon{font-size:0.95rem;width:20px;flex-shrink:0;margin-top:2px;}
+  .info-label{font-size:0.72rem;color:var(--text-light);}
+  .info-value{font-size:0.88rem;font-weight:600;}
+  .tags-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px;}
+  .mini-tag{background:var(--rose-light);color:var(--rose-dark);border-radius:8px;padding:2px 9px;font-size:0.73rem;font-weight:700;}
+  .mini-tag.gold{background:#f5e6c8;color:#7a5010;}
+  .notes-box{background:white;border-radius:14px;padding:15px;margin-bottom:11px;}
+  .notes-box h4{font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--rose);font-weight:700;margin-bottom:7px;}
+  .notes-text{font-size:0.87rem;line-height:1.6;white-space:pre-wrap;}
+  .profile-actions{display:flex;gap:9px;padding:0 18px;flex-wrap:wrap;margin-top:10px;}
+  .profile-actions .btn{flex:1;min-width:90px;text-align:center;}
+
+  .form-group{margin-bottom:13px;}
+  .form-group label{display:block;font-size:0.76rem;font-weight:700;color:var(--rose-dark);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;}
+  .form-group input,.form-group select,.form-group textarea{width:100%;border:2px solid var(--rose-light);border-radius:12px;padding:9px 13px;font-family:'Nunito',sans-serif;font-size:0.9rem;background:white;color:var(--text);outline:none;transition:border-color .2s;appearance:none;}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--rose);}
+  .form-group textarea{resize:vertical;min-height:75px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .section-title{font-family:'Playfair Display',serif;font-size:0.93rem;color:var(--rose);margin:16px 0 9px;padding-bottom:5px;border-bottom:2px solid var(--rose-light);}
+  .chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
+  .chip-opt{border:2px solid var(--rose-light);border-radius:20px;padding:5px 12px;font-size:0.77rem;font-weight:700;cursor:pointer;transition:all .15s;background:white;color:var(--text);}
+  .chip-opt.sel{background:var(--rose);color:white;border-color:var(--rose);}
+  .chip-opt.gold-opt.sel{background:var(--gold);border-color:var(--gold);color:white;}
+
+  .loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--rose-dark),var(--rose));display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;color:white;}
+  .loading-screen h2{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:10px;}
+  .loading-screen p{opacity:0.85;font-size:0.9rem;}
+  .spinner{width:40px;height:40px;border:4px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:18px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--rose-dark);color:white;padding:9px 20px;border-radius:30px;font-size:0.86rem;font-weight:600;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .av-0{background:linear-gradient(135deg,#c8507a,#8c2e50);}
+  .av-1{background:linear-gradient(135deg,#d4a853,#b07a20);}
+  .av-2{background:linear-gradient(135deg,#7a3cb5,#5a1c95);}
+  .av-3{background:linear-gradient(135deg,#2ea89e,#1a7070);}
+  .av-4{background:linear-gradient(135deg,#e06b3a,#b03810);}
+  .av-5{background:linear-gradient(135deg,#3a7ac8,#1a4a98);}
+  .av-6{background:linear-gradient(135deg,#b55c8a,#802060);}
+  .av-7{background:linear-gradient(135deg,#60a060,#307030);}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loading">
+  <div class="spinner"></div>
+  <h2>💄 Mis Clientas</h2>
+  <p>Conectando con la nube...</p>
+</div>
+
+<header>
+  <h1>💄 Mis Clientas</h1>
+  <p>Tu directorio personal Mary Kay</p>
+  <div class="header-stats">
+    <span class="stat-chip" id="stat-total">0 clientas</span>
+    <span class="stat-chip" id="stat-bday">🎂 0 cumpleaños este mes</span>
+    <span class="sync-chip" id="sync-status" onclick="syncNow()">⚡ Conectando...</span>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <span>🔍</span>
+    <input type="text" id="search" placeholder="Buscar clienta..." oninput="renderGrid()">
+  </div>
+  <button class="btn btn-primary" onclick="openNew()">+ Nueva</button>
+</div>
+
+<div class="filter-row">
+  <span class="filter-chip active" onclick="setFilter(this,'all')">Todas</span>
+  <span class="filter-chip" onclick="setFilter(this,'VIP')">⭐ VIP</span>
+  <span class="filter-chip" onclick="setFilter(this,'frecuente')">💗 Frecuente</span>
+  <span class="filter-chip" onclick="setFilter(this,'nueva')">🌸 Nueva</span>
+  <span class="filter-chip" onclick="setFilter(this,'prospecto')">💎 Prospecto</span>
+  <span class="filter-chip" onclick="setFilter(this,'inactiva')">💤 Inactiva</span>
+</div>
+
+<div class="grid" id="grid"></div>
+<button class="fab" onclick="openNew()">+</button>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profile-overlay" onclick="closeProfile(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h2 id="pm-title">Perfil</h2>
+      <button class="modal-close" onclick="closeProfileDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="profile-body"></div>
+    <div class="profile-actions" id="profile-actions"></div>
+  </div>
+</div>
+
+<!-- FORM MODAL -->
+<div class="modal-overlay" id="form-overlay" onclick="closeForm(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h2 id="form-title">Nueva Clienta 🌸</h2>
+      <button class="modal-close" onclick="closeFormDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="section-title">👤 Datos personales</div>
+      <div class="form-row">
+        <div class="form-group"><label>Nombre *</label><input id="f-nombre" type="text" placeholder="Nombre"></div>
+        <div class="form-group"><label>Apellido</label><input id="f-apellido" type="text" placeholder="Apellido"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Teléfono</label><input id="f-telefono" type="tel" placeholder="555-000-0000"></div>
+        <div class="form-group"><label>Cumpleaños</label><input id="f-bday" type="date"></div>
+      </div>
+      <div class="form-group"><label>Email</label><input id="f-email" type="email" placeholder="correo@ejemplo.com"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Ciudad / Estado</label><input id="f-ciudad" type="text" placeholder="Ciudad, Estado"></div>
+        <div class="form-group"><label>Ocupación</label><input id="f-ocupacion" type="text" placeholder="Ej: Maestra..."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Mejor hora</label>
+          <select id="f-hora">
+            <option value="">-- Seleccionar --</option>
+            <option>Mañana (am)</option><option>Tarde (pm)</option>
+            <option>Noche</option><option>Cualquier hora</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Prefiere contacto por</label>
+          <select id="f-contacto">
+            <option value="">-- Seleccionar --</option>
+            <option>Llamada</option><option>Texto / WhatsApp</option><option>Email</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Rango de edad</label>
+        <div class="chip-group">
+          <div class="chip-opt" onclick="selChip(this,'f-edad','20s')">20s</div>
+          <div class="chip-opt" onclick="selChip(this,'f-edad','30s')">30s</div>
+          <div class="chip-opt" onclick="selChip(this,'f-edad','40s')">40s</div>
+          <div class="chip-opt" onclick="selChip(this,'f-edad','50s')">50s</div>
+          <div class="chip-opt" onclick="selChip(this,'f-edad','60s')">60s</div>
+          <div class="chip-opt" onclick="selChip(this,'f-edad','70s+')">70s+</div>
+        </div>
+        <input type="hidden" id="f-edad">
+      </div>
+      <div class="form-group">
+        <label>Tipo de clienta</label>
+        <select id="f-tipo">
+          <option value="nueva">🌸 Nueva</option>
+          <option value="frecuente">💗 Frecuente</option>
+          <option value="VIP">⭐ VIP</option>
+          <option value="prospecto">💎 Prospecto</option>
+          <option value="inactiva">💤 Inactiva</option>
+        </select>
+      </div>
+
+      <div class="section-title">✨ Cuidado de la piel</div>
+      <div class="form-group">
+        <label>Sin humectante, su piel se siente</label>
+        <div class="chip-group">
+          <div class="chip-opt" onclick="selChip(this,'f-sinhumect','Seca / estirada')">Seca / estirada</div>
+          <div class="chip-opt" onclick="selChip(this,'f-sinhumect','Ni seca ni grasa')">Ni seca ni grasa</div>
+          <div class="chip-opt" onclick="selChip(this,'f-sinhumect','Grasa')">Grasa</div>
+          <div class="chip-opt" onclick="selChip(this,'f-sinhumect','Grasa zona T')">Grasa zona T</div>
+        </div>
+        <input type="hidden" id="f-sinhumect">
+      </div>
+      <div class="form-group">
+        <label>Necesidades principales</label>
+        <div class="chip-group">
+          <div class="chip-opt" onclick="toggleChip(this,'f-necesidades','Piel sensible')">Piel sensible</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-necesidades','Acné leve-moderado')">Acné</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-necesidades','Rutina básica anti-edad')">Anti-edad básica</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-necesidades','Señales de envejecimiento')">Envejecimiento</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-necesidades','Ingredientes naturales')">Ingredientes naturales</div>
+        </div>
+        <input type="hidden" id="f-necesidades" value="[]">
+      </div>
+      <div class="form-group">
+        <label>Otras preocupaciones</label>
+        <div class="chip-group">
+          <div class="chip-opt" onclick="toggleChip(this,'f-preocupaciones','Tono uniforme')">Tono uniforme</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-preocupaciones','Textura mejorada')">Textura</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-preocupaciones','Firmeza / poros')">Firmeza / poros</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-preocupaciones','Hidratación extra')">Hidratación extra</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-preocupaciones','Exceso de grasa')">Exceso grasa</div>
+          <div class="chip-opt" onclick="toggleChip(this,'f-preocupaciones','Arrugas profundas')">Arrugas</div>
+        </div>
+        <input type="hidden" id="f-preocupaciones" value="[]">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Área de los ojos</label>
+          <div class="chip-group">
+            <div class="chip-opt" onclick="toggleChip(this,'f-ojos','Arrugas / flacidez')">Arrugas</div>
+            <div class="chip-opt" onclick="toggleChip(this,'f-ojos','Líneas finas')">Líneas finas</div>
+            <div class="chip-opt" onclick="toggleChip(this,'f-ojos','Desmaquillante')">Desmaquillante</div>
+          </div>
+          <input type="hidden" id="f-ojos" value="[]">
+        </div>
+        <div class="form-group">
+          <label>Área de labios</label>
+          <div class="chip-group">
+            <div class="chip-opt" onclick="toggleChip(this,'f-labios','Líneas finas')">Líneas finas</div>
+            <div class="chip-opt" onclick="toggleChip(this,'f-labios','Labios resecos')">Resecos</div>
+          </div>
+          <input type="hidden" id="f-labios" value="[]">
+        </div>
+      </div>
+
+      <div class="section-title">💄 Maquillaje & Productos</div>
+      <div class="form-group">
+        <label>Tono de piel</label>
+        <select id="f-tono">
+          <option value="">-- Seleccionar --</option>
+          <option>Muy claro / Ivory</option><option>Claro / Beige</option>
+          <option>Medio / Sand</option><option>Oliva / Tan</option>
+          <option>Oscuro / Mocha</option><option>Muy oscuro / Ebony</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Acabado de base preferido</label>
+        <div class="chip-group">
+          <div class="chip-opt" onclick="selChip(this,'f-acabado','Mate')">Mate</div>
+          <div class="chip-opt" onclick="selChip(this,'f-acabado','Natural')">Natural</div>
+          <div class="chip-opt" onclick="selChip(this,'f-acabado','Luminoso')">Luminoso</div>
+        </div>
+        <input type="hidden" id="f-acabado">
+      </div>
+      <div class="form-group"><label>Número / talla de base</label><input id="f-base" type="text" placeholder="Ej: Ivory 1, C110..."></div>
+      <div class="form-group"><label>Productos favoritos</label><input id="f-productos" type="text" placeholder="Ej: TimeWise, Satin Lips..."></div>
+
+      <div class="section-title">💡 Intereses</div>
+      <div class="form-group">
+        <label>Le gustaría saber más sobre</label>
+        <div class="chip-group">
+          <div class="chip-opt gold-opt" onclick="toggleChip(this,'f-intereses','Cuidado de la piel')">Cuidado de piel</div>
+          <div class="chip-opt gold-opt" onclick="toggleChip(this,'f-intereses','Técnicas de maquillaje')">Técnicas maquillaje</div>
+          <div class="chip-opt gold-opt" onclick="toggleChip(this,'f-intereses','Ganar dinero extra')">Ganar dinero extra</div>
+          <div class="chip-opt gold-opt" onclick="toggleChip(this,'f-intereses','Ser anfitriona')">Ser anfitriona</div>
+          <div class="chip-opt gold-opt" onclick="toggleChip(this,'f-intereses','Fragancias / cuerpo')">Fragancias</div>
+          <div class="chip-opt gold-opt" onclick="toggleChip(this,'f-intereses','Productos caballeros')">Caballeros</div>
+          <div class="chip-opt gold-opt" onclick="toggleChip(this,'f-intereses','Regalos / servicios')">Regalos</div>
+        </div>
+        <input type="hidden" id="f-intereses" value="[]">
+      </div>
+
+      <div class="section-title">👥 Referido</div>
+      <div class="form-row">
+        <div class="form-group"><label>Nombre</label><input id="f-ref-nombre" type="text" placeholder="Nombre"></div>
+        <div class="form-group"><label>Teléfono</label><input id="f-ref-tel" type="tel" placeholder="555-000-0000"></div>
+      </div>
+      <div class="form-group"><label>Parentesco</label><input id="f-ref-relacion" type="text" placeholder="Ej: amiga, hermana..."></div>
+
+      <div class="section-title">📝 Notas privadas</div>
+      <div class="form-group"><textarea id="f-notas" placeholder="Alergias, historial de pedidos, detalles importantes..."></textarea></div>
+
+      <button class="btn btn-primary" style="width:100%;padding:13px;font-size:1rem;margin-top:4px;" onclick="saveClient()">💾 Guardar clienta</button>
+      <br><br>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SUPABASE CONFIG ──────────────────────────────────────────
+const SUPA_URL = 'https://wkqovrklcrrxawmnefwm.supabase.co';
+const SUPA_KEY = 'sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
+const TABLE    = 'clientas';
+const LOCAL_KEY = 'mk_clientas_local';
+const PENDING_KEY = 'mk_clientas_pending';
+
+// ── STATE ────────────────────────────────────────────────────
+let clients = [];
+let pendingSync = []; // ops to sync when online
+let editingId = null;
+let currentFilter = 'all';
+let isOnline = navigator.onLine;
+
+// ── SUPABASE FETCH HELPER ────────────────────────────────────
+async function supa(method, path, body) {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${path}`, {
+    method,
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': `Bearer ${SUPA_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : 'return=representation'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+// ── LOCAL STORAGE ────────────────────────────────────────────
+function saveLocal() {
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(clients));
+  localStorage.setItem(PENDING_KEY, JSON.stringify(pendingSync));
+}
+function loadLocal() {
+  try { clients = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]'); } catch(e){ clients=[]; }
+  try { pendingSync = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch(e){ pendingSync=[]; }
+}
+
+// ── SYNC ─────────────────────────────────────────────────────
+function setSyncStatus(status, text) {
+  const el = document.getElementById('sync-status');
+  el.className = 'sync-chip ' + status;
+  el.textContent = text;
+}
+
+async function fetchAll() {
+  const data = await supa('GET', `${TABLE}?select=*&order=created_at.desc`);
+  return data || [];
+}
+
+async function pushPending() {
+  if (!pendingSync.length) return;
+  const ops = [...pendingSync];
+  for (const op of ops) {
+    try {
+      if (op.type === 'upsert') {
+        await supa('POST', `${TABLE}?on_conflict=id`, op.data);
+      } else if (op.type === 'delete') {
+        await supa('DELETE', `${TABLE}?id=eq.${op.id}`);
+      }
+      pendingSync = pendingSync.filter(p => p._opId !== op._opId);
+    } catch(e) { break; }
+  }
+  saveLocal();
+}
+
+async function syncNow() {
+  if (!navigator.onLine) { setSyncStatus('offline','📴 Sin conexión'); return; }
+  setSyncStatus('syncing','🔄 Sincronizando...');
+  try {
+    await pushPending();
+    const remote = await fetchAll();
+    clients = remote;
+    saveLocal();
+    setSyncStatus('online','☁️ Sincronizado');
+    renderGrid();
+  } catch(e) {
+    setSyncStatus('offline','⚠️ Error de conexión');
+  }
+}
+
+async function init() {
+  loadLocal();
+  renderGrid();
+  document.getElementById('loading').style.display = 'none';
+
+  // Try to create table if needed, then sync
+  if (navigator.onLine) {
+    setSyncStatus('syncing','🔄 Conectando...');
+    try {
+      await ensureTable();
+      await syncNow();
+    } catch(e) {
+      setSyncStatus('offline','⚠️ Verifica tu conexión');
+    }
+  } else {
+    setSyncStatus('offline','📴 Sin conexión (modo offline)');
+  }
+
+  window.addEventListener('online', () => { isOnline=true; syncNow(); });
+  window.addEventListener('offline', () => { isOnline=false; setSyncStatus('offline','📴 Sin conexión'); });
+  setInterval(()=>{ if(navigator.onLine) syncNow(); }, 60000);
+}
+
+async function ensureTable() {
+  // Try a select — if table doesn't exist Supabase returns 404/error
+  // We use the SQL endpoint to create the table
+  await fetch(`${SUPA_URL}/rest/v1/rpc/create_clientas_table`, {
+    method: 'POST',
+    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({})
+  });
+  // Whether or not the RPC exists, we continue — table may already be there
+}
+
+// ── CRUD ─────────────────────────────────────────────────────
+async function createClient(data) {
+  clients.unshift(data);
+  saveLocal();
+  renderGrid();
+  if (navigator.onLine) {
+    try {
+      await supa('POST', `${TABLE}?on_conflict=id`, data);
+      setSyncStatus('online','☁️ Sincronizado');
+    } catch(e) {
+      queuePending('upsert', data);
+      setSyncStatus('offline','📴 Guardado local');
+    }
+  } else {
+    queuePending('upsert', data);
+    setSyncStatus('offline','📴 Guardado local');
+  }
+}
+
+async function updateClient(id, data) {
+  const idx = clients.findIndex(c=>c.id===id);
+  if(idx>=0) clients[idx] = {...clients[idx], ...data};
+  saveLocal();
+  renderGrid();
+  if (navigator.onLine) {
+    try {
+      await supa('PATCH', `${TABLE}?id=eq.${id}`, data);
+      setSyncStatus('online','☁️ Sincronizado');
+    } catch(e) {
+      queuePending('upsert', clients[idx]);
+      setSyncStatus('offline','📴 Guardado local');
+    }
+  } else {
+    queuePending('upsert', clients[idx >= 0 ? idx : 0]);
+    setSyncStatus('offline','📴 Guardado local');
+  }
+}
+
+async function deleteClient(id) {
+  clients = clients.filter(c=>c.id!==id);
+  saveLocal();
+  renderGrid();
+  if (navigator.onLine) {
+    try {
+      await supa('DELETE', `${TABLE}?id=eq.${id}`);
+      setSyncStatus('online','☁️ Sincronizado');
+    } catch(e) {
+      queuePending('delete', null, id);
+    }
+  } else {
+    queuePending('delete', null, id);
+  }
+}
+
+function queuePending(type, data, id) {
+  pendingSync.push({ type, data, id, _opId: Date.now()+Math.random() });
+  saveLocal();
+}
+
+// ── UI HELPERS ───────────────────────────────────────────────
+function getInitials(c){ return ((c.nombre||'?')[0]+(c.apellido||'')[0]).toUpperCase()||'?'; }
+function getColor(c){ let h=0;const s=(c.nombre||'')+(c.id||'');for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))&0xffffffff;return'av-'+(Math.abs(h)%8); }
+function isBdayThisMonth(c){ if(!c.cumpleanos)return false;return new Date().getMonth()+1===parseInt((c.cumpleanos||'').split('-')[1]); }
+function parseArr(v){ try{const p=JSON.parse(v||'[]');return Array.isArray(p)?p:[];}catch(e){return v?[v]:[]; } }
+function selChip(el,hid,val){ el.parentElement.querySelectorAll('.chip-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');document.getElementById(hid).value=val; }
+function toggleChip(el,hid,val){ el.classList.toggle('sel');const inp=document.getElementById(hid);let arr=parseArr(inp.value);if(el.classList.contains('sel')){if(!arr.includes(val))arr.push(val);}else{arr=arr.filter(v=>v!==val);}inp.value=JSON.stringify(arr); }
+function setFilter(el,f){ currentFilter=f;document.querySelectorAll('.filter-chip').forEach(e=>e.classList.remove('active'));el.classList.add('active');renderGrid(); }
+const tl=t=>({VIP:'⭐ VIP',frecuente:'💗 Frecuente',nueva:'🌸 Nueva',prospecto:'💎 Prospecto',inactiva:'💤 Inactiva'}[t]||t);
+
+function renderGrid(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  let list=clients.filter(c=>{
+    const match=[c.nombre,c.apellido,c.telefono,c.email,c.ciudad,c.ocupacion].join(' ').toLowerCase().includes(q);
+    return match&&(currentFilter==='all'||c.tipo===currentFilter);
+  });
+  const total=clients.length,bdayCount=clients.filter(isBdayThisMonth).length;
+  document.getElementById('stat-total').textContent=total+(total===1?' clienta':' clientas');
+  document.getElementById('stat-bday').textContent='🎂 '+bdayCount+' cumpleaños este mes';
+  const grid=document.getElementById('grid');
+  if(!list.length){ grid.innerHTML=`<div class="empty"><div class="icon">🌸</div><h3>${q?'Sin resultados':'Aún no tienes clientas'}</h3><p>${q?'Prueba con otro nombre.':'Toca + para agregar tu primera clienta.'}</p></div>`;return; }
+  grid.innerHTML=list.map(c=>`<div class="card" onclick="openProfile('${c.id}')">
+    ${isBdayThisMonth(c)?'<span class="card-birthday">🎂</span>':''}
+    <div class="card-avatar ${getColor(c)}">${getInitials(c)}</div>
+    <div class="card-name">${c.nombre||''} ${c.apellido||''}</div>
+    <div class="card-meta">${c.telefono||c.email||c.ciudad||'Sin datos'}</div>
+    <span class="card-tag">${tl(c.tipo)}</span>
+  </div>`).join('');
+}
+
+function openProfile(id){
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  const bday=c.cumpleanos?new Date(c.cumpleanos+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long'}):'';
+  const rt=(arr,gold=false)=>parseArr(arr).map(v=>`<span class="mini-tag${gold?' gold':''}">${v}</span>`).join('');
+  const row=(icon,label,val)=>val?`<div class="info-row"><span class="info-icon">${icon}</span><div><div class="info-label">${label}</div><div class="info-value">${val}</div></div></div>`:'';
+  const rowTags=(icon,label,val,gold=false)=>parseArr(val).length?`<div class="info-row"><span class="info-icon">${icon}</span><div><div class="info-label">${label}</div><div class="tags-wrap">${rt(val,gold)}</div></div></div>`:'';
+  document.getElementById('pm-title').textContent=(c.nombre||'')+(c.apellido?' '+c.apellido:'');
+  document.getElementById('profile-body').innerHTML=`
+    <div class="profile-hero">
+      <div class="profile-avatar ${getColor(c)}">${getInitials(c)}</div>
+      <div class="profile-name">${c.nombre||''} ${c.apellido||''}</div>
+      <span class="profile-tag">${tl(c.tipo)}</span>
+    </div>
+    <div class="info-section"><h4>📞 Contacto</h4>
+      ${row('📱','Teléfono',c.telefono)}${row('✉️','Email',c.email)}${row('📍','Ciudad',c.ciudad)}
+      ${bday?`<div class="info-row"><span class="info-icon">🎂</span><div><div class="info-label">Cumpleaños</div><div class="info-value">${bday}${isBdayThisMonth(c)?'  🎉 ¡Este mes!':''}</div></div></div>`:''}
+      ${row('💼','Ocupación',c.ocupacion)}${row('🗓','Edad',c.edad)}${row('⏰','Mejor hora',c.hora_contacto)}${row('💬','Prefiere',c.pref_contacto)}
+    </div>
+    <div class="info-section"><h4>✨ Piel</h4>
+      ${row('💧','Sin humectante',c.sin_humectante)}
+      ${rowTags('🎯','Necesidades',c.necesidades)}${rowTags('🔍','Preocupaciones',c.preocupaciones)}
+      ${rowTags('👁','Área ojos',c.ojos)}${rowTags('💋','Área labios',c.labios)}
+    </div>
+    <div class="info-section"><h4>💄 Maquillaje</h4>
+      ${row('🎨','Tono de piel',c.tono)}${row('✨','Acabado base',c.acabado)}${row('🪞','Número de base',c.base)}${row('💄','Favoritos',c.productos_fav)}
+    </div>
+    ${parseArr(c.intereses).length?`<div class="info-section"><h4>💡 Intereses</h4><div class="info-row"><div class="tags-wrap">${rt(c.intereses,true)}</div></div></div>`:''}
+    ${(c.ref_nombre||c.ref_tel)?`<div class="info-section"><h4>👥 Referido</h4>${row('👤','Nombre',c.ref_nombre)}${row('📱','Teléfono',c.ref_tel)}${row('🤝','Relación',c.ref_relacion)}</div>`:''}
+    ${c.notas?`<div class="notes-box"><h4>📝 Notas privadas</h4><div class="notes-text">${c.notas}</div></div>`:''}
+  `;
+  document.getElementById('profile-actions').innerHTML=`
+    <button class="btn btn-gold" style="flex:2" onclick="openEdit('${c.id}')">✏️ Editar</button>
+    <button class="btn btn-danger" onclick="confirmDelete('${c.id}')">🗑 Eliminar</button>
+  `;
+  document.getElementById('profile-overlay').classList.add('open');
+}
+
+function closeProfile(e){if(e&&e.target!==document.getElementById('profile-overlay'))return;closeProfileDirect();}
+function closeProfileDirect(){document.getElementById('profile-overlay').classList.remove('open');}
+
+function clearForm(){
+  ['nombre','apellido','telefono','email','ciudad','ocupacion','base','productos','notas','ref-nombre','ref-tel','ref-relacion'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});
+  ['f-bday','f-edad','f-sinhumect','f-acabado'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f-necesidades','f-preocupaciones','f-ojos','f-labios','f-intereses'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='[]';});
+  document.getElementById('f-tipo').value='nueva';
+  ['f-tono','f-hora','f-contacto'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#form-overlay .chip-opt').forEach(e=>e.classList.remove('sel'));
+}
+
+function openNew(){editingId=null;document.getElementById('form-title').textContent='Nueva Clienta 🌸';clearForm();document.getElementById('form-overlay').classList.add('open');}
+
+function openEdit(id){
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  editingId=id;
+  document.getElementById('form-title').textContent='Editar Clienta ✏️';
+  clearForm();
+  const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
+  set('f-nombre',c.nombre);set('f-apellido',c.apellido);set('f-telefono',c.telefono);
+  set('f-email',c.email);set('f-ciudad',c.ciudad);set('f-ocupacion',c.ocupacion);
+  set('f-bday',c.cumpleanos);set('f-tipo',c.tipo||'nueva');set('f-tono',c.tono);
+  set('f-hora',c.hora_contacto);set('f-contacto',c.pref_contacto);
+  set('f-base',c.base);set('f-productos',c.productos_fav);set('f-notas',c.notas);
+  set('f-ref-nombre',c.ref_nombre);set('f-ref-tel',c.ref_tel);set('f-ref-relacion',c.ref_relacion);
+  const restS=(hid,val)=>{if(!val)return;const inp=document.getElementById(hid);inp.value=val;const grp=inp.previousElementSibling;if(grp)grp.querySelectorAll('.chip-opt').forEach(e=>{if((e.getAttribute('onclick')||'').includes(`'${val}'`))e.classList.add('sel');});};
+  restS('f-edad',c.edad);restS('f-sinhumect',c.sin_humectante);restS('f-acabado',c.acabado);
+  const restM=(hid,val)=>{const arr=parseArr(val);if(!arr.length)return;const inp=document.getElementById(hid);inp.value=JSON.stringify(arr);const grp=inp.previousElementSibling;if(grp)grp.querySelectorAll('.chip-opt').forEach(e=>{const oc=e.getAttribute('onclick')||'';if(arr.some(v=>oc.includes(`'${v}'`)))e.classList.add('sel');});};
+  restM('f-necesidades',c.necesidades);restM('f-preocupaciones',c.preocupaciones);
+  restM('f-ojos',c.ojos);restM('f-labios',c.labios);restM('f-intereses',c.intereses);
+  closeProfileDirect();
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+async function saveClient(){
+  const nombre=document.getElementById('f-nombre').value.trim();
+  if(!nombre){toast('Por favor ingresa el nombre 🌸');return;}
+  const g=id=>document.getElementById(id).value;
+  const data={
+    nombre, apellido:g('f-apellido').trim(), telefono:g('f-telefono').trim(),
+    email:g('f-email').trim(), ciudad:g('f-ciudad').trim(), ocupacion:g('f-ocupacion').trim(),
+    cumpleanos:g('f-bday')||null, tipo:g('f-tipo'), edad:g('f-edad'),
+    hora_contacto:g('f-hora'), pref_contacto:g('f-contacto'),
+    sin_humectante:g('f-sinhumect'),
+    necesidades:g('f-necesidades'), preocupaciones:g('f-preocupaciones'),
+    ojos:g('f-ojos'), labios:g('f-labios'),
+    tono:g('f-tono'), acabado:g('f-acabado'),
+    base:g('f-base').trim(), productos_fav:g('f-productos').trim(),
+    intereses:g('f-intereses'),
+    ref_nombre:g('f-ref-nombre').trim(), ref_tel:g('f-ref-tel').trim(), ref_relacion:g('f-ref-relacion').trim(),
+    notas:g('f-notas').trim()
+  };
+  if(editingId){
+    await updateClient(editingId, data);
+    toast('✅ Clienta actualizada');
+  }else{
+    data.id = Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+    data.created_at = new Date().toISOString();
+    await createClient(data);
+    toast('🌸 Clienta agregada con éxito');
+  }
+  closeFormDirect();
+}
+
+async function confirmDelete(id){
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  if(confirm(`¿Eliminar a ${c.nombre} ${c.apellido||''}?\nEsta acción no se puede deshacer.`)){
+    await deleteClient(id);
+    closeProfileDirect();
+    toast('🗑 Clienta eliminada');
+  }
+}
+
+function closeForm(e){if(e&&e.target!==document.getElementById('form-overlay'))return;closeFormDirect();}
+function closeFormDirect(){document.getElementById('form-overlay').classList.remove('open');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+init();
+</script>
+</body>
+</html>

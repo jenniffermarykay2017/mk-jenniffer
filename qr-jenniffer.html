@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR — Tu piel, tu historia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#f5e8ef;font-family:'Nunito',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+  .card{background:white;border-radius:28px;width:100%;max-width:340px;overflow:hidden;box-shadow:0 20px 60px rgba(140,46,80,0.22);}
+  .card-top{background:linear-gradient(160deg,#6b1a35 0%,#c8507a 60%,#e8a0be 100%);padding:32px 24px 28px;text-align:center;position:relative;overflow:hidden;}
+  .card-top::before{content:'✿';position:absolute;right:-15px;top:-15px;font-size:120px;opacity:0.07;color:white;}
+  .card-top::after{content:'✿';position:absolute;left:-15px;bottom:-20px;font-size:80px;opacity:0.07;color:white;}
+  .mk-label{font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;}
+  .main-title{font-family:'Cormorant Garamond',serif;font-size:2rem;color:white;font-weight:300;line-height:1.2;margin-bottom:4px;}
+  .main-title em{font-style:italic;font-weight:600;}
+  .divider{width:40px;height:2px;background:rgba(255,255,255,0.4);border-radius:2px;margin:14px auto;}
+  .name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:rgba(255,255,255,0.9);font-weight:400;letter-spacing:0.5px;}
+  .subtitle{font-size:0.72rem;color:rgba(255,255,255,0.65);margin-top:3px;letter-spacing:0.5px;}
+  .card-bottom{padding:26px 24px 28px;text-align:center;background:white;}
+  .qr-container{position:relative;display:inline-block;margin-bottom:16px;}
+  #qr-canvas{border-radius:12px;border:2px solid #f5d0df;box-shadow:0 4px 20px rgba(200,80,122,0.12);display:block;}
+  .scan-text{font-size:0.78rem;color:#9a7080;font-weight:600;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .scan-text::before,.scan-text::after{content:'';flex:1;height:1px;background:#f0dde6;}
+  .url{font-size:0.75rem;color:#c8507a;font-weight:700;margin-bottom:16px;}
+  .footer-rose{display:flex;justify-content:center;gap:6px;font-size:0.85rem;opacity:0.4;}
+  .print-btn{margin-top:20px;background:linear-gradient(135deg,#c8507a,#8c2e50);color:white;border:none;border-radius:30px;padding:12px 30px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;box-shadow:0 4px 16px rgba(200,80,122,0.3);}
+  .share-btn{margin-top:10px;background:white;color:#c8507a;border:2px solid #f5d0df;border-radius:30px;padding:11px 30px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;display:block;}
+  @media print{body{background:white;padding:0;}.print-btn,.share-btn{display:none;}.card{box-shadow:none;}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-top">
+    <div class="mk-label">✨ Consulta Personalizada Gratuita</div>
+    <div class="main-title">Tu piel,<br><em>tu historia</em></div>
+    <div class="divider"></div>
+    <div class="name">Jenniffer Ivelisse</div>
+    <div class="subtitle">Tu Consultora de Belleza Independiente · Mary Kay</div>
+  </div>
+  <div class="card-bottom">
+    <div class="qr-container">
+      <canvas id="qr-canvas" width="240" height="240"></canvas>
+    </div>
+    <div class="scan-text">Escanea y descubre</div>
+    <div class="url">tupieltuhistoria.netlify.app</div>
+    <div class="footer-rose">🌸 🌸 🌸</div>
+  </div>
+</div>
+<button class="print-btn" onclick="window.print()">🖨️ Imprimir tarjeta</button>
+<button class="share-btn" onclick="shareCard()">📤 Compartir por WhatsApp</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const LOGO_B64 = 'data:image/png;base64,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';
+const URL = 'https://tupieltuhistoria.netlify.app';
+
+const tempDiv = document.createElement('div');
+new QRCode(tempDiv, {
+  text: URL,
+  width: 240,
+  height: 240,
+  colorDark: '#8c2e50',
+  colorLight: '#ffffff',
+  correctLevel: QRCode.CorrectLevel.H
+});
+
+setTimeout(() => {
+  const qrImg = tempDiv.querySelector('img') || tempDiv.querySelector('canvas');
+  const canvas = document.getElementById('qr-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const drawQR = new Image();
+  drawQR.onload = function() {
+    ctx.drawImage(drawQR, 0, 0, 240, 240);
+    const logoImg = new Image();
+    logoImg.onload = function() {
+      const size = 110;
+      const cx = 120, cy = 120;
+      ctx.drawImage(logoImg, cx - size/2, cy - size/2, size, size);
+    };
+    logoImg.src = LOGO_B64;
+  };
+  if (qrImg.tagName === 'CANVAS') {
+    drawQR.src = qrImg.toDataURL();
+  } else {
+    drawQR.src = qrImg.src;
+  }
+}, 300);
+
+async function shareCard() {
+  if (navigator.share) {
+    await navigator.share({ title: 'Tu piel, tu historia', text: '✨ Consulta personalizada gratuita de Mary Kay', url: URL });
+  } else {
+    navigator.clipboard.writeText(URL);
+    alert('¡Link copiado! 🌸');
+  }
+}
+</script>
+</body>
+</html>

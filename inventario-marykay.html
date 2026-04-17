@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Inventario · Jenniffer MK</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rose:#c8507a;--rose-light:#f5d0df;--rose-dark:#8c2e50;
+  --gold:#d4a853;--cream:#fdf6f0;--text:#3a2030;--text-light:#8a6070;
+  --shadow:0 4px 24px rgba(200,80,122,.10);--shadow-strong:0 8px 40px rgba(200,80,122,.18);
+  --radius:18px;--ok:#3d7a52;--warn:#c4621a;--empty:#9a2040;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh;padding-bottom:80px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* AUTOCOMPLETE */
+.ac-wrap{position:relative;}
+.ac-list{display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:white;border:2px solid var(--rose-light);border-radius:12px;max-height:220px;overflow-y:auto;z-index:600;box-shadow:var(--shadow-strong);}
+.ac-list.open{display:block;}
+.ac-item{padding:10px 14px;cursor:pointer;font-size:.88rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid #fdf0f4;transition:.1s;}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:hover,.ac-item.focused{background:var(--rose-light);}
+.ac-item-name{flex:1;font-weight:700;}
+.ac-item-price{font-size:.8rem;color:var(--rose);font-weight:700;}
+.ac-item-source{font-size:.7rem;color:var(--text-light);}
+
+@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+.loading-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--rose-dark),var(--rose));display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;color:white;}
+.loading-screen h2{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:10px;}
+.spinner{width:40px;height:40px;border:4px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:18px;}
+.spinner-sm{width:22px;height:22px;border:3px solid var(--rose-light);border-top-color:var(--rose);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:middle;}
+
+header{background:linear-gradient(135deg,var(--rose-dark) 0%,var(--rose) 60%,#e87fa8 100%);color:white;padding:22px 18px 16px;position:relative;overflow:hidden;}
+header::before{content:'✿';position:absolute;right:14px;top:6px;font-size:76px;opacity:.12;line-height:1;}
+header h1{font-family:'Playfair Display',serif;font-size:1.7rem;}
+header p{font-size:.8rem;opacity:.85;margin-top:2px;}
+.header-stats{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.stat-chip{background:rgba(255,255,255,.18);border-radius:20px;padding:3px 12px;font-size:.75rem;font-weight:700;}
+.sync-chip{background:rgba(255,255,255,.18);border-radius:20px;padding:3px 12px;font-size:.75rem;font-weight:700;cursor:pointer;}
+.sync-chip.online{background:rgba(100,220,100,.25);}
+.sync-chip.offline{background:rgba(255,180,0,.25);}
+.sync-chip.syncing{animation:pulse 1s infinite;}
+.price-chip{background:rgba(255,255,255,.15);border-radius:20px;padding:3px 12px;font-size:.75rem;font-weight:700;cursor:pointer;}
+.price-chip.live{background:rgba(100,220,100,.2);}
+
+.view{display:none;padding:12px 14px 16px;}
+.view.active{display:block;}
+.card-box{background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:12px;}
+.section-label{font-family:'Playfair Display',serif;font-size:1rem;color:var(--rose);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--rose-light);}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.stat-box{background:white;border-radius:14px;padding:12px 8px;text-align:center;box-shadow:var(--shadow);}
+.stat-box .n{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--rose);line-height:1;}
+.stat-box .l{font-size:.68rem;color:var(--text-light);margin-top:2px;}
+
+.prod-list{display:flex;flex-direction:column;gap:9px;}
+.prod-card{background:white;border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow);border-left:4px solid transparent;cursor:pointer;transition:.15s;}
+.prod-card:hover{box-shadow:var(--shadow-strong);}
+.prod-card.low{border-left-color:var(--warn);}
+.prod-card.empty{border-left-color:var(--empty);}
+.prod-badge{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.badge-Skincare{background:#fde8f0;}.badge-Maquillaje{background:#fce8d8;}
+.badge-Cuerpo{background:#e8f4e8;}.badge-Fragancia{background:#e8e8f4;}.badge-Otro{background:#f0f0f0;}
+.prod-info{flex:1;min-width:0;}
+.prod-name{font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prod-cat{font-size:.72rem;color:var(--text-light);margin-top:1px;}
+.prod-date{font-size:.68rem;color:var(--text-light);}
+.prod-right{text-align:right;flex-shrink:0;}
+.prod-price{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;}
+.prod-qty{font-size:.75rem;margin-top:2px;}
+.qty-ok{color:var(--ok);}.qty-low{color:var(--warn);font-weight:700;}.qty-empty{color:var(--empty);font-weight:700;}
+
+.toolbar{display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap;}
+.search-wrap{flex:1;min-width:140px;position:relative;}
+.search-wrap input{width:100%;border:2px solid var(--rose-light);border-radius:30px;padding:8px 12px 8px 32px;font-family:'Nunito',sans-serif;font-size:.88rem;background:white;outline:none;color:var(--text);transition:.2s;}
+.search-wrap input:focus{border-color:var(--rose);}
+.search-wrap span{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.9rem;opacity:.4;}
+.filter-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px;}
+.filter-row::-webkit-scrollbar{display:none;}
+.fchip{border:2px solid var(--rose-light);background:white;border-radius:20px;padding:4px 12px;font-size:.73rem;font-weight:700;color:var(--rose);cursor:pointer;white-space:nowrap;transition:.15s;font-family:'Nunito',sans-serif;}
+.fchip.active,.fchip:hover{background:var(--rose);color:white;border-color:var(--rose);}
+
+.form-group{margin-bottom:12px;}
+.form-group label{display:block;font-size:.73rem;font-weight:700;color:var(--rose-dark);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;border:2px solid var(--rose-light);border-radius:12px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;background:white;color:var(--text);outline:none;transition:.2s;appearance:none;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--rose);}
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+
+/* SEARCHABLE DROPDOWN */
+.sdrop-wrap{position:relative;}
+.sdrop-input-row{display:flex;border:2px solid var(--rose-light);border-radius:12px;overflow:hidden;background:white;transition:.2s;}
+.sdrop-input-row:focus-within{border-color:var(--rose);}
+.sdrop-search{flex:1;border:none;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;color:var(--text);background:transparent;outline:none;}
+.sdrop-clear{border:none;background:none;padding:0 10px;color:var(--text-light);cursor:pointer;font-size:1rem;display:none;}
+.sdrop-clear.visible{display:block;}
+.sdrop-arrow{border:none;background:none;padding:0 12px;color:var(--rose);cursor:pointer;}
+.sdrop-list{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border:2px solid var(--rose-light);border-radius:12px;max-height:200px;overflow-y:auto;z-index:500;box-shadow:var(--shadow-strong);}
+.sdrop-list.open{display:block;}
+.sdrop-item{padding:9px 14px;cursor:pointer;font-size:.86rem;display:flex;align-items:center;gap:8px;transition:.1s;}
+.sdrop-item:hover{background:var(--rose-light);}
+.sdrop-item .si-name{flex:1;font-weight:700;}
+.sdrop-item .si-sub{font-size:.73rem;color:var(--text-light);}
+.sdrop-item .si-price{font-size:.8rem;color:var(--rose);font-weight:700;}
+.sdrop-item.manual-hint{color:var(--rose-dark);font-style:italic;background:#fef8fb;}
+.sdrop-item.empty-opt{color:var(--text-light);font-style:italic;cursor:default;}
+.sdrop-selected-tag{display:inline-flex;align-items:center;gap:6px;background:var(--rose-light);color:var(--rose-dark);border-radius:20px;padding:4px 10px 4px 12px;font-size:.82rem;font-weight:700;margin-top:6px;}
+.sdrop-selected-tag button{border:none;background:none;cursor:pointer;color:var(--rose);font-size:.9rem;padding:0;line-height:1;}
+
+/* MANUAL ADD BOX */
+.manual-add-box{background:#fff8fb;border:2px solid var(--rose-light);border-radius:12px;padding:12px;margin-top:8px;display:none;}
+.manual-add-box.open{display:block;animation:slideUp .2s ease;}
+.ma-title{font-size:.78rem;font-weight:700;color:var(--rose-dark);margin-bottom:10px;}
+
+/* CART */
+.cart-item{background:white;border-radius:12px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);border-left:3px solid var(--rose);}
+.cart-item-info{flex:1;min-width:0;}
+.cart-item-name{font-weight:700;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cart-item-sub{font-size:.75rem;color:var(--text-light);margin-top:1px;}
+.cart-item-right{text-align:right;flex-shrink:0;}
+.cart-item-total{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--ok);}
+.cart-item-remove{border:none;background:none;color:#c44;cursor:pointer;font-size:1rem;padding:2px 6px;}
+.cart-qty-ctrl{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.qty-btn{border:2px solid var(--rose-light);background:white;color:var(--rose);border-radius:8px;width:26px;height:26px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.qty-btn:hover{background:var(--rose);color:white;}
+.qty-display{font-weight:700;font-size:.9rem;min-width:20px;text-align:center;}
+
+/* TOTALS BOX */
+.totals-box{background:white;border-radius:14px;padding:16px;margin-top:12px;border:2px solid var(--rose-light);}
+.totals-row{display:flex;justify-content:space-between;padding:5px 0;font-size:.88rem;}
+.totals-row.sub{color:var(--text-light);}
+.totals-row.divider{border-top:1px solid var(--rose-light);margin-top:6px;padding-top:10px;}
+.totals-row.total{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--rose);}
+.tax-row{display:grid;grid-template-columns:1fr auto 80px;gap:8px;align-items:center;margin-bottom:8px;}
+.tax-label{font-size:.78rem;font-weight:700;color:var(--rose-dark);}
+.tax-input{border:2px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;font-size:.88rem;width:100%;outline:none;text-align:right;}
+.tax-input:focus{border-color:var(--rose);}
+.discount-row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin-bottom:8px;}
+
+/* RECEIPT MODAL */
+.receipt-paper{background:white;border-radius:16px;padding:20px;font-family:'Nunito',sans-serif;}
+.receipt-header{text-align:center;padding-bottom:14px;border-bottom:2px dashed var(--rose-light);margin-bottom:14px;}
+.receipt-logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--rose);}
+.receipt-sub{font-size:.78rem;color:var(--text-light);margin-top:3px;}
+.receipt-line{display:flex;justify-content:space-between;padding:4px 0;font-size:.84rem;}
+.receipt-line.header{font-weight:700;font-size:.75rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;padding-bottom:6px;border-bottom:1px solid var(--rose-light);}
+.receipt-line.total{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--rose);border-top:2px solid var(--rose-light);margin-top:8px;padding-top:10px;}
+.receipt-footer{text-align:center;margin-top:14px;padding-top:12px;border-top:2px dashed var(--rose-light);font-size:.78rem;color:var(--text-light);}
+
+/* BUTTONS */
+.btn{border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;border-radius:30px;padding:9px 18px;font-size:.88rem;transition:.15s;}
+.btn:active{transform:scale(.96);}
+.btn-primary{background:var(--rose);color:white;box-shadow:0 3px 12px rgba(200,80,122,.3);}
+.btn-primary:hover{background:var(--rose-dark);}
+.btn-gold{background:var(--gold);color:white;}
+.btn-gray{background:#f0e8ec;color:var(--text);border:2px solid var(--rose-light);}
+.btn-danger{background:#fff0f3;color:#c0344e;border:2px solid #ffd0da;}
+.btn-green{background:#e8f5ee;color:var(--ok);border:2px solid #b8dfc8;}
+.btn-wa{background:#25d366;color:white;}
+.fab{position:fixed;bottom:72px;right:16px;background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;border:none;border-radius:50%;width:54px;height:54px;font-size:1.5rem;cursor:pointer;box-shadow:0 6px 24px rgba(200,80,122,.45);transition:.2s;display:flex;align-items:center;justify-content:center;z-index:100;}
+.fab:hover{transform:scale(1.1) rotate(15deg);}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(60,20,40,.45);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--cream);border-radius:26px 26px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;padding:0 0 32px;transform:translateY(60px);transition:transform .28s cubic-bezier(.4,0,.2,1);}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-handle{width:38px;height:4px;background:var(--rose-light);border-radius:4px;margin:11px auto 0;}
+.modal-header{background:linear-gradient(135deg,var(--rose-dark),var(--rose));padding:18px 16px 16px;color:white;position:relative;}
+.modal-header h2{font-family:'Playfair Display',serif;font-size:1.2rem;}
+.modal-close{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.2);border:none;color:white;width:28px;height:28px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:16px 16px 0;}
+.actions-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.actions-row .btn{flex:1;min-width:80px;text-align:center;padding:9px 10px;font-size:.8rem;}
+
+.cam-zone{border:2px dashed var(--rose-light);border-radius:14px;background:#fef5f8;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:170px;cursor:pointer;overflow:hidden;transition:.2s;}
+.cam-zone:hover{background:#fce8f0;}
+#previewImg{width:100%;border-radius:12px;display:none;max-height:240px;object-fit:cover;}
+#fileInput{display:none;}
+.scan-spinner-wrap{display:none;flex-direction:column;align-items:center;padding:20px 0 8px;}
+.det-item{background:#fef0f5;border-radius:10px;padding:13px;border-left:4px solid var(--rose);margin-bottom:9px;}
+.det-name{font-weight:700;font-size:.9rem;margin-bottom:9px;}
+.det-add-btn{width:100%;padding:9px;background:var(--rose);color:white;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:4px;font-family:'Nunito',sans-serif;}
+.det-add-btn:disabled{opacity:.5;cursor:default;}
+
+.followup-card{background:white;border-radius:14px;padding:13px;margin-bottom:9px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:flex-start;border-left:4px solid var(--gold);}
+.followup-card.overdue{border-left-color:var(--empty);}
+.followup-card.done{border-left-color:#ccc;opacity:.6;}
+.fu-info{flex:1;}
+.fu-client{font-weight:700;font-size:.88rem;}
+.fu-prod{font-size:.78rem;color:var(--text-light);}
+.fu-date{font-size:.73rem;margin-top:3px;}
+.fu-date.overdue{color:var(--empty);font-weight:700;}
+.fu-date.soon{color:var(--warn);font-weight:700;}
+.fu-actions{display:flex;flex-direction:column;gap:5px;}
+.fu-btn{padding:5px 10px;border-radius:20px;font-size:.72rem;font-weight:700;border:2px solid;cursor:pointer;background:none;font-family:'Nunito',sans-serif;}
+
+.sale-item{background:white;border-radius:12px;padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;}
+.sale-left .sale-prod{font-weight:700;font-size:.88rem;}
+.sale-left .sale-client{font-size:.75rem;color:var(--text-light);}
+.sale-left .sale-date{font-size:.72rem;color:var(--text-light);}
+.sale-right .sale-amount{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--ok);text-align:right;}
+.sale-right .sale-qty{font-size:.72rem;color:var(--text-light);text-align:right;}
+
+.chip-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.chip-opt{border:2px solid var(--rose-light);border-radius:20px;padding:4px 11px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.15s;background:white;color:var(--text);font-family:'Nunito',sans-serif;}
+.chip-opt.sel{background:var(--rose);color:white;border-color:var(--rose);}
+
+.empty-state{text-align:center;padding:40px 16px;color:var(--text-light);}
+.empty-state .icon{font-size:3rem;margin-bottom:10px;}
+.empty-state h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--rose);margin-bottom:6px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--rose-dark);color:white;padding:9px 20px;border-radius:30px;font-size:.84rem;font-weight:600;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.footer-credit{text-align:center;padding:18px 0 8px;font-size:.72rem;color:var(--text-light);}
+.footer-credit span{color:var(--rose);font-weight:700;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid var(--rose-light);display:flex;z-index:150;}
+.bnav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;cursor:pointer;font-family:'Nunito',sans-serif;color:var(--text-light);font-size:.62rem;font-weight:700;transition:.2s;}
+.bnav-btn .icon{font-size:1.2rem;}
+.bnav-btn.active{color:var(--rose);}
+.cart-badge{background:var(--rose);color:white;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;position:absolute;top:-2px;right:-2px;font-weight:700;}
+.bnav-icon-wrap{position:relative;display:inline-block;}
+</style>
+</head>
+<body>
+<div class="loading-screen" id="loading"><div class="spinner"></div><h2>✨ Inventario MK</h2><p>Cargando...</p></div>
+
+<header>
+  <h1>✨ Inventario MK</h1>
+  <p>Jenniffer Ivelisse · Consultora Independiente</p>
+  <div class="header-stats">
+    <span class="stat-chip" id="hstat-total">0 productos</span>
+    <span class="stat-chip" id="hstat-low">⚠️ 0 bajos</span>
+    <span class="stat-chip" id="hstat-empty">⛔ 0 agotados</span>
+    <span class="sync-chip" id="sync-status" onclick="syncNow()">⚡ Conectando...</span>
+    <span class="price-chip" id="price-status" onclick="refreshPrices()">💰 Precios...</span>
+  </div>
+</header>
+
+<div class="bottom-nav">
+  <button class="bnav-btn active" id="bnav-inv"      onclick="showTab('inv')">      <div class="bnav-icon-wrap"><span class="icon">📦</span></div>Inventario</button>
+
+  <button class="bnav-btn"        id="bnav-cart"     onclick="showTab('cart')">     <div class="bnav-icon-wrap"><span class="icon">🛒</span><span class="cart-badge" id="cart-badge" style="display:none">0</span></div>Cesta</button>
+  <button class="bnav-btn"        id="bnav-followup" onclick="showTab('followup')"> <span class="icon">📅</span>Seguimiento</button>
+  <button class="bnav-btn"        id="bnav-clients"  onclick="showTab('clients')">  <span class="icon">👥</span>Clientas</button>
+</div>
+
+<!-- ════ INVENTARIO ════ -->
+<div class="view active" id="view-inv">
+  <div class="stats-row">
+    <div class="stat-box"><div class="n" id="st-total">0</div><div class="l">Productos</div></div>
+    <div class="stat-box"><div class="n" id="st-low" style="color:var(--warn)">0</div><div class="l">Stock bajo</div></div>
+    <div class="stat-box"><div class="n" id="st-empty" style="color:var(--empty)">0</div><div class="l">Agotados</div></div>
+    <div class="stat-box"><div class="n" id="st-val">$0</div><div class="l">Valor</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap"><span>🔍</span><input id="inv-search" placeholder="Buscar producto..." oninput="renderInv()"></div>
+    <button class="btn btn-gold" style="font-size:.8rem;padding:8px 12px;" onclick="shareWhatsApp()">📤 WA</button>
+  </div>
+  <div class="filter-row">
+    <span class="fchip active" onclick="setInvFilter(this,'all')">Todos</span>
+    <span class="fchip" onclick="setInvFilter(this,'Skincare')">🧴 Skincare</span>
+    <span class="fchip" onclick="setInvFilter(this,'Maquillaje')">💄 Maquillaje</span>
+    <span class="fchip" onclick="setInvFilter(this,'Cuerpo')">🧼 Cuerpo</span>
+    <span class="fchip" onclick="setInvFilter(this,'Fragancia')">✨ Fragancia</span>
+    <span class="fchip" onclick="setInvFilter(this,'Otro')">📦 Otro</span>
+    <span class="fchip" onclick="setInvFilter(this,'__low')">⚠️ Bajos</span>
+    <span class="fchip" onclick="setInvFilter(this,'__empty')">⛔ Agotados</span>
+    <span class="fchip" onclick="setInvFilter(this,'__recent')">🗓 Recientes</span>
+  </div>
+  <div class="prod-list" id="inv-list"></div>
+  <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
+</div>
+
+<!-- ════ CESTA / VENTA ════ -->
+<div class="view" id="view-cart">
+  <div class="card-box" style="margin-bottom:10px;">
+    <div class="section-label">🛒 Agregar producto a la cesta</div>
+
+    <!-- PRODUCT SEARCH -->
+    <div class="form-group">
+      <label>Producto</label>
+      <div class="sdrop-wrap" id="sdrop-wrap">
+        <div class="sdrop-input-row">
+          <input type="text" class="sdrop-search" id="sdrop-search" placeholder="Escribe para buscar o agregar..." autocomplete="off" oninput="sdropFilter()" onfocus="sdropOpen()" onkeydown="sdropKey(event)">
+          <button class="sdrop-clear" id="sdrop-clear" onclick="sdropClear()">✕</button>
+          <button class="sdrop-arrow" onclick="sdropToggle()">▾</button>
+        </div>
+        <div class="sdrop-list" id="sdrop-list"></div>
+      </div>
+      <input type="hidden" id="cart-prod-id">
+      <input type="hidden" id="cart-prod-name">
+      <div class="manual-add-box" id="manual-add-box">
+        <div class="ma-title">➕ Producto no en inventario — agregar y registrar</div>
+        <div class="form-row2">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Categoría</label>
+            <select id="ma-cat">
+              <option value="Skincare">🧴 Skincare</option>
+              <option value="Maquillaje">💄 Maquillaje</option>
+              <option value="Cuerpo">🧼 Cuerpo</option>
+              <option value="Fragancia">✨ Fragancia</option>
+              <option value="Otro">📦 Otro (temporada anterior)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Precio sugerido ($)</label>
+            <input type="number" id="ma-price" placeholder="0.00" step="0.01" min="0">
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:10px;padding:9px;" onclick="sdropAddManual()">✅ Usar este producto</button>
+      </div>
+    </div>
+
+    <div class="form-row2">
+      <div class="form-group">
+        <label>Cantidad</label>
+        <input type="number" id="cart-qty" value="1" min="1">
+      </div>
+      <div class="form-group">
+        <label>Precio unitario ($)</label>
+        <input type="number" id="cart-item-price" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:11px;" onclick="addToCart()">➕ Agregar a la cesta</button>
+  </div>
+
+  <!-- CART ITEMS -->
+  <div id="cart-items-section" style="display:none;">
+    <div class="section-label" style="padding:0 0 6px;border-bottom:2px solid var(--rose-light);margin-bottom:10px;">🛍 Productos en la cesta</div>
+    <div id="cart-items-list"></div>
+
+    <!-- CLIENTA -->
+    <div class="card-box" style="margin-top:10px;">
+      <div class="section-label">👤 Clienta / Persona</div>
+
+      <!-- Mode toggle -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button id="cli-mode-free" onclick="setCliMode('free')"
+          style="flex:1;padding:8px;border-radius:20px;border:2px solid var(--rose);background:var(--rose);color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;">
+          ✏️ Escribir nombre
+        </button>
+        <button id="cli-mode-crm" onclick="setCliMode('crm')"
+          style="flex:1;padding:8px;border-radius:20px;border:2px solid var(--rose-light);background:white;color:var(--rose);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;">
+          👥 Buscar en CRM
+        </button>
+      </div>
+
+      <!-- FREE MODE: just type a name -->
+      <div id="cli-free-mode">
+        <input type="text" id="cli-free-name" placeholder="ej. María, la amiga de Carmen, cliente walk-in..."
+          oninput="document.getElementById('cart-client-name').value=this.value;document.getElementById('cart-client-id').value='';"
+          style="width:100%;border:2px solid var(--rose-light);border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;transition:.2s;"
+          onfocus="this.style.borderColor='var(--rose)'" onblur="this.style.borderColor='var(--rose-light)'">
+        <div style="font-size:.73rem;color:var(--text-light);margin-top:5px;">💡 Deja vacío si no quieres registrar nombre</div>
+      </div>
+
+      <!-- CRM MODE: search registered clients -->
+      <div id="cli-crm-mode" style="display:none;">
+        <div class="sdrop-wrap" id="cli-sdrop-wrap">
+          <div class="sdrop-input-row">
+            <input type="text" class="sdrop-search" id="cli-sdrop-search" placeholder="Buscar clienta del CRM..." autocomplete="off" oninput="cliSdropFilter()" onfocus="cliSdropOpen()">
+            <button class="sdrop-clear" id="cli-sdrop-clear" onclick="cliSdropClear()">✕</button>
+            <button class="sdrop-arrow" onclick="cliSdropToggle()">▾</button>
+          </div>
+          <div class="sdrop-list" id="cli-sdrop-list"></div>
+          <div id="cli-sdrop-selected-tag" style="display:none;">
+            <span class="sdrop-selected-tag"><span id="cli-sdrop-tag-label"></span><button onclick="cliSdropClear()">✕</button></span>
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" id="cart-client-id">
+      <input type="hidden" id="cart-client-name">
+    </div>
+
+    <!-- TOTALS — INTERNAL ONLY -->
+    <div class="totals-box">
+      <div style="background:#fff3f7;border-radius:10px;padding:8px 12px;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1rem;">🔒</span>
+        <span style="font-size:.75rem;color:var(--rose-dark);font-weight:700;">Solo tú ves este desglose — la clienta solo ve el total final.</span>
+      </div>
+
+      <!-- TAX 1: IVU Municipal Puerto Rico = 1% -->
+      <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Impuestos</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:.82rem;font-weight:700;color:var(--text);flex:1;">IVU Municipal (PR)</span>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <input class="tax-input" type="number" id="tax1-rate" value="1.0" step="0.1" min="0" max="100" oninput="calcTotals()" style="width:70px;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
+          <span style="font-size:.82rem;color:var(--text-light);font-weight:700;">%</span>
+        </div>
+      </div>
+
+      <!-- TAX 2: IVU Estatal Puerto Rico = 10.5% -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="font-size:.82rem;font-weight:700;color:var(--text);flex:1;">IVU Estatal (PR)</span>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <input class="tax-input" type="number" id="tax2-rate" value="10.5" step="0.1" min="0" max="100" oninput="calcTotals()" style="width:70px;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
+          <span style="font-size:.82rem;color:var(--text-light);font-weight:700;">%</span>
+        </div>
+      </div>
+
+      <!-- FEE — hidden from receipt -->
+      <div style="border-top:1px solid var(--rose-light);margin:12px 0 8px;padding-top:12px;">
+        <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Mi cargo adicional (no aparece en recibo)</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="chip-group" style="margin-top:0;flex-shrink:0;">
+            <div class="chip-opt sel" id="fee-pct-btn" onclick="setFeeType('pct')">%</div>
+            <div class="chip-opt" id="fee-amt-btn" onclick="setFeeType('amt')">$</div>
+          </div>
+          <input class="tax-input" type="number" id="fee-value" value="0" min="0" step="0.01" placeholder="0" oninput="calcTotals()" style="flex:1;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
+          <span id="fee-type-label" style="font-size:.82rem;color:var(--text-light);font-weight:700;width:16px;">%</span>
+        </div>
+      </div>
+
+      <!-- DISCOUNT -->
+      <div style="border-top:1px solid var(--rose-light);margin:12px 0 8px;padding-top:12px;">
+        <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Descuento a la clienta</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="chip-group" style="margin-top:0;flex-shrink:0;">
+            <div class="chip-opt sel" id="disc-pct-btn" onclick="setDiscType('pct')">%</div>
+            <div class="chip-opt" id="disc-amt-btn" onclick="setDiscType('amt')">$</div>
+          </div>
+          <input class="tax-input" type="number" id="disc-value" value="0" min="0" step="0.01" placeholder="0" oninput="calcTotals()" style="flex:1;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
+          <span id="disc-type-label" style="font-size:.82rem;color:var(--text-light);font-weight:700;width:16px;">%</span>
+        </div>
+      </div>
+
+      <div id="totals-display"></div>
+      <div class="form-group" style="margin-top:12px;margin-bottom:4px;">
+        <label>Crear seguimiento automático</label>
+        <div class="chip-group">
+          <div class="chip-opt sel" onclick="selChip1(this,'cart-followup','si')">✅ Sí</div>
+          <div class="chip-opt" onclick="selChip1(this,'cart-followup','no')">❌ No</div>
+        </div>
+        <input type="hidden" id="cart-followup" value="si">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="btn btn-gray" style="flex:1;" onclick="clearCart()">🗑 Vaciar</button>
+      <button class="btn btn-primary" style="flex:2;padding:12px;" onclick="checkoutCart()">💾 Registrar venta</button>
+    </div>
+    <button class="btn btn-green" style="width:100%;margin-top:8px;padding:11px;" onclick="previewReceipt()">🧾 Ver recibo</button>
+  </div>
+
+  <div id="cart-empty-msg" class="empty-state"><div class="icon">🛒</div><h3>La cesta está vacía</h3><p>Agrega productos arriba para crear una venta.</p>
+  <button class="btn btn-gray" style="margin-top:12px;width:100%;padding:11px;" onclick="openQuickReceipt()">🧾 Crear recibo rápido sin registro</button>
+  </div>
+
+  <div class="section-label" style="padding:0 0 6px;border-bottom:2px solid var(--rose-light);margin:16px 0 10px;">📋 Historial de ventas</div>
+  <div id="sales-list"></div>
+  <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
+</div>
+
+<!-- ════ SEGUIMIENTO ════ -->
+<div class="view" id="view-followup">
+  <div class="filter-row" style="margin-bottom:10px;">
+    <span class="fchip active" onclick="setFuFilter(this,'all')">Todos</span>
+    <span class="fchip" onclick="setFuFilter(this,'pending')">⏳ Pendientes</span>
+    <span class="fchip" onclick="setFuFilter(this,'overdue')">🚨 Vencidos</span>
+    <span class="fchip" onclick="setFuFilter(this,'done')">✅ Hechos</span>
+  </div>
+  <div id="followup-list"></div>
+  <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
+</div>
+
+<!-- ════ CLIENTAS ════ -->
+<div class="view" id="view-clients">
+
+  <!-- SEARCH BAR -->
+  <div class="toolbar" style="margin-bottom:10px;">
+    <div class="search-wrap">
+      <span>🔍</span>
+      <input id="cli-search" placeholder="Buscar clienta..." oninput="renderClientsView()" 
+        style="width:100%;border:2px solid var(--rose-light);border-radius:30px;padding:8px 12px 8px 32px;font-family:'Nunito',sans-serif;font-size:.88rem;background:white;outline:none;">
+    </div>
+    <a href="https://crmmisclientes.netlify.app" target="_blank">
+      <button class="btn btn-primary" style="font-size:.8rem;padding:8px 14px;white-space:nowrap;">+ Nueva</button>
+    </a>
+  </div>
+
+  <!-- FILTER CHIPS -->
+  <div class="filter-row" style="margin-bottom:10px;">
+    <span class="fchip active" onclick="setCliFilter(this,'all')">Todas</span>
+    <span class="fchip" onclick="setCliFilter(this,'VIP')">⭐ VIP</span>
+    <span class="fchip" onclick="setCliFilter(this,'frecuente')">💗 Frecuente</span>
+    <span class="fchip" onclick="setCliFilter(this,'nueva')">🌸 Nueva</span>
+    <span class="fchip" onclick="setCliFilter(this,'prospecto')">💎 Prospecto</span>
+    <span class="fchip" onclick="setCliFilter(this,'inactiva')">💤 Inactiva</span>
+  </div>
+
+  <div id="clients-view-list"></div>
+  <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
+</div>
+
+<!-- MODAL PERFIL CLIENTA -->
+<div class="modal-overlay" id="cli-profile-modal" onclick="closeModal('cli-profile-modal',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h2 id="cpm-title">Perfil</h2>
+      <button class="modal-close" onclick="closeModalDirect('cli-profile-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="cpm-body"></div>
+    <div style="padding:0 16px 16px;display:flex;gap:8px;margin-top:12px;">
+      <button class="btn btn-primary" style="flex:2;" onclick="addCliToCart()">🛒 Agregar a venta</button>
+      <a id="cpm-edit-link" href="https://crmmisclientes.netlify.app" target="_blank" style="flex:1;">
+        <button class="btn btn-gold" style="width:100%;">✏️ Editar</button>
+      </a>
+    </div>
+    <br>
+  </div>
+</div>
+<button class="fab" id="fab-btn" onclick="openAddProduct()">+</button>
+
+<!-- MODAL PRODUCTO -->
+<div class="modal-overlay" id="prod-modal" onclick="closeModal('prod-modal',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h2 id="prod-modal-title">Nuevo Producto</h2><button class="modal-close" onclick="closeModalDirect('prod-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nombre del producto *</label><input id="pf-name" type="text" placeholder="ej. TimeWise 4-in-1 Cleanser"></div>
+      <div class="form-row2">
+        <div class="form-group"><label>Categoría</label>
+          <select id="pf-cat"><option value="Skincare">🧴 Skincare</option><option value="Maquillaje">💄 Maquillaje</option><option value="Cuerpo">🧼 Cuerpo</option><option value="Fragancia">✨ Fragancia</option><option value="Otro">📦 Otro</option></select>
+        </div>
+        <div class="form-group"><label>Precio ($)</label><input type="number" id="pf-price" placeholder="0.00" min="0" step="0.01"></div>
+      </div>
+      <div class="form-row2">
+        <div class="form-group"><label>Cantidad</label><input type="number" id="pf-qty" placeholder="0" min="0"></div>
+        <div class="form-group"><label>Alerta stock bajo</label><input type="number" id="pf-alert" placeholder="2" min="1"></div>
+      </div>
+      <div class="actions-row">
+        <button class="btn btn-gray" onclick="closeModalDirect('prod-modal')">Cancelar</button>
+        <button class="btn btn-primary" style="flex:2;" onclick="saveProduct()">💾 Guardar</button>
+      </div><br>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VER PRODUCTO -->
+<div class="modal-overlay" id="view-modal" onclick="closeModal('view-modal',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h2 id="vm-title">Producto</h2><button class="modal-close" onclick="closeModalDirect('view-modal')">✕</button></div>
+    <div class="modal-body" id="vm-body"></div>
+    <div class="actions-row" id="vm-actions" style="padding:0 16px;"></div><br>
+  </div>
+</div>
+
+<!-- MODAL RECIBO -->
+<div class="modal-overlay" id="receipt-modal" onclick="closeModal('receipt-modal',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h2>🧾 Recibo</h2><button class="modal-close" onclick="closeModalDirect('receipt-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="receipt-paper" id="receipt-content"></div>
+      <div style="display:flex;gap:9px;margin-top:14px;">
+        <button class="btn btn-wa" style="flex:1;" onclick="shareReceiptWA()">💬 Enviar por WhatsApp</button>
+        <button class="btn btn-gray" onclick="closeModalDirect('receipt-modal')">Cerrar</button>
+      </div><br>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RECIBO RÁPIDO -->
+<div class="modal-overlay" id="quick-receipt-modal" onclick="closeModal('quick-receipt-modal',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h2>🧾 Recibo rápido</h2><button class="modal-close" onclick="closeModalDirect('quick-receipt-modal')">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:.8rem;color:var(--text-light);margin-bottom:12px;">Crea un recibo sin necesidad de registrar cliente ni producto en el sistema.</div>
+      <div id="qr-items-list"></div>
+      <button onclick="addQRItem()" class="btn btn-gray" style="width:100%;margin-bottom:14px;padding:10px;">+ Agregar producto</button>
+      <div class="form-group">
+        <label>Nombre de la clienta (opcional)</label>
+        <input id="qr-client-name" type="text" placeholder="ej. María García" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
+      </div>
+      <div id="qr-totals" style="background:#fef5f8;border-radius:12px;padding:12px;margin-bottom:12px;"></div>
+      <div style="display:flex;gap:9px;">
+        <button class="btn btn-gray" onclick="closeModalDirect('quick-receipt-modal')">Cancelar</button>
+        <button class="btn btn-primary" style="flex:2;padding:11px;" onclick="generateQuickReceipt()">🧾 Generar recibo</button>
+      </div><br>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MK_CATALOG = [
+  // ── TIMEWISE ─────────────────────────────────────────────────
+  {name:'TimeWise® Miracle Set® Normal/Dry',cat:'Skincare',price:116,variants:[
+    {label:'Miracle Set Normal/Dry',price:116},
+    {label:'Ultimate Miracle Set Normal/Dry (+Eye Cream)',price:150},
+    {label:'Beyond Ultimate Miracle Set Normal/Dry',price:208},
+    {label:'The Go Set Normal/Dry (travel)',price:28},
+  ]},
+  {name:'TimeWise® Miracle Set® Combination/Oily',cat:'Skincare',price:116,variants:[
+    {label:'Miracle Set Combination/Oily',price:116},
+    {label:'Ultimate Miracle Set Combination/Oily (+Eye Cream)',price:150},
+    {label:'Beyond Ultimate Miracle Set Combination/Oily',price:208},
+    {label:'The Go Set Combination/Oily (travel)',price:28},
+  ]},
+  {name:'TimeWise® 4-in-1 Cleanser Normal/Dry',cat:'Skincare',price:26,variants:[
+    {label:'Sencillo — Normal/Dry',price:26},
+    {label:'Parte del Miracle Set',price:null,setNote:'Incluido en Miracle Set $116'},
+  ]},
+  {name:'TimeWise® 4-in-1 Cleanser Combination/Oily',cat:'Skincare',price:26,variants:[
+    {label:'Sencillo — Combination/Oily',price:26},
+    {label:'Parte del Miracle Set',price:null,setNote:'Incluido en Miracle Set $116'},
+  ]},
+  {name:'TimeWise® Antioxidant Moisturizer Normal/Dry',cat:'Skincare',price:34,variants:[
+    {label:'Sencillo — Normal/Dry',price:34},
+    {label:'Parte del Miracle Set',price:null,setNote:'Incluido en Miracle Set $116'},
+  ]},
+  {name:'TimeWise® Antioxidant Moisturizer Combination/Oily',cat:'Skincare',price:34,variants:[
+    {label:'Sencillo — Combination/Oily',price:34},
+    {label:'Parte del Miracle Set',price:null,setNote:'Incluido en Miracle Set $116'},
+  ]},
+  {name:'TimeWise® Daytime Defender Sunscreen SPF 30',cat:'Skincare',price:34,variants:[
+    {label:'Sencillo',price:34},
+    {label:'Parte del Miracle Set',price:null,setNote:'Incluido en Miracle Set $116'},
+  ]},
+  {name:'TimeWise® Nighttime Recovery',cat:'Skincare',price:34,variants:[
+    {label:'Sencillo',price:34},
+    {label:'Parte del Miracle Set',price:null,setNote:'Incluido en Miracle Set $116'},
+  ]},
+  {name:'TimeWise® Eye Cream',cat:'Skincare',price:38,variants:[
+    {label:'Sencillo',price:38},
+    {label:'Parte del Ultimate Miracle Set',price:null,setNote:'Incluido en Ultimate Set $150'},
+  ]},
+  {name:'TimeWise® Firming Eye Cream',cat:'Skincare',price:34,variants:[{label:'Sencillo',price:34}]},
+  {name:'TimeWise® Microdermabrasion Plus Set',cat:'Skincare',price:58,variants:[
+    {label:'Set completo (Refine + Pore Minimizer)',price:58},
+    {label:'Microdermabrasion Refine — sencillo',price:36},
+    {label:'Pore Minimizer — sencillo',price:28},
+  ]},
+  {name:'TimeWise® Microdermabrasion Refine',cat:'Skincare',price:36,variants:[{label:'Sencillo',price:36}]},
+  {name:'TimeWise® Pore Minimizer',cat:'Skincare',price:28,variants:[{label:'Sencillo',price:28}]},
+  {name:'TimeWise Replenishing Serum C+E®',cat:'Skincare',price:60,variants:[{label:'Sencillo',price:60}]},
+  {name:'TimeWise® Targeted-Action® Toning Lotion',cat:'Skincare',price:36,variants:[{label:'Sencillo',price:36}]},
+
+  // ── TIMEWISE REPAIR ──────────────────────────────────────────
+  {name:'TimeWise Repair® Volu-Firm® Set',cat:'Skincare',price:225,variants:[
+    {label:'Volu-Firm Set (5 productos)',price:225},
+    {label:'Ultimate Volu-Firm Set (7 productos)',price:343},
+  ]},
+  {name:'TimeWise Repair® Volu-Firm® Foaming Cleanser',cat:'Skincare',price:30,variants:[
+    {label:'Sencillo',price:30},
+    {label:'Parte del Repair Set',price:null,setNote:'Incluido en Repair Set $225'},
+  ]},
+  {name:'TimeWise Repair® Volu-Firm® Advanced Lifting Serum',cat:'Skincare',price:74,variants:[
+    {label:'Sencillo',price:74},
+    {label:'Parte del Repair Set',price:null,setNote:'Incluido en Repair Set $225'},
+  ]},
+  {name:'TimeWise Repair® Volu-Firm® Day Cream SPF 30',cat:'Skincare',price:54,variants:[
+    {label:'Sencillo',price:54},
+    {label:'Parte del Repair Set',price:null,setNote:'Incluido en Repair Set $225'},
+  ]},
+  {name:'TimeWise Repair® Volu-Firm® Night Treatment With Retinol',cat:'Skincare',price:54,variants:[
+    {label:'Sencillo',price:54},
+    {label:'Parte del Repair Set',price:null,setNote:'Incluido en Repair Set $225'},
+  ]},
+  {name:'TimeWise Repair® Volu-Firm® Eye Renewal Cream',cat:'Skincare',price:44,variants:[
+    {label:'Sencillo',price:44},
+    {label:'Parte del Repair Set',price:null,setNote:'Incluido en Repair Set $225'},
+  ]},
+  {name:'TimeWise Repair® Volu-Fill® Deep Wrinkle Filler',cat:'Skincare',price:50,variants:[{label:'Sencillo',price:50}]},
+  {name:'TimeWise Repair® Revealing Radiance® Facial Peel',cat:'Skincare',price:68,variants:[{label:'Sencillo',price:68}]},
+  {name:'TimeWise Repair® Lifting Bio-Cellulose Mask pk/4',cat:'Skincare',price:70,variants:[{label:'Paquete de 4',price:70}]},
+
+  // ── MARY KAY SKIN CARE ───────────────────────────────────────
+  {name:'Mary Kay® Hydrating Regimen Set',cat:'Skincare',price:80,variants:[
+    {label:'Set completo Hydrating',price:80},
+    {label:'Go Set Hydrating (travel)',price:22},
+  ]},
+  {name:'Mary Kay® Mattifying Regimen Set',cat:'Skincare',price:80,variants:[
+    {label:'Set completo Mattifying',price:80},
+    {label:'Go Set Mattifying (travel)',price:22},
+  ]},
+  {name:'Mary Kay® Hydrating Cleanser',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Mattifying Cleanser',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Hydrating Moisturizer',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Mattifying Moisturizer',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Balancing Toner',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Exfoliating Scrub',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Hydrating Cream Mask',cat:'Skincare',price:24,variants:[
+    {label:'Sencillo',price:24},
+    {label:'Mix & Mask (Charcoal + Hydrating)',price:50},
+  ]},
+  {name:'Mary Kay® After-Sun Replenishing Gel',cat:'Cuerpo',price:20,variants:[{label:'Sencillo',price:20}]},
+
+  // ── CLINICAL SOLUTIONS ───────────────────────────────────────
+  {name:'Mary Kay Clinical Solutions® Barrier Restore',cat:'Skincare',price:46,variants:[{label:'Sencillo',price:46}]},
+  {name:'Mary Kay Clinical Solutions® Retinol 0.3',cat:'Skincare',price:70,variants:[{label:'Sencillo',price:70}]},
+  {name:'Mary Kay Clinical Solutions® Dynamic Wrinkle Limiter',cat:'Skincare',price:58,variants:[{label:'Sencillo',price:58}]},
+  {name:'Mary Kay Clinical Solutions® C + Resveratrol Line-Reducer',cat:'Skincare',price:38,variants:[{label:'Sencillo',price:38}]},
+  {name:'Mary Kay Clinical Solutions® HA + Ceramide Hydrator',cat:'Skincare',price:38,variants:[{label:'Sencillo',price:38}]},
+  {name:'Mary Kay Clinical Solutions® Ferulic + Niacinamide Brightener',cat:'Skincare',price:38,variants:[{label:'Sencillo',price:38}]},
+  {name:'Mary Kay Clinical Solutions® PHA + AHA Resurfacer',cat:'Skincare',price:38,variants:[{label:'Sencillo',price:38}]},
+
+  // ── CLEAR PROOF ──────────────────────────────────────────────
+  {name:'Clear Proof® Acne System Set',cat:'Skincare',price:56,variants:[
+    {label:'Set completo (4 productos)',price:56},
+  ]},
+  {name:'Clear Proof® Clarifying Cleansing Gel',cat:'Skincare',price:20,variants:[
+    {label:'Sencillo',price:20},
+    {label:'Parte del Acne System Set',price:null,setNote:'Incluido en Set $56'},
+  ]},
+  {name:'Clear Proof® Blemish Control Toner',cat:'Skincare',price:18,variants:[
+    {label:'Sencillo',price:18},
+    {label:'Parte del Acne System Set',price:null,setNote:'Incluido en Set $56'},
+  ]},
+  {name:'Clear Proof® Acne Treatment Gel',cat:'Skincare',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Clear Proof® Oil-Free Moisturizer',cat:'Skincare',price:22,variants:[{label:'Sencillo',price:22}]},
+  {name:'Clear Proof® Deep-Cleansing Charcoal Mask',cat:'Skincare',price:26,variants:[{label:'Sencillo',price:26}]},
+
+  // ── MKMEN ─────────────────────────────────────────────────────
+  {name:'MKMen® Regimen Set',cat:'Skincare',price:70,variants:[
+    {label:'Set completo (3 productos)',price:70},
+  ]},
+  {name:'MKMen® Daily Facial Wash',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'MKMen® Moisturizing Shave Cream',cat:'Cuerpo',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'MKMen® Ultimate Moisturizer',cat:'Skincare',price:30,variants:[{label:'Sencillo',price:30}]},
+
+  // ── SUN CARE ──────────────────────────────────────────────────
+  {name:'Mary Kay® Sunscreen Broad Spectrum SPF 50',cat:'Skincare',price:30,variants:[{label:'Sencillo',price:30}]},
+  {name:'Mary Kay® Mineral Facial Sunscreen SPF 30',cat:'Skincare',price:28,variants:[{label:'Sencillo',price:28}]},
+
+  // ── CUSTOMIZED SKIN CARE ──────────────────────────────────────
+  {name:'Mary Kay® Instant Puffiness Reducer',cat:'Skincare',price:38,variants:[{label:'Sencillo',price:38}]},
+  {name:'Indulge® Soothing Eye Gel',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Oil-Free Eye Makeup Remover',cat:'Skincare',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Hydrogel Eye Patches pk/30',cat:'Skincare',price:44,variants:[{label:'Paquete 30 pares',price:44}]},
+  {name:'Mary Kay® Nourishing Oil',cat:'Skincare',price:50,variants:[{label:'Sencillo',price:50}]},
+  {name:'Mary Kay® Micellar Water',cat:'Skincare',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Mary Kay® Extra Emollient Night Cream',cat:'Skincare',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Mary Kay® Intense Moisturizing Cream Dry',cat:'Skincare',price:36,variants:[{label:'Sencillo',price:36}]},
+  {name:'Mary Kay® Oil-Free Hydrating Gel Normal/Oily',cat:'Skincare',price:36,variants:[{label:'Sencillo',price:36}]},
+  {name:'Beauty Blotters® Oil-Absorbing Tissues pk/75',cat:'Skincare',price:8,variants:[{label:'Paquete 75',price:8}]},
+
+  // ── SATIN LIPS ────────────────────────────────────────────────
+  {name:'White Tea & Citrus Satin Lips® Set',cat:'Cuerpo',price:26,variants:[
+    {label:'Set completo (Scrub + Balm + bag)',price:26},
+    {label:'Satin Lips Shea Sugar Scrub — sencillo',price:14},
+    {label:'Satin Lips Shea Butter Balm — sencillo',price:14},
+    {label:'Citrus & Shea Bundle (Hands Cream + Lips Balm)',price:28},
+  ]},
+
+  // ── MAQUILLAJE — FACE ─────────────────────────────────────────
+  {name:'Mary Kay® CC Cream SPF 15',cat:'Maquillaje',price:22,variants:[{label:'Sencillo',price:22}]},
+  {name:'Mary Kay® Foundation Primer SPF 15',cat:'Maquillaje',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Makeup Finishing Spray',cat:'Maquillaje',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'TimeWise® Matte 3D Foundation',cat:'Maquillaje',price:26,variants:[{label:'Sencillo',price:26}]},
+  {name:'TimeWise® Luminous 3D Foundation',cat:'Maquillaje',price:26,variants:[{label:'Sencillo',price:26}]},
+  {name:'Mary Kay® Multi-Benefit Concealer',cat:'Maquillaje',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Mary Kay® Undereye Corrector',cat:'Maquillaje',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Mary Kay® Silky Setting Powder',cat:'Maquillaje',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Translucent Loose Powder',cat:'Maquillaje',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Mary Kay® Illuminating Bronzer',cat:'Maquillaje',price:22,variants:[{label:'Sencillo',price:22}]},
+
+  // ── MAQUILLAJE — COLOR ────────────────────────────────────────
+  {name:'Mary Kay Chromafusion® Blush',cat:'Maquillaje',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Mary Kay Chromafusion® Contour',cat:'Maquillaje',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Mary Kay Chromafusion® Highlighter',cat:'Maquillaje',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Mary Kay Chromafusion® Eye Shadow',cat:'Maquillaje',price:8,variants:[{label:'Sencillo',price:8}]},
+  {name:'Mary Kay® Shimmer Eye Shadow Stick',cat:'Maquillaje',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Waterproof Eyeliner',cat:'Maquillaje',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Mary Kay® Gel Eyeliner With Brush',cat:'Maquillaje',price:22,variants:[{label:'Sencillo',price:22}]},
+  {name:'Mary Kay® Waterproof Liquid Eyeliner Pen',cat:'Maquillaje',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Mary Kay® Great Heights Waterproof Mascara',cat:'Maquillaje',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Mary Kay® Great Heights Mascara',cat:'Maquillaje',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Lash Intensity® Mascara',cat:'Maquillaje',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Lash Love® Mascara',cat:'Maquillaje',price:16,variants:[{label:'Sencillo',price:16}]},
+  {name:'Lash Love Fanorama® Mascara',cat:'Maquillaje',price:16,variants:[{label:'Sencillo',price:16}]},
+  {name:'Mary Kay® Ultimate Mascara',cat:'Maquillaje',price:16,variants:[{label:'Sencillo',price:16}]},
+  {name:'Mary Kay® Clear Brow Styling Gel',cat:'Maquillaje',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Mary Kay® Volumizing Brow Tint',cat:'Maquillaje',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Mary Kay® Precision Brow Liner',cat:'Maquillaje',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Mary Kay® Waterproof Lip Liner',cat:'Maquillaje',price:14,variants:[{label:'Sencillo',price:14}]},
+  {name:'Mary Kay Unlimited® Lip Gloss',cat:'Maquillaje',price:18,variants:[{label:'Sencillo',price:18}]},
+  {name:'Mary Kay® Gel Semi-Matte Lipstick',cat:'Maquillaje',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Gel Semi-Shine Lipstick',cat:'Maquillaje',price:20,variants:[{label:'Sencillo',price:20}]},
+  {name:'Mary Kay® Supreme Hydrating Lipstick',cat:'Maquillaje',price:20,variants:[{label:'Sencillo',price:20}]},
+
+  // ── BODY CARE ─────────────────────────────────────────────────
+  {name:'White Tea & Citrus Satin Hands® Pampering Set',cat:'Cuerpo',price:38,variants:[
+    {label:'Set con fragancia (3 productos + bag)',price:38},
+    {label:'Set sin fragancia',price:38},
+    {label:'Nourishing Shea Cream — sencillo',price:14},
+    {label:'Fragrance-Free Shea Cream — sencillo',price:14},
+  ]},
+  {name:'White Tea & Citrus Satin Body® Set',cat:'Cuerpo',price:38,variants:[
+    {label:'Set completo (Scrub + Wash + Lotion)',price:38},
+    {label:'Revitalizing Shea Scrub — sencillo',price:22},
+    {label:'Indulgent Shea Wash — sencillo',price:22},
+    {label:'Silkening Shea Lotion — sencillo',price:22},
+  ]},
+  {name:'Hello Clean Set (Body Wash + Hydrating Lotion)',cat:'Cuerpo',price:36,variants:[
+    {label:'Set completo',price:36},
+    {label:'2-In-1 Body Wash & Shave — sencillo',price:18},
+    {label:'Hydrating Lotion — sencillo',price:18},
+  ]},
+  {name:'Mary Kay® Apple & Almond Body Lotion',cat:'Cuerpo',price:16,variants:[{label:'Sencillo',price:16}]},
+  {name:'Mary Kay® Apple & Almond Shower Gel',cat:'Cuerpo',price:16,variants:[{label:'Sencillo',price:16}]},
+  {name:'Mary Kay® Berry & Vanilla Body Lotion',cat:'Cuerpo',price:16,variants:[{label:'Sencillo',price:16}]},
+  {name:'Mary Kay® Berry & Vanilla Shower Gel',cat:'Cuerpo',price:16,variants:[{label:'Sencillo',price:16}]},
+  {name:'Mint Bliss™ Energizing Lotion for Feet & Legs',cat:'Cuerpo',price:12,variants:[{label:'Sencillo',price:12}]},
+
+  // ── FRAGANCIAS ────────────────────────────────────────────────
+  {name:'Mary Kay Confidently You™ Eau de Parfum',cat:'Fragancia',price:55,variants:[{label:'Sencillo',price:55}]},
+  {name:'Belara® Eau de Parfum',cat:'Fragancia',price:44,variants:[{label:'Sencillo',price:44}]},
+  {name:'Bella Belara® Eau de Parfum',cat:'Fragancia',price:44,variants:[{label:'Sencillo',price:44}]},
+  {name:'Enchanted Wish® Eau de Toilette',cat:'Fragancia',price:40,variants:[{label:'Sencillo',price:40}]},
+  {name:'Forever Diamonds® Eau de Parfum',cat:'Fragancia',price:46,variants:[{label:'Sencillo',price:46}]},
+  {name:'Live Fearlessly® Eau de Parfum',cat:'Fragancia',price:48,variants:[{label:'Sencillo',price:48}]},
+  {name:'Mary Kay Illuminea™ Extrait de Parfum',cat:'Fragancia',price:80,variants:[{label:'Sencillo',price:80}]},
+  {name:'Thinking of You® Eau de Parfum',cat:'Fragancia',price:36,variants:[{label:'Sencillo',price:36}]},
+  {name:'Cityscape® Cologne Spray',cat:'Fragancia',price:56,variants:[{label:'Sencillo',price:56}]},
+  {name:'Domain® Cologne Spray',cat:'Fragancia',price:42,variants:[{label:'Sencillo',price:42}]},
+  {name:'MK High Intensity® Cologne Spray',cat:'Fragancia',price:46,variants:[{label:'Sencillo',price:46}]},
+  {name:'MK High Intensity Ocean® Cologne Spray',cat:'Fragancia',price:46,variants:[{label:'Sencillo',price:46}]},
+  {name:'MK High Intensity® Sport Cologne Spray',cat:'Fragancia',price:46,variants:[{label:'Sencillo',price:46}]},
+];
+
+// ══ SUPABASE ══
+const SUPA_URL='https://wkqovrklcrrxawmnefwm.supabase.co';
+const SUPA_KEY='sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
+async function supa(method,path,body){
+  const res=await fetch(`${SUPA_URL}/rest/v1/${path}`,{method,headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:body?JSON.stringify(body):undefined});
+  if(!res.ok)throw new Error(await res.text());
+  const t=await res.text();return t?JSON.parse(t):null;
+}
+
+// ══ STATE ══
+let inventory = JSON.parse(localStorage.getItem('mk_inv_v2')||'[]');
+let sales     = JSON.parse(localStorage.getItem('mk_sales_v2')||'[]');
+let followups = JSON.parse(localStorage.getItem('mk_fu_v2')||'[]');
+let clients   = JSON.parse(localStorage.getItem('mk_clientas_local')||'[]');
+let mkPrices  = JSON.parse(localStorage.getItem('mk_prices')||'{}');
+let cart      = []; // [{id,name,cat,price,qty}]
+let discType  = 'pct'; // 'pct' or 'amt'
+let invFilter='all', fuFilter='all', editingProdId=null;
+const PRICE_TTL=24*60*60*1000;
+
+function saveLocal(){
+  localStorage.setItem('mk_inv_v2',JSON.stringify(inventory));
+  localStorage.setItem('mk_sales_v2',JSON.stringify(sales));
+  localStorage.setItem('mk_fu_v2',JSON.stringify(followups));
+  localStorage.setItem('mk_prices',JSON.stringify(mkPrices));
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+
+// ══ INIT ══
+async function init(){
+  renderAll();
+  document.getElementById('loading').style.display='none';
+  if(navigator.onLine){setSyncStatus('syncing','🔄 Sincronizando...');try{await syncAll();}catch(e){setSyncStatus('offline','⚠️ Modo offline');}}
+  else setSyncStatus('offline','📴 Sin conexión');
+  refreshPrices();
+  window.addEventListener('online',()=>syncAll());
+  window.addEventListener('offline',()=>setSyncStatus('offline','📴 Sin conexión'));
+  setInterval(()=>{if(navigator.onLine)syncAll();},60000);
+  document.addEventListener('click',(e)=>{
+    if(!document.getElementById('sdrop-wrap').contains(e.target))sdropClose();
+    if(!document.getElementById('cli-sdrop-wrap').contains(e.target))cliSdropClose();
+  });
+  calcTotals();
+}
+
+async function syncAll(){
+  try{const r=await supa('GET','mk_inventory?select=*&order=created_at.desc');if(r){inventory=r;saveLocal();}}catch(e){}
+  try{const r=await supa('GET','mk_sales?select=*&order=created_at.desc');if(r){sales=r;saveLocal();}}catch(e){}
+  try{const r=await supa('GET','mk_followups?select=*&order=scheduled_date.asc');if(r){followups=r;saveLocal();}}catch(e){}
+  try{const r=await supa('GET','clientas?select=*&order=created_at.desc');if(r){clients=r;localStorage.setItem('mk_clientas_local',JSON.stringify(clients));}}catch(e){}
+  renderAll();setSyncStatus('online','☁️ Sincronizado');
+}
+function setSyncStatus(s,t){const el=document.getElementById('sync-status');el.className='sync-chip '+s;el.textContent=t;}
+function syncNow(){if(navigator.onLine)syncAll();else setSyncStatus('offline','📴 Sin conexión');}
+
+// ══ LIVE PRICES ══
+async function refreshPrices(){
+  const el=document.getElementById('price-status');
+  if(Date.now()-(mkPrices._lastFetch||0)<PRICE_TTL&&Object.keys(mkPrices).length>1){el.className='price-chip live';el.textContent='💰 Precios al día ✓';return;}
+  if(!navigator.onLine){el.textContent='💰 Sin conexión';return;}
+  el.textContent='💰 Actualizando...';
+  try{
+    const resp=await fetch('https://mk-scan.jenniffermarykay2017.workers.dev/prices',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({})
+    });
+    const data=await resp.json();
+    if(data.prices&&Object.keys(data.prices).length){
+      const prices=data.prices;prices._lastFetch=Date.now();mkPrices=prices;saveLocal();
+      let updated=false;
+      inventory.forEach(p=>{
+        const key=Object.keys(prices).find(k=>k!=='_lastFetch'&&(p.name.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(p.name.toLowerCase().split(' ').slice(0,3).join(' '))));
+        if(key&&prices[key]&&Math.abs((p.price||0)-prices[key])>0.01){p.price=prices[key];updated=true;}
+      });
+      if(updated){saveLocal();inventory.forEach(p=>{if(navigator.onLine)try{supa('PATCH',`mk_inventory?id=eq.${p.id}`,{price:p.price});}catch(e){}});}
+      el.className='price-chip live';el.textContent='💰 Precios al día ✓';renderAll();
+    }
+  }catch(e){el.textContent='💰 Error precios';}
+}
+
+// ══ TABS ══
+function showTab(t){
+  ['inv','cart','followup','clients'].forEach(id=>{
+    document.getElementById('view-'+id).classList.toggle('active',id===t);
+    const bn=document.getElementById('bnav-'+id);
+    if(bn)bn.classList.toggle('active',id===t);
+  });
+  document.getElementById('fab-btn').style.display=t==='inv'?'flex':'none';
+  if(t==='followup')renderFollowups();
+  if(t==='clients')renderClientsQuick();
+  if(t==='cart'){calcTotals();renderCartItems();}
+}
+
+// ══ STATS ══
+function renderStats(){
+  const total=inventory.length,low=inventory.filter(p=>p.qty>0&&p.qty<=(p.alert||2)).length,empty=inventory.filter(p=>p.qty===0).length,val=inventory.reduce((s,p)=>s+(p.price||0)*(p.qty||0),0);
+  document.getElementById('st-total').textContent=total;document.getElementById('st-low').textContent=low;
+  document.getElementById('st-empty').textContent=empty;document.getElementById('st-val').textContent='$'+val.toFixed(0);
+  document.getElementById('hstat-total').textContent=total+' productos';
+  document.getElementById('hstat-low').textContent='⚠️ '+low+' bajos';
+  document.getElementById('hstat-empty').textContent='⛔ '+empty+' agotados';
+  // cart badge
+  const badge=document.getElementById('cart-badge');
+  badge.style.display=cart.length?'flex':'none';
+  badge.textContent=cart.length;
+}
+function catEmoji(c){return{Skincare:'🧴',Maquillaje:'💄',Cuerpo:'🧼',Fragancia:'✨',Otro:'📦'}[c]||'📦';}
+function renderAll(){renderInv();renderStats();renderSales();renderFollowups();renderClientsQuick();}
+
+// ══ INVENTORY ══
+function setInvFilter(el,f){invFilter=f;document.querySelectorAll('#view-inv .fchip').forEach(e=>e.classList.remove('active'));el.classList.add('active');renderInv();}
+function renderInv(){
+  const q=(document.getElementById('inv-search').value||'').toLowerCase();
+  let list=inventory.filter(p=>{
+    if(q&&!p.name.toLowerCase().includes(q))return false;
+    if(invFilter==='all')return true;
+    if(invFilter==='__low')return p.qty>0&&p.qty<=(p.alert||2);
+    if(invFilter==='__empty')return p.qty===0;
+    if(invFilter==='__recent')return(new Date()-new Date(p.created_at||0))<7*24*60*60*1000;
+    return p.cat===invFilter;
+  });
+  list.sort((a,b)=>{const r=p=>p.qty===0?0:p.qty<=(p.alert||2)?1:2;return r(a)-r(b);});
+  const el=document.getElementById('inv-list');
+  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="icon">📦</div><h3>Sin productos</h3><p>Toca + para agregar o usa la cámara.</p></div>`;return;}
+  el.innerHTML=list.map(p=>{
+    const isEmpty=p.qty===0,isLow=!isEmpty&&p.qty<=(p.alert||2);
+    const qc=isEmpty?'qty-empty':isLow?'qty-low':'qty-ok';
+    const ql=isEmpty?'⛔ Agotado':isLow?`⚠️ Solo ${p.qty}`:`✅ ${p.qty} unid.`;
+    const cc=isEmpty?'empty':isLow?'low':'';
+    const ds=p.created_at?new Date(p.created_at).toLocaleDateString('es-PR',{day:'numeric',month:'short'}):'';
+    return `<div class="prod-card ${cc}" onclick="openViewProduct('${p.id}')">
+      <div class="prod-badge badge-${p.cat||'Otro'}">${catEmoji(p.cat)}</div>
+      <div class="prod-info"><div class="prod-name">${p.name}</div><div class="prod-cat">${p.cat||'Otro'}</div>${ds?`<div class="prod-date">Agregado: ${ds}</div>`:''}</div>
+      <div class="prod-right"><div class="prod-price">$${(p.price||0).toFixed(2)}</div><div class="prod-qty ${qc}">${ql}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ══ PRODUCT CRUD ══
+function openAddProduct(){editingProdId=null;document.getElementById('prod-modal-title').textContent='Nuevo Producto ✨';['pf-name','pf-price','pf-qty','pf-alert'].forEach(id=>document.getElementById(id).value='');document.getElementById('pf-cat').value='Skincare';document.getElementById('prod-modal').classList.add('open');}
+function openEditProduct(id){const p=inventory.find(x=>x.id===id);if(!p)return;editingProdId=id;document.getElementById('prod-modal-title').textContent='Editar Producto ✏️';document.getElementById('pf-name').value=p.name;document.getElementById('pf-cat').value=p.cat||'Skincare';document.getElementById('pf-price').value=p.price||0;document.getElementById('pf-qty').value=p.qty||0;document.getElementById('pf-alert').value=p.alert||2;closeModalDirect('view-modal');document.getElementById('prod-modal').classList.add('open');}
+async function saveProduct(){
+  const name=document.getElementById('pf-name').value.trim();if(!name){toast('Escribe el nombre 🌸');return;}
+  const data={name,cat:document.getElementById('pf-cat').value,price:parseFloat(document.getElementById('pf-price').value)||0,qty:parseInt(document.getElementById('pf-qty').value)||0,alert:parseInt(document.getElementById('pf-alert').value)||2};
+  if(editingProdId){
+    const idx=inventory.findIndex(x=>x.id===editingProdId);if(idx>=0)inventory[idx]={...inventory[idx],...data};
+    saveLocal();renderAll();if(navigator.onLine)try{await supa('PATCH',`mk_inventory?id=eq.${editingProdId}`,data);}catch(e){}
+    toast('✅ Producto actualizado');
+  }else{
+    data.id=uid();data.created_at=new Date().toISOString();
+    inventory.unshift(data);saveLocal();renderAll();if(navigator.onLine)try{await supa('POST','mk_inventory?on_conflict=id',data);}catch(e){}
+    toast('✅ Producto agregado');
+  }
+  closeModalDirect('prod-modal');
+}
+async function deleteProduct(id){
+  if(!confirm('¿Eliminar este producto?'))return;
+  inventory=inventory.filter(x=>x.id!==id);saveLocal();renderAll();closeModalDirect('view-modal');
+  if(navigator.onLine)try{await supa('DELETE',`mk_inventory?id=eq.${id}`);}catch(e){}
+  toast('Producto eliminado');
+}
+function openViewProduct(id){
+  const p=inventory.find(x=>x.id===id);if(!p)return;
+  const isEmpty=p.qty===0,isLow=!isEmpty&&p.qty<=(p.alert||2);
+  const qc=isEmpty?'color:var(--empty)':isLow?'color:var(--warn)':'color:var(--ok)';
+  const ql=isEmpty?'⛔ Agotado':isLow?`⚠️ Solo ${p.qty} unidades`:`✅ ${p.qty} unidades`;
+  document.getElementById('vm-title').textContent=p.name;
+  document.getElementById('vm-body').innerHTML=`
+    <div style="text-align:center;padding:16px 0 12px;">
+      <div style="font-size:3rem;">${catEmoji(p.cat)}</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin:8px 0 4px;">${p.name}</div>
+      <div style="font-size:.85rem;color:var(--text-light);">${p.cat||'Otro'}</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:14px;margin-bottom:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center;">
+        <div><div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--rose);">$${(p.price||0).toFixed(2)}</div><div style="font-size:.72rem;color:var(--text-light);">Precio sugerido</div></div>
+        <div><div style="font-size:1.3rem;font-weight:700;${qc}">${p.qty||0}</div><div style="font-size:.72rem;color:var(--text-light);">En inventario</div></div>
+      </div>
+      <div style="margin-top:12px;text-align:center;font-size:.85rem;font-weight:700;${qc}">${ql}</div>
+    </div>`;
+  document.getElementById('vm-actions').innerHTML=`<button class="btn btn-gold" style="flex:1;" onclick="openEditProduct('${id}')">✏️ Editar</button><button class="btn btn-danger" onclick="deleteProduct('${id}')">🗑</button>`;
+  document.getElementById('view-modal').classList.add('open');
+}
+
+// ══ SEARCHABLE DROPDOWN ══
+function sdropOpen(){sdropFilter();document.getElementById('sdrop-list').classList.add('open');}
+function sdropClose(){document.getElementById('sdrop-list').classList.remove('open');}
+function sdropToggle(){const l=document.getElementById('sdrop-list');if(l.classList.contains('open'))sdropClose();else sdropOpen();}
+function sdropFilter(){
+  const q=document.getElementById('sdrop-search').value;
+  const ql=q.toLowerCase().trim();
+  document.getElementById('sdrop-clear').classList.toggle('visible',q.length>0);
+  const invOpts=inventory.filter(p=>!ql||p.name.toLowerCase().includes(ql));
+  const catOpts=ql.length>=2?MK_CATALOG.filter(p=>p.name.toLowerCase().includes(ql)&&!invOpts.find(i=>i.name.toLowerCase()===p.name.toLowerCase())):[];
+  const list=document.getElementById('sdrop-list');
+  const showManual=ql.length>0&&invOpts.length===0&&catOpts.length===0;
+  document.getElementById('manual-add-box').classList.toggle('open',showManual);
+  let html='';
+  if(!invOpts.length&&!catOpts.length&&!ql){
+    html=`<div class="sdrop-item empty-opt">No hay productos — toca + para agregar</div>`;
+  } else if(showManual){
+    html=`<div class="sdrop-item manual-hint">➕ Agregar "${q}" como nuevo producto ↓</div>`;
+  } else {
+    html+=invOpts.slice(0,20).map(p=>{
+      const isEmpty=p.qty===0,isLow=!isEmpty&&p.qty<=(p.alert||2);
+      const qLabel=isEmpty?'⛔':isLow?`⚠️${p.qty}`:p.qty;
+      return `<div class="sdrop-item" onclick="sdropSelectWithVariants('inv','${p.id}','${p.name.replace(/'/g,"\'").replace(/"/g,'&quot;')}',${p.price||0},'${p.cat||'Otro'}')">
+        <span>${catEmoji(p.cat)}</span><span class="si-name">${p.name}</span>
+        <span class="si-sub">${qLabel} 📦</span><span class="si-price">$${(p.price||0).toFixed(0)}</span></div>`;
+    }).join('');
+    if(catOpts.length){
+      html+=`<div style="padding:5px 14px;font-size:.7rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;background:#fdf5f8;">Catálogo MK</div>`;
+      html+=catOpts.slice(0,10).map(p=>{
+        const hasV=p.variants&&p.variants.length>1;
+        const prices=p.variants?p.variants.filter(v=>v.price).map(v=>v.price):[];
+        const minP=prices.length?Math.min(...prices):p.price;
+        const escaped=p.name.replace(/'/g,"\'").replace(/"/g,'&quot;');
+        return `<div class="sdrop-item" onclick="sdropSelectWithVariants('cat',null,'${escaped}',${p.price||0},'${p.cat||'Skincare'}','${escaped}')">
+          <span>${catEmoji(p.cat)}</span><span class="si-name">${p.name}${hasV?' <span style="font-size:.7rem;color:var(--rose);">▾</span>':''}</span>
+          <span class="si-sub">catálogo</span><span class="si-price">${hasV?'desde ':''}$${(minP||0).toFixed(0)}</span></div>`;
+      }).join('');
+    }
+  }
+  list.innerHTML=html;list.classList.add('open');
+}
+
+function sdropSelectWithVariants(source,prodId,name,price,cat,catalogName){
+  const catEntry=MK_CATALOG.find(p=>p.name===name||(catalogName&&p.name===catalogName));
+  if(catEntry&&catEntry.variants&&catEntry.variants.length>1){
+    const list=document.getElementById('sdrop-list');
+    const escaped=catEntry.name.replace(/'/g,"\'");
+    list.innerHTML=`
+      <div style="padding:10px 12px 6px;font-size:.75rem;font-weight:700;color:var(--rose-dark);border-bottom:1px solid var(--rose-light);">
+        ${catEmoji(cat)} ${catEntry.name}<br>
+        <span style="font-weight:400;color:var(--text-light);">¿Es sencillo o en set?</span>
+      </div>
+      ${catEntry.variants.map((v,vi)=>`
+        <div class="sdrop-item" onclick="sdropFinalSelect('${prodId||''}','${escaped}',${v.price||price},'${cat}','${(v.label||'').replace(/'/g,"\'")}')">
+          <span>${v.price?'🔹':'📦'}</span>
+          <span class="si-name" style="font-weight:${v.price?'700':'400'};">${v.label}</span>
+          <span class="si-price">${v.price?'$'+v.price.toFixed(2):(v.setNote||'')}</span>
+        </div>`).join('')}
+      <div class="sdrop-item" style="color:var(--text-light);font-style:italic;" onclick="sdropOpen()">← Volver a buscar</div>`;
+    list.classList.add('open');
+    return;
+  }
+  sdropSelect(prodId||'',name,price,cat);
+}
+
+function sdropFinalSelect(prodId,name,price,cat,variantLabel){
+  const displayName=variantLabel&&variantLabel!=='Sencillo'?`${name} (${variantLabel})`:name;
+  sdropSelect(prodId,displayName,price,cat);
+}
+
+function sdropSelect(id,name,price,cat){
+  document.getElementById('cart-prod-id').value=id;
+  document.getElementById('cart-prod-name').value=name;
+  document.getElementById('cart-item-price').value=price||'';
+  document.getElementById('sdrop-search').value=name;
+  document.getElementById('sdrop-clear').classList.add('visible');
+  document.getElementById('manual-add-box').classList.remove('open');
+  sdropClose();
+}
+function sdropClear(){
+  document.getElementById('cart-prod-id').value='';document.getElementById('cart-prod-name').value='';
+  document.getElementById('sdrop-search').value='';document.getElementById('sdrop-clear').classList.remove('visible');
+  document.getElementById('manual-add-box').classList.remove('open');document.getElementById('cart-item-price').value='';
+}
+function sdropKey(e){if(e.key==='Escape')sdropClose();}
+async function sdropAddManual(){
+  const name=document.getElementById('sdrop-search').value.trim();if(!name){toast('Escribe el nombre');return;}
+  const cat=document.getElementById('ma-cat').value;const price=parseFloat(document.getElementById('ma-price').value)||0;
+  const data={id:uid(),name,cat,price,qty:0,alert:2,created_at:new Date().toISOString()};
+  inventory.unshift(data);saveLocal();renderAll();
+  if(navigator.onLine)try{await supa('POST','mk_inventory?on_conflict=id',data);}catch(e){}
+  sdropSelect(data.id,name,price,cat);
+  document.getElementById('manual-add-box').classList.remove('open');
+  toast(`✅ "${name}" agregado`);
+}
+
+// ══ CLIENT DROPDOWN ══
+function setCliMode(mode){
+  const isFree = mode === 'free';
+  document.getElementById('cli-free-mode').style.display = isFree ? 'block' : 'none';
+  document.getElementById('cli-crm-mode').style.display  = isFree ? 'none'  : 'block';
+  // button styles
+  const freeBtn = document.getElementById('cli-mode-free');
+  const crmBtn  = document.getElementById('cli-mode-crm');
+  freeBtn.style.background    = isFree ? 'var(--rose)' : 'white';
+  freeBtn.style.color         = isFree ? 'white' : 'var(--rose)';
+  freeBtn.style.borderColor   = 'var(--rose)';
+  crmBtn.style.background     = isFree ? 'white' : 'var(--rose)';
+  crmBtn.style.color          = isFree ? 'var(--rose)' : 'white';
+  crmBtn.style.borderColor    = 'var(--rose)';
+  // clear both fields on switch
+  if(isFree){
+    cliSdropClear();
+    const n = document.getElementById('cli-free-name').value;
+    document.getElementById('cart-client-name').value = n;
+    document.getElementById('cart-client-id').value   = '';
+  } else {
+    document.getElementById('cli-free-name').value    = '';
+    document.getElementById('cart-client-name').value = '';
+    document.getElementById('cart-client-id').value   = '';
+  }
+}
+
+function cliSdropOpen(){cliSdropFilter();document.getElementById('cli-sdrop-list').classList.add('open');}
+function cliSdropClose(){document.getElementById('cli-sdrop-list').classList.remove('open');}
+function cliSdropToggle(){const l=document.getElementById('cli-sdrop-list');if(l.classList.contains('open'))cliSdropClose();else cliSdropOpen();}
+function cliSdropFilter(){
+  const q=(document.getElementById('cli-sdrop-search').value||'').toLowerCase();
+  document.getElementById('cli-sdrop-clear').classList.toggle('visible',q.length>0);
+  const opts=clients.filter(c=>!q||`${c.nombre||''} ${c.apellido||''}`.toLowerCase().includes(q));
+  const tl=t=>({VIP:'⭐',frecuente:'💗',nueva:'🌸',prospecto:'💎',inactiva:'💤'}[t]||'');
+  let html=`<div class="sdrop-item" onclick="cliSdropSelect('','Sin clienta / venta directa')"><span>🛍</span><span class="si-name" style="font-style:italic;color:var(--text-light);">Sin clienta</span></div>`;
+  html+=opts.slice(0,20).map(c=>`<div class="sdrop-item" onclick="cliSdropSelect('${c.id}','${((c.nombre||'')+' '+(c.apellido||'')).trim()}')"><span>👤</span><span class="si-name">${c.nombre||''} ${c.apellido||''}</span><span class="si-sub">${tl(c.tipo)}</span></div>`).join('');
+  if(!opts.length&&q)html+=`<div class="sdrop-item empty-opt">No encontrada</div>`;
+  document.getElementById('cli-sdrop-list').innerHTML=html;document.getElementById('cli-sdrop-list').classList.add('open');
+}
+function cliSdropSelect(id,name){
+  document.getElementById('cart-client-id').value=id;document.getElementById('cart-client-name').value=name;
+  document.getElementById('cli-sdrop-search').value=id?name:'';
+  document.getElementById('cli-sdrop-tag-label').textContent=name;
+  document.getElementById('cli-sdrop-selected-tag').style.display=id?'block':'none';
+  document.getElementById('cli-sdrop-clear').classList.toggle('visible',!!id);
+  cliSdropClose();
+}
+function cliSdropClear(){document.getElementById('cart-client-id').value='';document.getElementById('cart-client-name').value='';document.getElementById('cli-sdrop-search').value='';document.getElementById('cli-sdrop-selected-tag').style.display='none';document.getElementById('cli-sdrop-clear').classList.remove('visible');}
+
+// ══ CART ══
+function addToCart(){
+  const prodId=document.getElementById('cart-prod-id').value;
+  const prodName=document.getElementById('cart-prod-name').value||document.getElementById('sdrop-search').value.trim();
+  if(!prodName){toast('Selecciona o escribe un producto 🌸');return;}
+  const qty=parseInt(document.getElementById('cart-qty').value)||1;
+  const price=parseFloat(document.getElementById('cart-item-price').value)||0;
+  if(!price){toast('Escribe el precio unitario');return;}
+  const existing=cart.findIndex(x=>x.prodId===prodId&&prodId);
+  if(existing>=0){cart[existing].qty+=qty;cart[existing].price=price;}
+  else{
+    const prod=inventory.find(x=>x.id===prodId);
+    cart.push({cartId:uid(),prodId:prodId||null,name:prodName,cat:prod?.cat||'Otro',price,qty});
+  }
+  sdropClear();document.getElementById('cart-qty').value='1';document.getElementById('cart-item-price').value='';
+  renderCartItems();calcTotals();renderStats();
+  toast(`✅ ${prodName} agregado a la cesta`);
+}
+
+function renderCartItems(){
+  const sec=document.getElementById('cart-items-section');
+  const emptyMsg=document.getElementById('cart-empty-msg');
+  if(!cart.length){sec.style.display='none';emptyMsg.style.display='block';return;}
+  sec.style.display='block';emptyMsg.style.display='none';
+  document.getElementById('cart-items-list').innerHTML=cart.map((item,i)=>`
+    <div class="cart-item">
+      <div style="font-size:1.3rem;">${catEmoji(item.cat)}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-sub">$${item.price.toFixed(2)} c/u</div>
+        <div class="cart-qty-ctrl">
+          <button class="qty-btn" onclick="cartQty(${i},-1)">−</button>
+          <span class="qty-display">${item.qty}</span>
+          <button class="qty-btn" onclick="cartQty(${i},1)">+</button>
+        </div>
+      </div>
+      <div class="cart-item-right">
+        <div class="cart-item-total">$${(item.price*item.qty).toFixed(2)}</div>
+        <button class="cart-item-remove" onclick="removeFromCart(${i})">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function cartQty(i,delta){
+  cart[i].qty=Math.max(1,cart[i].qty+delta);
+  renderCartItems();calcTotals();renderStats();
+}
+function removeFromCart(i){cart.splice(i,1);renderCartItems();calcTotals();renderStats();}
+function clearCart(){if(!confirm('¿Vaciar la cesta?'))return;cart=[];renderCartItems();calcTotals();renderStats();sdropClear();cliSdropClear();}
+
+// ══ FEE & DISCOUNT ══
+let feeType='pct';
+function setFeeType(t){
+  feeType=t;
+  document.getElementById('fee-pct-btn').classList.toggle('sel',t==='pct');
+  document.getElementById('fee-amt-btn').classList.toggle('sel',t==='amt');
+  document.getElementById('fee-type-label').textContent=t==='pct'?'%':'$';
+  calcTotals();
+}
+function setDiscType(t){
+  discType=t;
+  document.getElementById('disc-pct-btn').classList.toggle('sel',t==='pct');
+  document.getElementById('disc-amt-btn').classList.toggle('sel',t==='amt');
+  document.getElementById('disc-type-label').textContent=t==='pct'?'%':'$';
+  calcTotals();
+}
+
+function calcTotals(){
+  const subtotal=cart.reduce((s,i)=>s+(i.price*i.qty),0);
+  const t1Rate=parseFloat(document.getElementById('tax1-rate')?.value||0)/100;
+  const t2Rate=parseFloat(document.getElementById('tax2-rate')?.value||0)/100;
+  const discVal=parseFloat(document.getElementById('disc-value')?.value||0);
+  const feeVal=parseFloat(document.getElementById('fee-value')?.value||0);
+  const discAmt=discType==='pct'?subtotal*(discVal/100):Math.min(discVal,subtotal);
+  const afterDisc=Math.max(0,subtotal-discAmt);
+  const tax1Amt=afterDisc*t1Rate;
+  const tax2Amt=afterDisc*t2Rate;
+  const feeAmt=feeType==='pct'?afterDisc*(feeVal/100):feeVal;
+  const total=afterDisc+tax1Amt+tax2Amt+feeAmt;
+  const t1Name='IVU Municipal (PR)';
+  const t2Name='IVU Estatal (PR)';
+  const el=document.getElementById('totals-display');
+  if(!el)return;
+  // INTERNAL breakdown — never shown to client
+  el.innerHTML=`
+    <div style="border-top:1px solid var(--rose-light);margin-top:14px;padding-top:12px;">
+      <div class="totals-row sub"><span>Subtotal productos</span><span>$${subtotal.toFixed(2)}</span></div>
+      ${discAmt>0?`<div class="totals-row sub" style="color:var(--ok);"><span>Descuento (${discType==='pct'?discVal+'%':'$'+parseFloat(discVal).toFixed(2)})</span><span>−$${discAmt.toFixed(2)}</span></div>`:''}
+      <div class="totals-row sub"><span>${t1Name} ${(t1Rate*100).toFixed(1)}%</span><span>$${tax1Amt.toFixed(2)}</span></div>
+      <div class="totals-row sub"><span>${t2Name} ${(t2Rate*100).toFixed(1)}%</span><span>$${tax2Amt.toFixed(2)}</span></div>
+      ${feeAmt>0?`<div class="totals-row sub" style="color:var(--rose-dark);"><span>Mi cargo (${feeType==='pct'?feeVal+'%':'$'+parseFloat(feeVal).toFixed(2)})</span><span>$${feeAmt.toFixed(2)}</span></div>`:''}
+      <div class="totals-row total divider"><span>TOTAL A COBRAR</span><span>$${total.toFixed(2)}</span></div>
+    </div>`;
+  return{subtotal,discAmt,tax1Amt,tax2Amt,feeAmt,total,t1Name,t2Name};
+}
+
+// ══ CHECKOUT ══
+async function checkoutCart(){
+  if(!cart.length){toast('La cesta está vacía');return;}
+  const totals=calcTotals();
+  const clientId=document.getElementById('cart-client-id').value;
+  const clientName=document.getElementById('cart-client-name').value||'Venta directa';
+  const doFollowup=document.getElementById('cart-followup').value==='si';
+  const saleId=uid();
+  const saleData={id:saleId,items:JSON.stringify(cart),client_id:clientId||null,client_name:clientName,subtotal:totals.subtotal,discount:totals.discAmt,tax1:totals.tax1Amt,tax2:totals.tax2Amt,fee:totals.feeAmt,total:totals.total,created_at:new Date().toISOString()};
+  sales.unshift(saleData);saveLocal();
+  if(navigator.onLine)try{await supa('POST','mk_sales?on_conflict=id',saleData);}catch(e){}
+  for(const item of cart){
+    if(item.prodId){
+      const idx=inventory.findIndex(x=>x.id===item.prodId);
+      if(idx>=0){inventory[idx].qty=Math.max(0,(inventory[idx].qty||0)-item.qty);saveLocal();if(navigator.onLine)try{await supa('PATCH',`mk_inventory?id=eq.${item.prodId}`,{qty:inventory[idx].qty});}catch(e){}}
+    }
+  }
+  if(doFollowup&&clientId){
+    const now=new Date();const prodNames=cart.map(i=>i.name).join(', ');
+    [2,14,60].forEach(async(days,i)=>{
+      const d=new Date(now);d.setDate(d.getDate()+days);
+      const labels=['2 días','2 semanas','2 meses'];
+      const fu={id:uid(),prod_name:prodNames,client_id:clientId,client_name:clientName,type:labels[i],scheduled_date:d.toISOString().split('T')[0],done:false,created_at:new Date().toISOString()};
+      followups.push(fu);saveLocal();if(navigator.onLine)try{await supa('POST','mk_followups?on_conflict=id',fu);}catch(e){}
+    });
+  }
+  renderAll();
+  const cartSnap=[...cart];
+  cart=[];renderCartItems();calcTotals();renderStats();sdropClear();cliSdropClear();
+  toast(`✅ Venta registrada — $${totals.total.toFixed(2)}`);
+  setTimeout(()=>showReceiptModal(cartSnap,totals,clientName,new Date()),400);
+}
+
+// ══ RECEIPT — clean version for client, no tax/fee words ══
+function previewReceipt(){
+  if(!cart.length){toast('La cesta está vacía');return;}
+  const totals=calcTotals();
+  const clientName=document.getElementById('cart-client-name').value||'';
+  showReceiptModal(cart,totals,clientName,new Date());
+}
+
+function previewReceiptFromSale(sale){
+  let items=[];try{items=JSON.parse(sale.items||'[]');}catch(e){}
+  // Rebuild totals from sale data — no tax/fee labels
+  const totals={subtotal:sale.subtotal,discAmt:sale.discount||0,tax1Amt:sale.tax1||0,tax2Amt:sale.tax2||0,feeAmt:sale.fee||0,total:sale.total};
+  showReceiptModal(items,totals,sale.client_name||'',new Date(sale.created_at));
+}
+
+function showReceiptModal(items,totals,clientName,date){
+  const dateStr=date.toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'});
+  const timeStr=date.toLocaleTimeString('es-PR',{hour:'2-digit',minute:'2-digit'});
+  const clientStr=clientName&&clientName!=='Venta directa'?`<div style="font-size:.8rem;font-weight:700;margin-top:6px;color:var(--rose-dark);">Para: ${clientName}</div>`:'';
+  // RECEIPT shows only: products list + total. Nothing about taxes, fees, or discounts.
+  document.getElementById('receipt-content').innerHTML=`
+    <div class="receipt-header">
+      <div class="receipt-logo">✨ Mary Kay</div>
+      <div class="receipt-sub">Jenniffer Ivelisse · Consultora Independiente</div>
+      <div style="font-size:.75rem;color:var(--text-light);margin-top:4px;">${dateStr} · ${timeStr}</div>
+      ${clientStr}
+    </div>
+    <div class="receipt-line header"><span style="flex:2;">Producto</span><span style="text-align:center;">Cant.</span><span style="text-align:right;">Importe</span></div>
+    ${items.map(i=>`
+      <div class="receipt-line">
+        <span style="flex:2;min-width:0;white-space:normal;font-size:.83rem;line-height:1.3;">${i.name}</span>
+        <span style="text-align:center;white-space:nowrap;padding:0 6px;">${i.qty}</span>
+        <span style="text-align:right;white-space:nowrap;">$${(i.qty*i.price).toFixed(2)}</span>
+      </div>`).join('')}
+    <div class="receipt-line total" style="margin-top:12px;padding-top:12px;border-top:2px solid var(--rose-light);">
+      <span style="flex:2;">Total</span>
+      <span></span>
+      <span style="text-align:right;">$${(totals.total||0).toFixed(2)}</span>
+    </div>
+    <div class="receipt-footer">¡Gracias por tu compra! 🌸<br>marykay.com/jenniffer/es/</div>`;
+  document.getElementById('receipt-modal').classList.add('open');
+}
+
+function shareReceiptWA(){
+  const el=document.getElementById('receipt-content');
+  const text=el.innerText.replace(/\n\n+/g,'\n').trim();
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+// ══ SALES LIST ══
+function renderSales(){
+  const el=document.getElementById('sales-list');if(!el)return;
+  if(!sales.length){el.innerHTML=`<div class="empty-state"><div class="icon">🛒</div><h3>Sin ventas aún</h3><p>Registra tu primera venta arriba.</p></div>`;return;}
+  el.innerHTML=sales.slice(0,30).map(s=>{
+    let items=[];try{items=JSON.parse(s.items||'[]');}catch(e){}
+    const prodLabel=items.length>1?`${items[0].name} +${items.length-1} más`:items[0]?.name||'Venta';
+    return `<div class="sale-item" onclick="previewReceiptFromSale(${JSON.stringify(s).replace(/"/g,'&quot;')})">
+      <div class="sale-left">
+        <div class="sale-prod">${prodLabel}</div>
+        <div class="sale-client">👤 ${s.client_name||'Venta directa'}</div>
+        <div class="sale-date">${s.created_at?new Date(s.created_at).toLocaleDateString('es-PR',{day:'numeric',month:'short',year:'numeric'}):''}</div>
+      </div>
+      <div class="sale-right">
+        <div class="sale-amount">$${(s.total||0).toFixed(2)}</div>
+        <div class="sale-qty" style="color:var(--rose);font-size:.7rem;">🧾 ver recibo</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══ FOLLOWUPS ══
+function setFuFilter(el,f){fuFilter=f;document.querySelectorAll('#view-followup .fchip').forEach(e=>e.classList.remove('active'));el.classList.add('active');renderFollowups();}
+function renderFollowups(){
+  const el=document.getElementById('followup-list');if(!el)return;
+  const today=new Date();today.setHours(0,0,0,0);
+  let list=followups.filter(f=>{
+    if(fuFilter==='done')return f.done;
+    if(fuFilter==='pending')return !f.done&&new Date(f.scheduled_date)>=today;
+    if(fuFilter==='overdue')return !f.done&&new Date(f.scheduled_date)<today;
+    return true;
+  });
+  list.sort((a,b)=>new Date(a.scheduled_date)-new Date(b.scheduled_date));
+  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="icon">📅</div><h3>Sin seguimientos</h3><p>Al registrar una venta con clienta, se crean automáticamente.</p></div>`;return;}
+  el.innerHTML=list.map(f=>{
+    const sDate=new Date(f.scheduled_date+'T12:00:00');
+    const diff=Math.round((sDate-today)/(1000*60*60*24));
+    const isOverdue=!f.done&&diff<0;const isSoon=!f.done&&diff>=0&&diff<=2;
+    const dateLabel=f.done?'✅ Completado':isOverdue?`🚨 Venció hace ${Math.abs(diff)} día(s)`:diff===0?'⏰ Hoy':diff===1?'⏰ Mañana':sDate.toLocaleDateString('es-PR',{day:'numeric',month:'short'});
+    return `<div class="followup-card ${f.done?'done':isOverdue?'overdue':''}">
+      <div class="fu-info">
+        <div class="fu-client">👤 ${f.client_name||'Clienta'}</div>
+        <div class="fu-prod">📦 ${f.prod_name||'Producto'} · ${f.type||''}</div>
+        <div class="fu-date ${f.done?'':isOverdue?'overdue':isSoon?'soon':''}">${dateLabel}</div>
+      </div>
+      <div class="fu-actions">
+        ${!f.done?`<button class="fu-btn" style="border-color:#25d366;color:#25d366;" onclick="fuWhatsApp('${f.id}')">💬 WA</button>
+        <button class="fu-btn" style="border-color:var(--ok);color:var(--ok);" onclick="fuDone('${f.id}')">✅ Listo</button>`:
+        `<span style="font-size:.72rem;color:var(--text-light);">✅ Hecho</span>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+async function fuDone(id){const idx=followups.findIndex(x=>x.id===id);if(idx<0)return;followups[idx].done=true;saveLocal();renderFollowups();if(navigator.onLine)try{await supa('PATCH',`mk_followups?id=eq.${id}`,{done:true});}catch(e){}toast('✅ Seguimiento completado');}
+function fuWhatsApp(id){const f=followups.find(x=>x.id===id);if(!f)return;const c=clients.find(x=>x.id===f.client_id);const tel=(c?.telefono||'').replace(/\D/g,'');const msg=encodeURIComponent(`Hola ${f.client_name?.split(' ')[0]||''} 🌸 Soy Jenniffer, tu consultora Mary Kay. Solo quería hacer seguimiento sobre ${f.prod_name} — ¿cómo te ha ido? ¿Necesitas algo? 💕`);window.open(`https://wa.me/${tel?tel:''}?text=${msg}`,'_blank');}
+
+// ══ CLIENTS ══
+function renderClientsQuick(){
+  const el=document.getElementById('clients-quick');if(!el)return;
+  if(!clients.length){el.innerHTML=`<div class="empty-state"><div class="icon">👥</div><h3>Sin clientas</h3><p>Agrégalas desde el CRM.</p></div>`;return;}
+  const tl=t=>({VIP:'⭐ VIP',frecuente:'💗 Frecuente',nueva:'🌸 Nueva',prospecto:'💎 Prospecto',inactiva:'💤 Inactiva'}[t]||t);
+  el.innerHTML=clients.slice(0,20).map(c=>`
+    <div class="prod-card" style="cursor:default;">
+      <div class="prod-badge" style="background:#fde8f0;font-size:1rem;font-weight:700;color:var(--rose);font-family:'Playfair Display',serif;">${((c.nombre||'?')[0]+(c.apellido||'')[0]).toUpperCase()}</div>
+      <div class="prod-info"><div class="prod-name">${c.nombre||''} ${c.apellido||''}</div><div class="prod-cat">${c.telefono||c.ciudad||''}</div></div>
+      <div class="prod-right"><span style="font-size:.7rem;background:var(--rose-light);color:var(--rose-dark);border-radius:10px;padding:2px 8px;font-weight:700;">${tl(c.tipo)}</span></div>
+    </div>`).join('');
+}
+
+// ══ WHATSAPP SHARE ══
+function shareWhatsApp(){
+  const avail=inventory.filter(p=>p.qty>0);if(!avail.length){toast('No hay productos disponibles');return;}
+  let msg='✨ *Productos Mary Kay disponibles*\n_Jenniffer Ivelisse · Consultora Independiente_\n\n';
+  const bycat={};avail.forEach(p=>{if(!bycat[p.cat])bycat[p.cat]=[];bycat[p.cat].push(p);});
+  Object.entries(bycat).forEach(([cat,prods])=>{msg+=`*${catEmoji(cat)} ${cat}*\n`;prods.forEach(p=>{msg+=`• ${p.name} — $${(p.price||0).toFixed(2)}\n`;});msg+='\n';});
+  msg+='📲 _Para pedidos escríbeme por WhatsApp_ 🌸';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══ SCAN ══
+
+
+
+
+function addToCartFromScan(i, silent=false){
+  const name=document.getElementById(`dn-${i}`)?.value.trim();if(!name)return;
+  const cat=document.getElementById(`dc-${i}`)?.value||'Skincare';
+  const price=parseFloat(document.getElementById(`dp-${i}`)?.value)||0;
+  const qty=parseInt(document.getElementById(`dq-${i}`)?.value)||1;
+  // Find if already in inventory
+  const existing=inventory.find(p=>p.name.toLowerCase()===name.toLowerCase());
+  cart.push({cartId:uid(),prodId:existing?.id||null,name,cat,price,qty});
+  renderCartItems();calcTotals();renderStats();
+  const btns=document.getElementById(`det-btns-${i}`);
+  if(btns) btns.innerHTML=`<div style="width:100%;padding:9px;background:#e8f5ee;color:var(--ok);border-radius:8px;font-size:.85rem;font-weight:700;text-align:center;">✅ En la cesta — <span style="cursor:pointer;text-decoration:underline;" onclick="showTab('cart')">ir a cesta →</span></div>`;
+  if(!silent) toast(`✅ ${name} → cesta`);
+}
+
+
+
+function selChip1(el,hid,val){el.parentElement.querySelectorAll('.chip-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');document.getElementById(hid).value=val;}
+function closeModal(id,e){if(e&&e.target!==document.getElementById(id))return;closeModalDirect(id);}
+function closeModalDirect(id){document.getElementById(id).classList.remove('open');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+
+// ══ MK PRODUCT CATALOG (for autocomplete) ══
+
+// ══ AUTOCOMPLETE ENGINE ══
+function acSearch(query){
+  if(!query||query.length<2)return[];
+  const q=query.toLowerCase();
+  const catalogHits=MK_CATALOG.filter(p=>p.name.toLowerCase().includes(q));
+  const invHits=inventory.filter(p=>p.name.toLowerCase().includes(q)&&!catalogHits.find(c=>c.name.toLowerCase()===p.name.toLowerCase()));
+  return[
+    ...catalogHits.slice(0,8).map(p=>({...p,source:'MK'})),
+    ...invHits.slice(0,4).map(p=>({...p,source:'inv',variants:[{label:'Sencillo',price:p.price||0}]}))
+  ].slice(0,10);
+}
+
+function acRender(listId,items,onSelect){
+  const el=document.getElementById(listId);if(!el)return;
+  if(!items.length){el.classList.remove('open');return;}
+  el.innerHTML=items.map((p,i)=>{
+    const hasVariants=p.variants&&p.variants.length>1;
+    const priceLabel=hasVariants?`desde $${Math.min(...p.variants.filter(v=>v.price).map(v=>v.price)).toFixed(0)}`:`$${(p.price||0).toFixed(0)}`;
+    return`<div class="ac-item" onclick="acPickVariant('${listId}',${i})"
+      onmouseenter="this.classList.add('focused')" onmouseleave="this.classList.remove('focused')"
+      data-idx="${i}">
+      <span>${catEmoji(p.cat)}</span>
+      <span class="ac-item-name">${p.name}${hasVariants?` <span style="font-size:.7rem;color:var(--rose);font-weight:400;">▾ variantes</span>`:''}</span>
+      <span class="ac-item-price">${priceLabel}</span>
+    </div>`;
+  }).join('');
+  el._items=items;
+  el._onSelect=onSelect;
+  el.classList.add('open');
+}
+
+function acPickVariant(listId,idx){
+  const el=document.getElementById(listId);if(!el)return;
+  const p=el._items[idx];
+  const onSelect=el._onSelect;
+  if(!p)return;
+  if(!p.variants||p.variants.length<=1){
+    // single variant — select immediately
+    onSelect({...p,price:p.variants?.[0]?.price??p.price??0});
+    el.classList.remove('open');
+    return;
+  }
+  // Show variant picker inside the list
+  el.innerHTML=`
+    <div style="padding:10px 12px 6px;font-size:.75rem;font-weight:700;color:var(--rose-dark);border-bottom:1px solid var(--rose-light);">
+      ${catEmoji(p.cat)} ${p.name} — ¿es sencillo o en set?
+    </div>
+    ${p.variants.map((v,vi)=>`
+      <div class="ac-item" onclick="acSelectVariant('${listId}',${idx},${vi})">
+        <span style="font-size:.85rem;">${v.price?'🔹':'📦'}</span>
+        <span class="ac-item-name" style="font-weight:${v.price?'700':'400'};color:${v.price?'var(--text)':'var(--text-light)'};">${v.label}</span>
+        <span class="ac-item-price">${v.price?'$'+v.price.toFixed(2):v.setNote||''}</span>
+      </div>`).join('')}
+    <div class="ac-item" style="color:var(--text-light);font-size:.8rem;" onclick="acClose('${listId}')">← Volver</div>`;
+}
+
+function acSelectVariant(listId,idx,variantIdx){
+  const el=document.getElementById(listId);if(!el)return;
+  const p=el._items[idx];
+  const v=p.variants[variantIdx];
+  const onSelect=el._onSelect;
+  const finalPrice=v.price??p.price??0;
+  // Build display name with variant label if meaningful
+  const variantIsSimple=p.variants.length===1||v.label==='Sencillo';
+  const displayName=variantIsSimple?p.name:`${p.name} (${v.label})`;
+  onSelect({...p,name:displayName,price:finalPrice,variantLabel:v.label,setNote:v.setNote||null});
+  el.classList.remove('open');
+}
+
+function acClose(listId){
+  const el=document.getElementById(listId);
+  if(el)el.classList.remove('open');
+}
+
+
+// ══ QUICK RECEIPT (no registration needed) ══
+let qrItems = [];
+
+function openQuickReceipt(){
+  qrItems=[{name:'',qty:1,price:0}];
+  renderQRItems();
+  document.getElementById('qr-client-name').value='';
+  document.getElementById('quick-receipt-modal').classList.add('open');
+}
+
+function addQRItem(){
+  qrItems.push({name:'',qty:1,price:0});
+  renderQRItems();
+}
+
+function removeQRItem(i){
+  qrItems.splice(i,1);
+  if(!qrItems.length)qrItems=[{name:'',qty:1,price:0}];
+  renderQRItems();
+}
+
+function renderQRItems(){
+  const el=document.getElementById('qr-items-list');
+  el.innerHTML=qrItems.map((item,i)=>`
+    <div style="background:white;border:2px solid var(--rose-light);border-radius:10px;padding:11px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:.78rem;font-weight:700;color:var(--rose-dark);">Producto ${i+1}</span>
+        ${qrItems.length>1?`<button onclick="removeQRItem(${i})" style="border:none;background:none;color:#c44;cursor:pointer;font-size:.85rem;">✕ quitar</button>`:''}
+      </div>
+      <input type="text" value="${(item.name||'').replace(/"/g,'&quot;')}" placeholder="Nombre del producto" oninput="qrItems[${i}].name=this.value;updateQRTotals();"
+        style="width:100%;border:2px solid var(--rose-light);border-radius:8px;padding:8px 10px;font-family:'Nunito',sans-serif;font-size:.88rem;outline:none;margin-bottom:8px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div>
+          <div style="font-size:.7rem;font-weight:700;color:var(--rose-dark);margin-bottom:3px;">CANTIDAD</div>
+          <input type="number" value="${item.qty}" min="1" oninput="qrItems[${i}].qty=parseInt(this.value)||1;updateQRTotals();"
+            style="width:100%;border:2px solid var(--rose-light);border-radius:8px;padding:8px 10px;font-family:'Nunito',sans-serif;font-size:.88rem;outline:none;">
+        </div>
+        <div>
+          <div style="font-size:.7rem;font-weight:700;color:var(--rose-dark);margin-bottom:3px;">PRECIO ($)</div>
+          <input type="number" value="${item.price||''}" placeholder="0.00" step="0.01" min="0" oninput="qrItems[${i}].price=parseFloat(this.value)||0;updateQRTotals();"
+            style="width:100%;border:2px solid var(--rose-light);border-radius:8px;padding:8px 10px;font-family:'Nunito',sans-serif;font-size:.88rem;outline:none;">
+        </div>
+      </div>
+    </div>`).join('');
+  updateQRTotals();
+}
+
+function updateQRTotals(){
+  const subtotal=qrItems.reduce((s,i)=>s+(i.price*i.qty),0);
+  const t1Rate=parseFloat(document.getElementById('tax1-rate')?.value||0)/100;
+  const t2Rate=parseFloat(document.getElementById('tax2-rate')?.value||0)/100;
+  const feeVal=parseFloat(document.getElementById('fee-value')?.value||0);
+  const feeAmt=feeType==='pct'?subtotal*(feeVal/100):feeVal;
+  const total=subtotal+subtotal*t1Rate+subtotal*t2Rate+feeAmt;
+  const el=document.getElementById('qr-totals');
+  if(el) el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px;"><span style="color:var(--text-light);">Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--rose);border-top:1px solid var(--rose-light);padding-top:8px;margin-top:4px;"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
+  return{subtotal,total};
+}
+
+function generateQuickReceipt(){
+  const hasItems=qrItems.some(i=>i.name.trim());
+  if(!hasItems){toast('Escribe al menos un producto 🌸');return;}
+  const clientName=document.getElementById('qr-client-name').value.trim()||'';
+  const t=updateQRTotals();
+  const t1Rate=parseFloat(document.getElementById('tax1-rate')?.value||0)/100;
+  const t2Rate=parseFloat(document.getElementById('tax2-rate')?.value||0)/100;
+  const feeVal=parseFloat(document.getElementById('fee-value')?.value||0);
+  const feeAmt=feeType==='pct'?t.subtotal*(feeVal/100):feeVal;
+  const totals={subtotal:t.subtotal,discAmt:0,tax1Amt:t.subtotal*t1Rate,tax2Amt:t.subtotal*t2Rate,feeAmt,total:t.total};
+  const items=qrItems.filter(i=>i.name.trim()).map(i=>({name:i.name,qty:i.qty,price:i.price}));
+  closeModalDirect('quick-receipt-modal');
+  showReceiptModal(items,totals,clientName,new Date());
+}
+
+init();
+</script>
+</body>
+</html>

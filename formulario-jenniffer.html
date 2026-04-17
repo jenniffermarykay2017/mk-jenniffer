@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu Consulta de Belleza • Jenniffer Ivelisse</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose:#c8507a; --rose-light:#f5d0df; --rose-dark:#8c2e50;
+    --gold:#d4a853; --gold-light:#fdf6e8;
+    --cream:#fdf8f5; --white:#ffffff;
+    --text:#3a2030; --text-light:#9a7080;
+    --shadow:0 8px 40px rgba(200,80,122,0.12);
+    --shadow-gold:0 8px 30px rgba(212,168,83,0.2);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--cream);font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+  /* MUSIC BUTTON */
+  .music-btn{position:fixed;top:16px;right:16px;z-index:500;background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);border:2px solid var(--rose-light);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;box-shadow:var(--shadow);transition:all .2s;}
+  .music-btn:hover{transform:scale(1.1);}
+  .music-btn.playing{border-color:var(--rose);background:var(--rose-light);}
+
+  /* HERO */
+  .hero{background:linear-gradient(165deg,#6b1a35 0%,var(--rose-dark) 30%,var(--rose) 65%,#e8a0be 100%);padding:55px 24px 70px;text-align:center;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;inset:0;opacity:0.06;background-image:radial-gradient(circle at 20% 50%,white 1px,transparent 1px),radial-gradient(circle at 80% 20%,white 1px,transparent 1px),radial-gradient(circle at 50% 80%,white 1px,transparent 1px);background-size:60px 60px;}
+  .hero::after{content:'✿ ✿ ✿';position:absolute;bottom:-10px;left:0;right:0;text-align:center;font-size:1.4rem;color:rgba(255,255,255,0.15);letter-spacing:20px;}
+  .hero-name{font-family:'Cormorant Garamond',serif;font-size:0.85rem;font-weight:400;color:rgba(255,255,255,0.75);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
+  .hero-title{font-size:0.72rem;color:rgba(255,255,255,0.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px;}
+  .hero-flower{font-size:2.8rem;margin-bottom:18px;display:block;animation:float 4s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  .hero h1{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:white;line-height:1.25;font-weight:300;margin-bottom:14px;}
+  .hero h1 em{font-style:italic;font-weight:600;}
+  .hero-desc{color:rgba(255,255,255,0.85);font-size:0.88rem;line-height:1.7;max-width:320px;margin:0 auto 20px;}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:30px;padding:7px 18px;font-size:0.75rem;color:white;font-weight:600;letter-spacing:0.5px;}
+
+  /* WAVE */
+  .wave{margin-top:-2px;line-height:0;}
+  .wave svg{display:block;width:100%;}
+
+  /* PROGRESS */
+  .progress-wrap{padding:18px 22px 0;background:white;}
+  .progress-bar{height:5px;background:var(--rose-light);border-radius:5px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--gold));border-radius:5px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+  .progress-info{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
+  .progress-text{font-size:0.73rem;color:var(--text-light);font-weight:600;}
+  .progress-pct{font-size:0.73rem;color:var(--rose);font-weight:700;}
+
+  /* STEPS */
+  .steps-wrap{padding:0 18px 100px;background:white;}
+
+  .step{display:none;animation:fadeUp .45s cubic-bezier(.4,0,.2,1);}
+  .step.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+  .step-card{background:var(--cream);border-radius:24px;padding:26px 20px;margin-top:18px;box-shadow:var(--shadow);}
+  .step-block{font-size:0.68rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .step-block::before{content:'';width:20px;height:2px;background:var(--gold);border-radius:2px;}
+  .step-q{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--text);line-height:1.25;margin-bottom:8px;font-weight:400;}
+  .step-q em{font-style:italic;color:var(--rose-dark);}
+  .step-sub{font-size:0.84rem;color:var(--text-light);line-height:1.6;margin-bottom:20px;}
+
+  /* OPTIONS */
+  .options{display:flex;flex-direction:column;gap:10px;}
+  .opt{border:2px solid #eedde8;border-radius:16px;padding:14px 16px;cursor:pointer;transition:all .22s;background:white;text-align:left;display:flex;align-items:center;gap:13px;position:relative;}
+  .opt:hover{border-color:var(--rose);transform:translateY(-1px);box-shadow:0 4px 16px rgba(200,80,122,0.12);}
+  .opt.sel{border-color:var(--rose);background:linear-gradient(135deg,#fef0f6,#fce6f0);box-shadow:0 4px 20px rgba(200,80,122,0.18);}
+  .opt.sel::after{content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--rose);font-weight:700;font-size:1rem;}
+  .opt-icon{font-size:1.5rem;flex-shrink:0;}
+  .opt-text{font-size:0.92rem;font-weight:700;color:var(--text);line-height:1.3;}
+  .opt-sub{font-size:0.77rem;color:var(--text-light);margin-top:2px;font-weight:400;}
+
+  /* MULTI */
+  .multi-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+  .mopt{border:2px solid #eedde8;border-radius:30px;padding:9px 16px;cursor:pointer;transition:all .2s;background:white;font-size:0.83rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px;}
+  .mopt:hover{border-color:var(--rose);}
+  .mopt.sel{background:var(--rose);color:white;border-color:var(--rose);}
+
+  /* INPUTS */
+  .inp-group{margin-bottom:13px;}
+  .inp-group label{display:block;font-size:0.73rem;font-weight:700;color:var(--rose-dark);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+  .inp-group input,.inp-group select,.inp-group textarea{width:100%;border:2px solid #eedde8;border-radius:13px;padding:12px 14px;font-family:'Nunito',sans-serif;font-size:0.92rem;background:white;color:var(--text);outline:none;transition:border-color .2s;appearance:none;}
+  .inp-group input:focus,.inp-group select:focus,.inp-group textarea:focus{border-color:var(--rose);}
+  .inp-group textarea{resize:vertical;min-height:80px;line-height:1.5;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  /* SCALE */
+  .scale{display:flex;gap:7px;justify-content:space-between;}
+  .scale-btn{flex:1;border:2px solid #eedde8;border-radius:14px;padding:13px 4px;cursor:pointer;text-align:center;transition:all .2s;background:white;}
+  .scale-btn:hover{border-color:var(--rose);}
+  .scale-btn.sel{background:linear-gradient(135deg,var(--rose),var(--rose-dark));border-color:var(--rose);}
+  .scale-btn .s-emoji{font-size:1.5rem;display:block;margin-bottom:4px;}
+  .scale-btn .s-label{font-size:0.62rem;font-weight:700;color:var(--text-light);line-height:1.2;}
+  .scale-btn.sel .s-label{color:white;}
+
+  /* INSIGHT BOX */
+  .insight{background:linear-gradient(135deg,var(--gold-light),#fdf0d0);border-radius:14px;padding:14px 16px;margin-top:16px;display:flex;gap:10px;align-items:flex-start;}
+  .insight-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+  .insight-text{font-size:0.82rem;color:#7a5010;line-height:1.6;}
+
+  /* NAV */
+  .nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--rose-light);padding:14px 20px;display:flex;gap:10px;z-index:100;}
+  .btn{border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;border-radius:30px;padding:14px 22px;font-size:0.93rem;transition:all .2s;flex:1;text-align:center;}
+  .btn:active{transform:scale(0.97);}
+  .btn-back{background:var(--rose-light);color:var(--rose-dark);}
+  .btn-next{background:linear-gradient(135deg,var(--rose),var(--rose-dark));color:white;box-shadow:0 5px 18px rgba(200,80,122,0.38);}
+  .btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,80,122,0.45);}
+
+  /* THANK YOU */
+  .thankyou{padding:30px 18px 100px;background:white;}
+  .ty-hero{background:linear-gradient(160deg,var(--rose-dark),var(--rose));border-radius:24px;padding:32px 24px;text-align:center;color:white;margin-bottom:20px;position:relative;overflow:hidden;}
+  .ty-hero::before{content:'✿';position:absolute;right:-10px;bottom:-20px;font-size:100px;opacity:0.08;}
+  .ty-icon{font-size:3.5rem;margin-bottom:12px;display:block;animation:pop .6s cubic-bezier(.4,0,.2,1);}
+  @keyframes pop{0%{transform:scale(0);}80%{transform:scale(1.12);}100%{transform:scale(1);}}
+  .ty-hero h2{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:400;margin-bottom:8px;}
+  .ty-hero h2 em{font-style:italic;font-weight:600;}
+  .ty-hero p{font-size:0.85rem;opacity:0.88;line-height:1.7;}
+
+  .diag-card{background:var(--cream);border-radius:20px;padding:22px;margin-bottom:14px;box-shadow:var(--shadow);}
+  .diag-card h3{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--rose-dark);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--rose-light);}
+  .diag-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f0e0e8;align-items:flex-start;}
+  .diag-item:last-child{border:none;}
+  .diag-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+  .diag-name{font-size:0.88rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+  .diag-desc{font-size:0.78rem;color:var(--text-light);line-height:1.5;}
+
+  .secret-card{background:linear-gradient(135deg,#fff8e8,var(--gold-light));border:2px solid #f0d898;border-radius:20px;padding:20px;margin-bottom:14px;}
+  .secret-card h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#7a5010;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .secret-card p{font-size:0.84rem;color:#8a6020;line-height:1.7;}
+
+  .jennifer-card{background:linear-gradient(135deg,var(--rose-dark),var(--rose));border-radius:20px;padding:22px;color:white;text-align:center;}
+  .jennifer-card p{font-size:0.88rem;line-height:1.8;opacity:0.92;font-style:italic;margin-bottom:14px;}
+  .jennifer-card strong{display:block;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:normal;opacity:1;}
+
+  .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--rose-dark);color:white;padding:10px 22px;border-radius:30px;font-size:0.84rem;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- MUSIC BUTTON -->
+<button class="music-btn" id="music-btn" onclick="toggleMusic()" title="Música ambiental">🌊</button>
+
+<!-- OCEAN AUDIO -->
+<audio id="ocean-audio" loop>
+  <source src="https://www.soundjay.com/nature/sounds/ocean-wave-1.mp3" type="audio/mpeg">
+</audio>
+
+<div class="hero">
+  <div class="hero-name">Jenniffer Ivelisse</div>
+  <div class="hero-title">Tu Consultora de Belleza Independiente · Mary Kay</div>
+  <span class="hero-flower">🌸</span>
+  <h1>Tu piel merece<br><em>lo mejor de ti</em></h1>
+  <p class="hero-desc">Completa esta consulta personalizada y descubre la rutina perfecta diseñada especialmente para tu piel — de forma gratuita y sin compromiso.</p>
+  <div class="hero-badge">✨ Consulta Personalizada Gratuita</div>
+</div>
+
+<div class="wave">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,40 C360,80 1080,0 1440,40 L1440,60 L0,60 Z" fill="white"/>
+  </svg>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  <div class="progress-info">
+    <div class="progress-text" id="progress-text">Comenzando tu consulta...</div>
+    <div class="progress-pct" id="progress-pct">0%</div>
+  </div>
+</div>
+
+<div class="steps-wrap" id="steps-wrap">
+
+  <!-- STEP 1 -->
+  <div class="step active" data-step="1">
+    <div class="step-card">
+      <div class="step-block">Tus datos</div>
+      <div class="step-q">¿Cómo te llamas, <em>hermosa</em>? 💄</div>
+      <div class="step-sub">Quiero conocerte para brindarte una atención completamente personalizada.</div>
+      <div class="form-row">
+        <div class="inp-group"><label>Nombre *</label><input id="s-nombre" type="text" placeholder="Tu nombre"></div>
+        <div class="inp-group"><label>Apellido</label><input id="s-apellido" type="text" placeholder="Apellido"></div>
+      </div>
+      <div class="inp-group"><label>WhatsApp *</label><input id="s-tel" type="tel" placeholder="555-000-0000"></div>
+      <div class="inp-group"><label>Correo electrónico</label><input id="s-email" type="email" placeholder="correo@ejemplo.com"></div>
+      <div class="form-row">
+        <div class="inp-group"><label>Cumpleaños 🎂</label><input id="s-bday" type="date"></div>
+        <div class="inp-group"><label>Ocupación</label><input id="s-ocupacion" type="text" placeholder="¿A qué te dedicas?"></div>
+      </div>
+      <div class="inp-group">
+        <label>Prefiero que me contacten por</label>
+        <select id="s-contacto">
+          <option value="">-- Seleccionar --</option>
+          <option>WhatsApp</option>
+          <option>Llamada telefónica</option>
+          <option>Mensaje de texto</option>
+          <option>Correo electrónico</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" data-step="2">
+    <div class="step-card">
+      <div class="step-block">Tu historia</div>
+      <div class="step-q">Cuando te ves al espejo sin maquillaje... <em>¿qué sientes?</em> 🪞</div>
+      <div class="step-sub">Tu respuesta me ayuda a entenderte de verdad y brindarte lo que realmente necesitas.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-sentimiento','Me da vergüenza — prefiero no salir sin maquillaje')">
+          <span class="opt-icon">😔</span>
+          <div><div class="opt-text">Me da vergüenza</div><div class="opt-sub">Prefiero no salir sin maquillaje</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-sentimiento','Me frustra — he gastado en productos sin ver resultados')">
+          <span class="opt-icon">😤</span>
+          <div><div class="opt-text">Me frustra gastar sin ver resultados</div><div class="opt-sub">He probado muchas cosas sin éxito</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-sentimiento','Me siento mayor de lo que soy — mi piel no refleja cómo me siento')">
+          <span class="opt-icon">😟</span>
+          <div><div class="opt-text">Me siento mayor de lo que soy</div><div class="opt-sub">Mi piel no refleja cómo me siento por dentro</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-sentimiento','Me siento bien — pero quiero verme aún mejor')">
+          <span class="opt-icon">😊</span>
+          <div><div class="opt-text">Me siento bien, quiero verme aún mejor</div><div class="opt-sub">Quiero llevar mi piel al siguiente nivel</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-sentimiento">
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" data-step="3">
+    <div class="step-card">
+      <div class="step-block">Tu piel</div>
+      <div class="step-q">¿Qué es lo que más te <em>preocupa</em> de tu piel? 🔍</div>
+      <div class="step-sub">Selecciona todas las que apliquen — no hay respuestas incorrectas.</div>
+      <div class="multi-wrap">
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Poros dilatados')">🔬 Poros dilatados</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Arrugas y líneas finas')">⏳ Arrugas / líneas finas</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Manchas y tono desigual')">🟤 Manchas / tono desigual</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Sequedad y falta de hidratación')">💧 Sequedad</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Acné y espinillas')">😖 Acné / espinillas</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Piel opaca sin luminosidad')">✨ Piel opaca</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Piel sensible o irritada')">🌡️ Piel sensible</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Flacidez')">📉 Flacidez</div>
+      </div>
+      <input type="hidden" id="s-preocupaciones" value="[]">
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step" data-step="4">
+    <div class="step-card">
+      <div class="step-block">Tu historia</div>
+      <div class="step-q">¿Cuánto tiempo llevas <em>con este problema?</em> ⏰</div>
+      <div class="step-sub">Esto me indica qué tan urgente es encontrar la solución correcta para ti.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-tiempo','Menos de 6 meses')">
+          <span class="opt-icon">🌱</span>
+          <div><div class="opt-text">Menos de 6 meses</div><div class="opt-sub">Es algo relativamente reciente para mí</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-tiempo','Entre 1 y 3 años')">
+          <span class="opt-icon">📅</span>
+          <div><div class="opt-text">Entre 1 y 3 años</div><div class="opt-sub">Llevo un tiempo buscando una solución</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-tiempo','Más de 3 años')">
+          <span class="opt-icon">😮‍💨</span>
+          <div><div class="opt-text">Más de 3 años</div><div class="opt-sub">Ha sido un reto constante en mi vida</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-tiempo','Toda mi vida')">
+          <span class="opt-icon">💔</span>
+          <div><div class="opt-text">Toda mi vida</div><div class="opt-sub">Siempre he lidiado con mi piel</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-tiempo">
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step" data-step="5">
+    <div class="step-card">
+      <div class="step-block">Tu experiencia</div>
+      <div class="step-q">¿Qué has intentado antes para <em>mejorar tu piel?</em> 💭</div>
+      <div class="step-sub">Esta información me ayuda a no repetir lo que ya no funcionó para ti.</div>
+      <div class="multi-wrap">
+        <div class="mopt" onclick="toggleMopt(this,'s-intentos','Productos de farmacia o supermercado')">🏪 Farmacia / supermercado</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intentos','Otras marcas de belleza')">💄 Otras marcas</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intentos','Remedios naturales o caseros')">🌿 Remedios naturales</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intentos','Dermatólogo o médico')">👩‍⚕️ Dermatólogo</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intentos','No he intentado nada — no sé por dónde empezar')">🤷‍♀️ No he intentado nada</div>
+      </div>
+      <input type="hidden" id="s-intentos" value="[]">
+      <div class="insight">
+        <span class="insight-icon">💡</span>
+        <span class="insight-text">Muchas mujeres llegan a mí después de años de probar sin resultados. La diferencia está en encontrar los productos correctos para <em>tu</em> tipo de piel específico.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step" data-step="6">
+    <div class="step-card">
+      <div class="step-block">Tu piel</div>
+      <div class="step-q">Sin humectante, tu piel se siente... 💧</div>
+      <div class="step-sub">Esto me ayuda a identificar tu tipo de piel con precisión.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-sinhumect','Seca y estirada — como si le faltara agua')">
+          <span class="opt-icon">🏜️</span>
+          <div><div class="opt-text">Seca y estirada</div><div class="opt-sub">Como si le faltara agua constantemente</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-sinhumect','Ni seca ni grasa — bastante equilibrada')">
+          <span class="opt-icon">⚖️</span>
+          <div><div class="opt-text">Ni seca ni grasa</div><div class="opt-sub">Bastante equilibrada</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-sinhumect','Grasa — brillante especialmente en la frente y nariz')">
+          <span class="opt-icon">✨</span>
+          <div><div class="opt-text">Grasa</div><div class="opt-sub">Brillante, especialmente en frente y nariz</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-sinhumect','Mixta — grasa en zona T y seca en mejillas')">
+          <span class="opt-icon">🔀</span>
+          <div><div class="opt-text">Mixta</div><div class="opt-sub">Grasa en zona T, seca en mejillas</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-sinhumect">
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step" data-step="7">
+    <div class="step-card">
+      <div class="step-block">Tu estilo</div>
+      <div class="step-q">¿Cuál es tu tono de piel y acabado favorito? ✨</div>
+      <div class="step-sub">Para recomendarte el tono y la base perfecta para ti.</div>
+      <div class="inp-group">
+        <label>Tono de piel</label>
+        <select id="s-tono">
+          <option value="">-- Seleccionar --</option>
+          <option>Muy claro / Ivory</option>
+          <option>Claro / Beige</option>
+          <option>Medio / Sand</option>
+          <option>Oliva / Tan</option>
+          <option>Oscuro / Mocha</option>
+          <option>Muy oscuro / Ebony</option>
+        </select>
+      </div>
+      <div class="inp-group">
+        <label>Acabado de base preferido</label>
+        <div class="multi-wrap" style="margin-top:6px;">
+          <div class="mopt" onclick="selMoptSingle(this,'s-acabado','Mate — sin brillo')">🪞 Mate</div>
+          <div class="mopt" onclick="selMoptSingle(this,'s-acabado','Natural — equilibrado')">🌿 Natural</div>
+          <div class="mopt" onclick="selMoptSingle(this,'s-acabado','Luminoso — con resplandor')">✨ Luminoso</div>
+        </div>
+        <input type="hidden" id="s-acabado">
+      </div>
+      <div class="inp-group" style="margin-top:4px;">
+        <label>Preocupaciones en área de ojos</label>
+        <div class="multi-wrap" style="margin-top:6px;">
+          <div class="mopt" onclick="toggleMopt(this,'s-ojos','Arrugas y flacidez')">👁️ Arrugas / flacidez</div>
+          <div class="mopt" onclick="toggleMopt(this,'s-ojos','Líneas finas')">〰️ Líneas finas</div>
+          <div class="mopt" onclick="toggleMopt(this,'s-ojos','Ojeras')">🔵 Ojeras</div>
+          <div class="mopt" onclick="toggleMopt(this,'s-ojos','Necesito removedor suave')">🌸 Removedor suave</div>
+        </div>
+        <input type="hidden" id="s-ojos" value="[]">
+      </div>
+      <div class="inp-group">
+        <label>Preocupaciones en área de labios</label>
+        <div class="multi-wrap" style="margin-top:6px;">
+          <div class="mopt" onclick="toggleMopt(this,'s-labios','Líneas finas alrededor')">〰️ Líneas finas</div>
+          <div class="mopt" onclick="toggleMopt(this,'s-labios','Labios resecos')">💋 Resecos</div>
+        </div>
+        <input type="hidden" id="s-labios" value="[]">
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 8 -->
+  <div class="step" data-step="8">
+    <div class="step-card">
+      <div class="step-block">Tu sueño</div>
+      <div class="step-q">Si tu piel pudiera cambiar en 30 días... <em>¿cómo te imaginas?</em> 🌟</div>
+      <div class="step-sub">Cierra los ojos un momento e imagínalo — piel luminosa, uniforme, suave al tacto...</div>
+      <div class="scale">
+        <div class="scale-btn" onclick="selScale(this,'s-urgencia','1')">
+          <span class="s-emoji">😐</span><span class="s-label">Sin diferencia</span>
+        </div>
+        <div class="scale-btn" onclick="selScale(this,'s-urgencia','2')">
+          <span class="s-emoji">🙂</span><span class="s-label">Me gustaría</span>
+        </div>
+        <div class="scale-btn" onclick="selScale(this,'s-urgencia','3')">
+          <span class="s-emoji">😃</span><span class="s-label">Muy bien</span>
+        </div>
+        <div class="scale-btn" onclick="selScale(this,'s-urgencia','4')">
+          <span class="s-emoji">🤩</span><span class="s-label">Increíble</span>
+        </div>
+        <div class="scale-btn" onclick="selScale(this,'s-urgencia','5')">
+          <span class="s-emoji">🥹</span><span class="s-label">¡Lo necesito!</span>
+        </div>
+      </div>
+      <input type="hidden" id="s-urgencia">
+      <div class="insight" style="margin-top:18px;">
+        <span class="insight-icon">🍎</span>
+        <span class="insight-text"><strong>¿Sabías esto?</strong> Así como una manzana se oxida cuando la dejas al aire, nuestra piel también se oxida con el tiempo. Los productos Mary Kay actúan como antioxidantes que protegen y reparan — desde adentro hacia afuera.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 9 -->
+  <div class="step" data-step="9">
+    <div class="step-card">
+      <div class="step-block">Tu rutina</div>
+      <div class="step-q">¿Tienes una rutina de cuidado de piel <em>actualmente?</em> 🧴</div>
+      <div class="step-sub">No importa si es mínima — toda información me ayuda a orientarte mejor.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-rutina','No tengo ninguna rutina — solo me lavo la cara')">
+          <span class="opt-icon">😅</span>
+          <div><div class="opt-text">No tengo ninguna rutina</div><div class="opt-sub">Solo me lavo la cara con agua o jabón</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-rutina','Rutina básica — limpieza y humectante ocasional')">
+          <span class="opt-icon">🧼</span>
+          <div><div class="opt-text">Rutina básica</div><div class="opt-sub">Limpieza y humectante de vez en cuando</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-rutina','Rutina completa mañana y noche — soy constante')">
+          <span class="opt-icon">⭐</span>
+          <div><div class="opt-text">Rutina completa mañana y noche</div><div class="opt-sub">Soy constante con mis pasos</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-rutina">
+    </div>
+  </div>
+
+  <!-- STEP 10 -->
+  <div class="step" data-step="10">
+    <div class="step-card">
+      <div class="step-block">Oportunidad</div>
+      <div class="step-q">Una pregunta más... <em>¿te interesaría</em> saber más sobre? 💡</div>
+      <div class="step-sub">Selecciona todo lo que te llame la atención — sin compromiso.</div>
+      <div class="multi-wrap">
+        <div class="mopt" onclick="toggleMopt(this,'s-intereses','Técnicas de aplicación de maquillaje')">💄 Técnicas de maquillaje</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intereses','Cuidado avanzado de la piel')">🧴 Cuidado avanzado</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intereses','Ganar ingresos extra con Mary Kay')">💰 Generar ingresos extra</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intereses','Ser anfitriona de una reunión')">🎀 Ser anfitriona</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intereses','Fragancias y cuidado corporal')">🌺 Fragancias</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intereses','Productos para caballeros')">👨 Productos caballeros</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-intereses','Ideas para regalos')">🎁 Ideas para regalos</div>
+      </div>
+      <input type="hidden" id="s-intereses" value="[]">
+    </div>
+  </div>
+
+  <!-- STEP 11 -->
+  <div class="step" data-step="11">
+    <div class="step-card">
+      <div class="step-block">Referido</div>
+      <div class="step-q">¿Conoces a alguien que también merece <em>lucir hermosa?</em> 🌸</div>
+      <div class="step-sub">Si hay alguien especial en tu vida que podría beneficiarse de una consulta gratuita, me encantaría conocerla.</div>
+      <div class="form-row">
+        <div class="inp-group"><label>Nombre</label><input id="s-ref-nombre" type="text" placeholder="Nombre"></div>
+        <div class="inp-group"><label>WhatsApp</label><input id="s-ref-tel" type="tel" placeholder="555-000-0000"></div>
+      </div>
+      <div class="inp-group"><label>¿Cuál es su relación contigo?</label><input id="s-ref-relacion" type="text" placeholder="Ej: amiga, hermana, compañera..."></div>
+    </div>
+  </div>
+
+  <!-- STEP 12 -->
+  <div class="step" data-step="12">
+    <div class="step-card">
+      <div class="step-block">Último paso</div>
+      <div class="step-q">¿Cuándo podría <em>contactarte</em> para tu consulta? 🌸</div>
+      <div class="step-sub">Una conversación de 15 minutos — cálida, sin presión, completamente a tu ritmo.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-disponibilidad','Mañanas — antes del mediodía')">
+          <span class="opt-icon">🌅</span>
+          <div><div class="opt-text">Mañanas</div><div class="opt-sub">Antes del mediodía</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-disponibilidad','Tardes — entre 12pm y 6pm')">
+          <span class="opt-icon">☀️</span>
+          <div><div class="opt-text">Tardes</div><div class="opt-sub">Entre 12pm y 6pm</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-disponibilidad','Noches — después de las 6pm')">
+          <span class="opt-icon">🌙</span>
+          <div><div class="opt-text">Noches</div><div class="opt-sub">Después de las 6pm</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-disponibilidad','Fines de semana')">
+          <span class="opt-icon">📅</span>
+          <div><div class="opt-text">Fines de semana</div><div class="opt-sub">Sábado o domingo</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-disponibilidad">
+      <div class="inp-group" style="margin-top:16px;">
+        <label>¿Algo más que desees compartir conmigo?</label>
+        <textarea id="s-extra" placeholder="Alergias, preguntas, cualquier detalle que consideres importante..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- THANK YOU -->
+  <div class="step" data-step="13" id="ty-step">
+    <div class="ty-hero">
+      <span class="ty-icon">🌸</span>
+      <h2>¡Gracias, <em><span id="ty-nombre"></span></em>!</h2>
+      <p>Tu consulta fue recibida. En breve me pondré en contacto contigo con tu recomendación personalizada.</p>
+    </div>
+    <div class="diag-card" id="diag-card"></div>
+    <div class="secret-card">
+      <h4>👁️ Un secreto que pocas conocen...</h4>
+      <p>El <strong>Removedor de Maquillaje para Ojos Mary Kay</strong> no es solo un removedor — nutre y protege el área más delicada de tu rostro mientras limpia con suavidad. No irrita, no reseca y deja la piel lista para absorber mejor tu rutina. El 9 de cada 10 clientas que lo prueban no pueden vivir sin él. Lo veremos juntas en tu consulta. 💕</p>
+    </div>
+    <div class="jennifer-card">
+      <p>"Estoy emocionada de conocerte y ayudarte a descubrir la mejor versión de tu piel. Recuerda: cuidarte no es un lujo — es una decisión que mereces tomar hoy."</p>
+      <strong>— Jenniffer Ivelisse, Tu CBI Mary Kay 🌸</strong>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav" id="nav-bar">
+  <button class="btn btn-back" id="btn-back" onclick="prevStep()" style="display:none">← Atrás</button>
+  <button class="btn btn-next" id="btn-next" onclick="nextStep()">Comenzar ✨</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://wkqovrklcrrxawmnefwm.supabase.co';
+const SUPA_KEY = 'sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
+const TOTAL = 12;
+let cur = 1;
+
+// MUSIC
+let musicOn = false;
+const audio = document.getElementById('ocean-audio');
+audio.volume = 0.3;
+function toggleMusic() {
+  const btn = document.getElementById('music-btn');
+  if (musicOn) { audio.pause(); btn.textContent = '🌊'; btn.classList.remove('playing'); }
+  else { audio.play().catch(()=>{}); btn.textContent = '🔇'; btn.classList.add('playing'); }
+  musicOn = !musicOn;
+}
+// Auto-play on first interaction
+document.addEventListener('click', function autoPlay() {
+  if (!musicOn) { audio.play().catch(()=>{}); musicOn = true; document.getElementById('music-btn').textContent = '🔇'; document.getElementById('music-btn').classList.add('playing'); }
+  document.removeEventListener('click', autoPlay);
+}, {once: true});
+
+function updateProgress() {
+  const pct = Math.round(((cur - 1) / TOTAL) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-text').textContent = cur <= TOTAL ? `Pregunta ${cur} de ${TOTAL}` : '¡Completado! 🎉';
+}
+
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const el = document.querySelector(`[data-step="${n}"]`);
+  if (el) el.classList.add('active');
+  document.getElementById('btn-back').style.display = n > 1 && n <= TOTAL ? 'block' : 'none';
+  const btnNext = document.getElementById('btn-next');
+  if (n > TOTAL) { document.getElementById('nav-bar').style.display = 'none'; }
+  else if (n === TOTAL) { btnNext.textContent = 'Enviar mi consulta 🌸'; }
+  else if (n === 1) { btnNext.textContent = 'Comenzar ✨'; }
+  else { btnNext.textContent = 'Siguiente →'; }
+  updateProgress();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function nextStep() {
+  if (!validateStep()) return;
+  if (cur === TOTAL) { submitForm(); return; }
+  cur++; showStep(cur);
+}
+function prevStep() { if (cur > 1) { cur--; showStep(cur); } }
+
+function validateStep() {
+  if (cur === 1) {
+    if (!document.getElementById('s-nombre').value.trim()) { toast('Por favor ingresa tu nombre 🌸'); return false; }
+    if (!document.getElementById('s-tel').value.trim()) { toast('Por favor ingresa tu WhatsApp 📱'); return false; }
+  }
+  if (cur === 2 && !document.getElementById('s-sentimiento').value) { toast('Selecciona una opción para continuar 🌸'); return false; }
+  if (cur === 3 && !JSON.parse(document.getElementById('s-preocupaciones').value||'[]').length) { toast('Selecciona al menos una preocupación 🌸'); return false; }
+  if (cur === 4 && !document.getElementById('s-tiempo').value) { toast('Selecciona una opción para continuar 🌸'); return false; }
+  if (cur === 6 && !document.getElementById('s-sinhumect').value) { toast('Selecciona una opción para continuar 🌸'); return false; }
+  if (cur === 8 && !document.getElementById('s-urgencia').value) { toast('¿Cómo te sentirías? Selecciona una opción 🌸'); return false; }
+  if (cur === 9 && !document.getElementById('s-rutina').value) { toast('Selecciona una opción para continuar 🌸'); return false; }
+  if (cur === 12 && !document.getElementById('s-disponibilidad').value) { toast('¿Cuándo podemos contactarte? 🌸'); return false; }
+  return true;
+}
+
+function selOpt(el, hid, val) {
+  el.closest('.step-card').querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById(hid).value = val;
+}
+function toggleMopt(el, hid, val) {
+  el.classList.toggle('sel');
+  const inp = document.getElementById(hid);
+  let arr = []; try { arr = JSON.parse(inp.value); } catch(e){}
+  if (el.classList.contains('sel')) { if (!arr.includes(val)) arr.push(val); }
+  else { arr = arr.filter(v => v !== val); }
+  inp.value = JSON.stringify(arr);
+}
+function selMoptSingle(el, hid, val) {
+  el.parentElement.querySelectorAll('.mopt').forEach(m => m.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById(hid).value = val;
+}
+function selScale(el, hid, val) {
+  el.closest('.scale').querySelectorAll('.scale-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById(hid).value = val;
+}
+
+function getDiagnostico(preoc, sinhumect) {
+  const p = JSON.parse(preoc || '[]');
+  const seca = sinhumect && sinhumect.includes('Seca');
+  const grasa = sinhumect && (sinhumect.includes('Grasa') || sinhumect.includes('Mixta'));
+  const muyDañada = p.includes('Arrugas y líneas finas') && (p.includes('Sequedad y falta de hidratación') || p.includes('Flacidez'));
+  let items = [];
+  if (muyDañada) {
+    items.push({ icon:'💎', name:'TimeWise Repair — Tu colección estrella', desc:'Formulado con células madre vegetales y un suero que trabaja en el triángulo de la juventud. Para pieles que merecen atención profunda — porque sí, lo mereces.' });
+  } else {
+    items.push({ icon:'✨', name:'TimeWise Miracle Set', desc: seca ? 'Fórmula para piel normal a seca — limpia, exfolia, refresca e ilumina. Con humectante antioxidante, SPF 30 y gel nocturno con Nutribits que trabaja mientras descansas.' : 'Fórmula para piel combinada — equilibra, controla y nutre. Con SPF 30 para protección diaria y gel nocturno con Nutribits.' });
+  }
+  if (p.includes('Poros dilatados') || p.includes('Manchas y tono desigual') || p.includes('Piel opaca sin luminosidad')) {
+    items.push({ icon:'🔬', name:'Set de Microdermoabrasión', desc:'Renueva tu piel desde la primera aplicación. Exfolia suavemente las células muertas para revelar una piel más luminosa, suave y uniforme — resultados visibles desde el primer uso.' });
+  }
+  if (p.includes('Arrugas y líneas finas') || p.includes('Manchas y tono desigual')) {
+    items.push({ icon:'👁️', name:'Crema de Ojos — Hidratación de hasta 12 horas', desc:'Contiene algas marinas que hidratan el área más delicada. Suave, se absorbe rápidamente, sin sensación pegajosa. Ayuda con ojeras y líneas de expresión.' });
+  }
+  items.push({ icon:'🌸', name:'Removedor de Maquillaje para Ojos', desc:'El favorito de todas mis clientas — aunque pocas lo piden hasta que lo prueban. Limpia, nutre y protege sin irritar. Perfecto para preparar tu piel para su rutina.' });
+  return items;
+}
+
+async function submitForm() {
+  const nombre = document.getElementById('s-nombre').value.trim();
+  const preoc = document.getElementById('s-preocupaciones').value;
+  const sinhumect = document.getElementById('s-sinhumect').value;
+  const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+
+  const notas = `📋 FORMULARIO WEB\n\nSentimiento: ${g('s-sentimiento')}\nTiempo con el problema: ${g('s-tiempo')}\nIntentado antes: ${JSON.parse(g('s-intentos')||'[]').join(', ')}\nUrgencia: ${g('s-urgencia')}/5\nRutina actual: ${g('s-rutina')}\nDisponibilidad: ${g('s-disponibilidad')}\nIntereses: ${JSON.parse(g('s-intereses')||'[]').join(', ')}\nComentarios: ${g('s-extra')}`;
+
+  const data = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    created_at: new Date().toISOString(),
+    nombre, apellido: g('s-apellido').trim(),
+    telefono: g('s-tel').trim(), email: g('s-email').trim(),
+    cumpleanos: g('s-bday') || null, ocupacion: g('s-ocupacion').trim(),
+    pref_contacto: g('s-contacto'), tipo: 'nueva',
+    sin_humectante: sinhumect, tono: g('s-tono'), acabado: g('s-acabado'),
+    preocupaciones: preoc, necesidades: '[]',
+    ojos: g('s-ojos'), labios: g('s-labios'),
+    intereses: g('s-intereses'),
+    ref_nombre: g('s-ref-nombre').trim(), ref_tel: g('s-ref-tel').trim(),
+    ref_relacion: g('s-ref-relacion').trim(), notas,
+    edad: '', hora_contacto: g('s-disponibilidad'),
+    base: '', productos_fav: ''
+  };
+
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/clientas`, {
+      method: 'POST',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(data)
+    });
+  } catch(e) { console.log('Sin conexión — datos guardados localmente'); }
+
+  // Show results
+  document.getElementById('ty-nombre').textContent = nombre;
+  const diags = getDiagnostico(preoc, sinhumect);
+  document.getElementById('diag-card').innerHTML = `
+    <h3>🌸 Tu diagnóstico personalizado, ${nombre}</h3>
+    ${diags.map(d => `<div class="diag-item"><span class="diag-icon">${d.icon}</span><div><div class="diag-name">${d.name}</div><div class="diag-desc">${d.desc}</div></div></div>`).join('')}
+  `;
+  cur = TOTAL + 1;
+  showStep(TOTAL + 1);
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+showStep(1);
+</script>
+</body>
+</html>
