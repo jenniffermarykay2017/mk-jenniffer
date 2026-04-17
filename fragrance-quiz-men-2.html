@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mary Kay · Fragancia para Él</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#f4f1ec;--deep:#1a1a2e;--navy:#16213e;--steel:#2d4a6e;
+  --gold:#c9a96e;--slate:#6b7fa3;--card:rgba(255,255,255,0.78);
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+html,body{min-height:100%;font-family:var(--sans);background:var(--cream);color:var(--deep);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 70% 60% at 15% 15%,#dce4f0 0%,transparent 60%),
+             radial-gradient(ellipse 60% 70% at 85% 85%,#d8e0ec 0%,transparent 60%),
+             radial-gradient(ellipse 50% 50% at 50% 50%,#f4f1ec 0%,#eaecf4 100%);
+  pointer-events:none}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+
+/* HEADER */
+header{width:100%;padding:44px 24px 0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.mk-badge{font-size:10px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--slate);margin-bottom:18px}
+header h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.2rem,8vw,3.6rem);line-height:1.12;color:var(--deep)}
+header h1 em{font-style:italic;color:var(--steel)}
+.hline{width:44px;height:1px;background:var(--gold);margin:20px auto}
+header p{font-size:15px;color:var(--slate);max-width:300px;line-height:1.75}
+
+/* PROGRESS */
+.prog-wrap{width:100%;max-width:520px;padding:28px 24px 0}
+.prog-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.prog-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--slate);font-weight:600}
+.prog-count{font-family:var(--serif);font-size:18px;color:var(--steel)}
+.prog-track{height:2px;background:rgba(45,74,110,.15);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#8fa8c8,var(--steel));border-radius:2px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* QUIZ CONTAINER */
+.quiz-wrap{width:100%;max-width:520px;padding:22px 24px 90px;flex:1}
+
+/* QUESTION CARD */
+.q-card{background:var(--card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.85);border-radius:22px;padding:30px 24px;
+  box-shadow:0 4px 40px rgba(26,26,46,.08),0 1px 0 rgba(255,255,255,.9) inset;
+  animation:cardIn .45s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.q-num{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px}
+.q-text{font-family:var(--serif);font-size:clamp(1.15rem,4.5vw,1.4rem);line-height:1.45;color:var(--deep);margin-bottom:24px}
+
+/* OPTIONS */
+.options{display:flex;flex-direction:column;gap:10px}
+.opt-btn{background:rgba(255,255,255,.6);border:1.5px solid rgba(45,74,110,.18);border-radius:13px;
+  padding:15px 16px;cursor:pointer;text-align:left;transition:all .22s ease;display:flex;align-items:flex-start;gap:13px}
+.opt-btn:hover{background:rgba(255,255,255,.92);border-color:var(--steel);transform:translateX(3px);box-shadow:0 4px 18px rgba(45,74,110,.13)}
+.opt-btn.sel{background:linear-gradient(135deg,rgba(143,168,200,.35),rgba(45,74,110,.14));border-color:var(--steel);box-shadow:0 4px 22px rgba(45,74,110,.2)}
+.opt-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(45,74,110,.35);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .22s}
+.opt-btn.sel .opt-dot{background:var(--steel);border-color:var(--steel)}
+.opt-btn.sel .opt-dot::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
+.opt-text{display:flex;flex-direction:column;gap:4px}
+.opt-label{font-size:15px;font-weight:500;color:var(--deep);line-height:1.3}
+.opt-sub{font-size:13px;color:var(--slate);font-style:italic;font-family:var(--serif);line-height:1.4}
+
+/* NEXT BTN */
+.next-btn{width:100%;margin-top:18px;padding:17px;background:linear-gradient(135deg,var(--steel),#1e3a5f);
+  border:none;border-radius:13px;color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .25s ease;
+  box-shadow:0 6px 24px rgba(45,74,110,.35);opacity:0;pointer-events:none}
+.next-btn.on{opacity:1;pointer-events:all;animation:btnIn .35s ease forwards}
+@keyframes btnIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(45,74,110,.42)}
+
+/* RESULT CARD */
+.r-card{background:var(--card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.85);border-radius:24px;overflow:hidden;
+  box-shadow:0 8px 60px rgba(26,26,46,.12);animation:cardIn .55s cubic-bezier(.4,0,.2,1) forwards}
+.r-hero{background:linear-gradient(160deg,#d8e4f0 0%,#c8d8ec 100%);padding:28px 28px 24px;text-align:center;position:relative}
+.r-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.r-tag{font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--steel);font-weight:700;margin-bottom:14px}
+.r-img{width:150px;height:150px;object-fit:contain;margin:0 auto 16px;display:block;
+  filter:drop-shadow(0 10px 28px rgba(26,26,46,.25));animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.r-name{font-family:var(--serif);font-size:clamp(1.5rem,6vw,2.3rem);font-weight:400;line-height:1.15;color:var(--deep);margin-bottom:6px}
+.r-vibe{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--steel);margin-bottom:8px}
+.r-type{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--slate);margin-bottom:12px}
+.r-badge{display:inline-block;background:rgba(45,74,110,.12);border:1px solid rgba(45,74,110,.28);
+  border-radius:20px;padding:5px 16px;font-size:11px;letter-spacing:.14em;color:var(--steel);text-transform:uppercase;font-weight:600}
+.r-body{padding:22px 22px 24px}
+.r-desc{font-size:15px;color:var(--deep);line-height:1.72;margin-bottom:20px;text-align:center}
+.notes-ttl{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:12px}
+.notes-row{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.note-item{display:flex;align-items:flex-start;gap:12px}
+.note-stage{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel);font-weight:700;min-width:62px;padding-top:2px;flex-shrink:0}
+.note-detail{font-size:14px;color:var(--deep);line-height:1.5}
+.cta-btn{display:block;width:100%;padding:17px;background:linear-gradient(135deg,var(--steel),#1e3a5f);
+  border:none;border-radius:13px;color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;text-decoration:none;text-align:center;
+  cursor:pointer;transition:all .25s;box-shadow:0 6px 24px rgba(45,74,110,.35);margin-bottom:8px}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(45,74,110,.42)}
+.price-hint{text-align:center;font-size:12px;color:var(--slate);opacity:.7;margin-bottom:14px;letter-spacing:.03em}
+
+/* CONTACT FORM */
+.contact-card{background:linear-gradient(135deg,rgba(143,168,200,.25),rgba(45,74,110,.1));
+  border:1.5px solid rgba(45,74,110,.22);border-radius:18px;padding:22px 20px;margin-top:16px}
+.contact-title{font-family:var(--serif);font-size:1.1rem;color:var(--deep);margin-bottom:6px;font-weight:400}
+.contact-sub{font-size:12px;color:var(--slate);line-height:1.65;margin-bottom:18px}
+.contact-field{width:100%;padding:14px 16px;border:1.5px solid rgba(45,74,110,.22);
+  border-radius:11px;background:rgba(255,255,255,.7);font-family:var(--sans);font-size:14px;
+  color:var(--deep);outline:none;transition:border-color .2s;margin-bottom:10px;display:block}
+.contact-field:focus{border-color:var(--steel);background:rgba(255,255,255,.95)}
+.contact-field::placeholder{color:var(--slate);opacity:.7}
+.send-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--steel),#1e3a5f);
+  border:none;border-radius:11px;color:#fff;font-family:var(--sans);font-size:13px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:all .25s;
+  box-shadow:0 4px 18px rgba(45,74,110,.3)}
+.send-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(45,74,110,.4)}
+.send-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.no-thanks{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--slate);
+  cursor:pointer;text-decoration:underline;text-underline-offset:3px;opacity:.7}
+.no-thanks:hover{opacity:1;color:var(--steel)}
+.sent-msg{text-align:center;padding:18px;background:rgba(45,74,110,.08);border-radius:12px;border:1px solid rgba(45,74,110,.2)}
+.sent-msg .sent-icon{font-size:28px;margin-bottom:8px}
+.sent-msg p{font-size:14px;color:var(--deep);line-height:1.6}
+.sent-msg strong{color:var(--steel)}
+
+.restart-btn{display:block;width:100%;padding:15px;background:transparent;
+  border:1.5px solid rgba(45,74,110,.28);border-radius:13px;color:var(--slate);
+  font-family:var(--sans);font-size:14px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .25s;margin-top:14px}
+.restart-btn:hover{border-color:var(--steel);color:var(--steel)}
+
+/* FOOTER */
+.footer-note{text-align:center;font-size:10px;color:var(--slate);letter-spacing:.1em;padding:0 24px 36px;opacity:.65}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="mk-badge">Mary Kay · Fragancia para Él</div>
+    <h1>Descubre tu<br><em>Aroma Ideal</em></h1>
+    <div class="hline"></div>
+    <p>Responde desde lo que eres y descubre el cologne Mary Kay que fue hecho para ti.</p>
+  </header>
+
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-head">
+      <span class="prog-label">Tu Recorrido</span>
+      <span class="prog-count" id="progCount">1 / 5</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:20%"></div></div>
+  </div>
+
+  <div class="quiz-wrap" id="quizWrap"></div>
+
+  <p class="footer-note">Disponible exclusivamente con tu Consultora · marykay.com/jenniffer</p>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  PREGUNTAS
+// ══════════════════════════════════════════
+var questions = [
+  { q:"¿Cómo describirías tu estilo personal?", opts:[
+    {l:"Clásico y elegante",          s:"Limpio, refinado, siempre impecable",      t:{city:3,domain:2,hi:1}},
+    {l:"Activo y deportivo",          s:"Energía, movimiento, siempre en acción",   t:{sport:4,ocean:2}},
+    {l:"Sofisticado y moderno",        s:"Urbano, seguro, con personalidad propia",  t:{city:4,hi:2}},
+    {l:"Relajado y auténtico",         s:"Sin pretensiones, cómodo en su piel",      t:{ocean:3,domain:2,hi:1}}
+  ]},
+  { q:"¿En qué momento usas más una fragancia?", opts:[
+    {l:"En el trabajo o reuniones",         s:"Presencia profesional que se recuerda",  t:{city:3,domain:2}},
+    {l:"En el gimnasio o al hacer deporte", s:"Fresco incluso cuando das todo",         t:{sport:4,ocean:2}},
+    {l:"En salidas nocturnas o citas",      s:"Esa primera impresión que no se olvida", t:{hi:3,city:2,domain:1}},
+    {l:"Todo el tiempo — es mi sello",      s:"Mi firma personal, todos los días",      t:{domain:3,ocean:2,hi:1}}
+  ]},
+  { q:"¿Qué aroma te atrae más?", opts:[
+    {l:"🌊 Marino y fresco",           s:"Brisa, agua, limpio y libre",              t:{ocean:4,sport:2}},
+    {l:"🌲 Amaderado y profundo",       s:"Cedro, sándalo, intenso y duradero",       t:{domain:4,city:2}},
+    {l:"⚡ Fresco y energético",        s:"Cítrico, limpio, que despierta",           t:{sport:3,hi:2,ocean:1}},
+    {l:"🏙️ Urbano y sofisticado",       s:"Moderno, elegante, magnético",             t:{city:4,hi:3}}
+  ]},
+  { q:"Si tu fragancia pudiera hablar, ¿qué diría de ti?", opts:[
+    {l:"\"Este hombre sabe lo que quiere\"",      s:"Determinado, enfocado, seguro",       t:{city:3,domain:2}},
+    {l:"\"Siempre activo, nunca se rinde\"",      s:"Energía que inspira a otros",         t:{sport:4,ocean:1}},
+    {l:"\"Entra y todos lo notan\"",              s:"Presencia que impacta sin esfuerzo",  t:{hi:4,city:2}},
+    {l:"\"Es auténtico, no necesita aparentar\"", s:"Confianza tranquila, la más real",    t:{domain:3,ocean:2}}
+  ]},
+  { q:"¿Qué quieres que digan cuando pasas?", opts:[
+    {l:"\"¿Qué cologne usas?\" — quiero saberlo", s:"Impactante, que se queda en la mente", t:{hi:3,city:3}},
+    {l:"\"Siempre hueles increíble\"",             s:"Consistente, elegante, memorable",    t:{domain:3,city:2}},
+    {l:"\"Qué fresco y limpio hueles\"",           s:"Natural, agradable, sin exagerar",    t:{ocean:3,sport:3}},
+    {l:"\"Ese aroma te queda perfecto\"",          s:"Tu fragancia, tu identidad",          t:{domain:3,sport:2}}
+  ]}
+];
+
+// ══════════════════════════════════════════
+//  FRAGANCIAS
+// ══════════════════════════════════════════
+var frags = {
+  city:{
+    name:"Cityscape®", type:"Cologne Spray · 3.4 fl. oz.", scent:"Amaderado Urbano",
+    price:"$56.00", vibe:"Sofisticado · Urbano · Memorable",
+    desc:"Para el hombre que domina la ciudad. Fresco al inicio, profundo al final. El cologne del hombre que entra a un lugar y todos lo notan sin que tenga que decir una palabra.",
+    top:"🍋 Lima · pimienta negra — arranque fresco y audaz",
+    mid:"🌿 Salvia · cardamomo — corazón especiado y moderno",
+    base:"🌲 Vetiver · sándalo — fondo amaderado y duradero",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dw3c53eb25/hi-res/10005/J2009227-UNL-GB-075-Cityscape-Mens-Carton-2.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/mens-collection/cityscape-cologne-spray-10221421/990322932US10221421.html"
+  },
+  hi:{
+    name:"MK High Intensity®", type:"Cologne Spray · 3.4 fl. oz.", scent:"Masculino",
+    price:"$46.00", vibe:"Intenso · Clásico · Irresistible",
+    desc:"El clásico que nunca falla. Intenso, masculino y con una durabilidad que habla por sí sola. Para el hombre que quiere dejar huella sin importar dónde esté.",
+    top:"🌿 Lavanda · bergamota — inicio fresco y limpio",
+    mid:"🪵 Madera de cedro · especias — masculino y profundo",
+    base:"🍯 Almizcle · ámbar — cálido, intenso y duradero",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dw7014281d/hi-res/10001/585009-UNL-GB-002-LB-05-18-Fragrance-HighIntensity-Hi-Res.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/scent/masculine/mk-high-intensity-cologne-spray-150105/150105US10109680.html"
+  },
+  sport:{
+    name:"MK High Intensity® Sport", type:"Cologne Spray · 3.4 fl. oz.", scent:"Fresco Deportivo",
+    price:"$46.00", vibe:"Energético · Fresco · Activo",
+    desc:"Hecho para el hombre en movimiento. Fresco, limpio y con energía que dura todo el día. Perfecto para el gym, el trabajo o cualquier momento donde das el 100%.",
+    top:"⚡ Cítricos · menta — explosión de frescura",
+    mid:"🌊 Notas acuáticas · flores blancas — limpio y vibrante",
+    base:"🌲 Madera blanca · almizcle — base fresca y duradera",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dw651d22c4/hi-res/10000/mk-high-intensity-sport-cologne-spray.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/scent/masculine/mk-high-intensity-sport-cologne-spray-150115/150115US10075680.html"
+  },
+  ocean:{
+    name:"MK High Intensity Ocean®", type:"Cologne Spray · 3.4 fl. oz.", scent:"Marino Fresco",
+    price:"$46.00", vibe:"Libre · Fresco · Natural",
+    desc:"Como una brisa marina que te sigue a donde vayas. Fresco, limpio y natural. Para el hombre auténtico que no necesita exagerar para ser recordado.",
+    top:"🌊 Brisa marina · ozono — libertad en cada spray",
+    mid:"🍃 Menta acuática · flores frescas — limpio y natural",
+    base:"🪵 Madera de deriva · almizcle — cálido y auténtico",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dwc1a94475/hi-res/10001/394571-S54-GB-023-HIOFragrance-cmyk-Hi-Res.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/mens-collection/mk-high-intensity-ocean-cologne-300285/300285US10095123.html"
+  },
+  domain:{
+    name:"Domain®", type:"Cologne Spray · 3.4 fl. oz.", scent:"Amaderado Clásico",
+    price:"$42.00", vibe:"Clásico · Seguro · Atemporal",
+    desc:"Un clásico atemporal. Suave al inicio, amaderado al final. Para el hombre que no necesita seguir tendencias porque su estilo ya es su firma.",
+    top:"🌿 Lavanda · hierbas frescas — inicio suave y limpio",
+    mid:"🌰 Especias cálidas · madera — corazón clásico y seguro",
+    base:"🟫 Sándalo · almizcle cálido — base profunda y duradera",
+    img:"https://www.marykay.com/dw/image/v2/BKGS_PRD/on/demandware.static/-/Sites-us-master-catalog/default/dwba6693e8/hi-res/10001/585009-UNL-GB-004-LB-05-18-Fragrance-Domain-Hi-Res.jpg?sw=400&sh=400&sm=fit",
+    url:"https://www.marykay.com/jenniffer/es/fragrance/scent/masculine/domain-cologne-spray-150103/150103US10028783.html"
+  }
+};
+
+// ══════════════════════════════════════════
+//  LÓGICA QUIZ
+// ══════════════════════════════════════════
+var cur=0;
+var scores={city:0,hi:0,sport:0,ocean:0,domain:0};
+var sel=null;
+
+function render(){
+  var q=questions[cur]; var total=questions.length;
+  document.getElementById('progFill').style.width=(((cur+1)/total)*100)+'%';
+  document.getElementById('progCount').textContent=(cur+1)+' / '+total;
+  document.getElementById('quizWrap').innerHTML=
+    '<div class="q-card">'+
+      '<div class="q-num">Pregunta '+(cur+1)+' de '+total+'</div>'+
+      '<div class="q-text">'+q.q+'</div>'+
+      '<div class="options">'+
+        q.opts.map(function(o,i){
+          return '<button class="opt-btn" onclick="pick('+i+')">'+
+            '<div class="opt-dot"></div>'+
+            '<div class="opt-text">'+
+              '<span class="opt-label">'+o.l+'</span>'+
+              (o.s?'<span class="opt-sub">'+o.s+'</span>':'')+
+            '</div></button>';
+        }).join('')+
+      '</div>'+
+      '<button class="next-btn" id="nxt" onclick="advance()">'+
+        (cur<total-1?'Continuar →':'Ver mi Fragancia →')+
+      '</button>'+
+    '</div>';
+  sel=null;
+}
+
+function pick(i){
+  document.querySelectorAll('.opt-btn').forEach(function(b){b.classList.remove('sel')});
+  document.querySelectorAll('.opt-btn')[i].classList.add('sel');
+  sel=i;
+  document.getElementById('nxt').classList.add('on');
+}
+
+function advance(){
+  if(sel===null) return;
+  var t=questions[cur].opts[sel].t;
+  Object.keys(t).forEach(function(k){if(scores[k]!==undefined)scores[k]+=t[k];});
+  cur++;
+  if(cur<questions.length){render();}else{showResult();}
+}
+
+function showResult(){
+  document.getElementById('progWrap').style.display='none';
+  var winner=Object.keys(scores).reduce(function(a,b){return scores[a]>=scores[b]?a:b});
+  var f=frags[winner];
+  document.getElementById('quizWrap').innerHTML=
+    '<div class="r-card">'+
+      '<div class="r-hero">'+
+        '<div class="r-tag">✦ Tu Fragancia Ideal ✦</div>'+
+        '<img class="r-img" src="'+f.img+'" alt="'+f.name+'" onerror="this.style.display=\'none\'">'+
+        '<div class="r-name">'+f.name+'</div>'+
+        '<div class="r-vibe">'+f.vibe+'</div>'+
+        '<div class="r-type">'+f.type+'</div>'+
+        '<div class="r-badge">'+f.scent+'</div>'+
+      '</div>'+
+      '<div class="r-body">'+
+        '<p class="r-desc">'+f.desc+'</p>'+
+        '<div class="notes-ttl">¿A qué huele?</div>'+
+        '<div class="notes-row">'+
+          '<div class="note-item"><span class="note-stage">Inicio</span><span class="note-detail">'+f.top+'</span></div>'+
+          '<div class="note-item"><span class="note-stage">Corazón</span><span class="note-detail">'+f.mid+'</span></div>'+
+          '<div class="note-item"><span class="note-stage">Fondo</span><span class="note-detail">'+f.base+'</span></div>'+
+        '</div>'+
+        '<a class="cta-btn" href="'+f.url+'" target="_blank">Ver cologne con Jenniffer 🛍️</a>'+
+        '<p class="price-hint">Precio sugerido: '+f.price+'</p>'+
+        '<div class="contact-card" id="contactCard">'+
+          '<div class="contact-title">¿Quieres que Jenniffer te contacte? 🌟</div>'+
+          '<p class="contact-sub">Sin compromiso. Solo si quieres más información sobre este cologne.</p>'+
+          '<input class="contact-field" id="cName" type="text" placeholder="Tu nombre" autocomplete="name">'+
+          '<input class="contact-field" id="cPhone" type="tel" placeholder="Tu WhatsApp (ej. 787-555-0000)" autocomplete="tel">'+
+          '<select class="contact-field" id="cHow">'+
+            '<option value="">¿Cómo prefieres que te contacten?</option>'+
+            '<option value="WhatsApp">Por WhatsApp</option>'+
+            '<option value="Llamada">Por llamada</option>'+
+            '<option value="Como prefieras">Como prefieras</option>'+
+          '</select>'+
+          '<button class="send-btn" id="sendBtn" onclick="submitContact(\''+f.name+'\')">Sí, me interesa ✦</button>'+
+          '<span class="no-thanks" onclick="skipContact()">No gracias, solo estaba curioso</span>'+
+        '</div>'+
+        '<button class="restart-btn" onclick="restart()">Volver a tomar el quiz</button>'+
+      '</div>'+
+    '</div>';
+}
+
+function submitContact(fragName){
+  var name=document.getElementById('cName').value.trim();
+  var phone=document.getElementById('cPhone').value.trim();
+  var how=document.getElementById('cHow').value;
+  if(!name||!phone){
+    document.getElementById('cName').style.borderColor=name?'':'var(--steel)';
+    document.getElementById('cPhone').style.borderColor=phone?'':'var(--steel)';
+    return;
+  }
+  var btn=document.getElementById('sendBtn');
+  btn.disabled=true; btn.textContent='Enviando…';
+  var FORMSPREE='https://formspree.io/f/xgoreqga';
+  fetch(FORMSPREE,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({
+      nombre:name, whatsapp:phone,
+      contacto_preferido:how||'No especificó',
+      cologne_recomendado:fragName,
+      _subject:'✦ Nuevo cliente del quiz · '+fragName
+    })
+  })
+  .then(function(){showSent(name);})
+  .catch(function(){showSent(name);});
+}
+
+function showSent(name){
+  document.getElementById('contactCard').innerHTML=
+    '<div class="sent-msg">'+
+      '<div class="sent-icon">✦</div>'+
+      '<p>¡Gracias, <strong>'+name+'</strong>!<br>'+
+      'Jenniffer se pondrá en contacto contigo pronto.</p>'+
+    '</div>';
+}
+
+function skipContact(){
+  document.getElementById('contactCard').style.display='none';
+}
+
+function restart(){
+  cur=0;
+  Object.keys(scores).forEach(function(k){scores[k]=0;});
+  document.getElementById('progWrap').style.display='block';
+  render();
+}
+
+render();
+
+// ══════════════════════════════════════════
+//  MÚSICA OCEÁNICA TERAPÉUTICA
+//  Olas · Profundidad · Drone 528 Hz
+//  Arranca al primer toque — sin botón
+// ══════════════════════════════════════════
+var AC=null,MG=null,started=false,loopTmr=null;
+
+function startMusic(){
+  if(started) return; started=true;
+  AC=new(window.AudioContext||window.webkitAudioContext)();
+  MG=AC.createGain(); MG.gain.setValueAtTime(0,AC.currentTime);
+  MG.connect(AC.destination);
+  MG.gain.linearRampToValueAtTime(1,AC.currentTime+3);
+  doLoop();
+}
+document.addEventListener('touchstart',startMusic,{once:true});
+document.addEventListener('click',startMusic,{once:true});
+
+function makeReverb(duration,decay){
+  var sr=AC.sampleRate, len=sr*duration;
+  var imp=AC.createBuffer(2,len,sr);
+  for(var ch=0;ch<2;ch++){
+    var d=imp.getChannelData(ch);
+    for(var i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);
+  }
+  var c=AC.createConvolver(); c.buffer=imp; return c;
+}
+
+function wave(t,dur,vol){
+  var buf=AC.createBuffer(1,AC.sampleRate*dur,AC.sampleRate);
+  var data=buf.getChannelData(0);
+  for(var i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*0.3;
+  var src=AC.createBufferSource(); src.buffer=buf;
+  var filt=AC.createBiquadFilter();
+  filt.type='bandpass';
+  filt.frequency.setValueAtTime(300,t);
+  filt.frequency.linearRampToValueAtTime(650,t+dur*0.5);
+  filt.frequency.linearRampToValueAtTime(250,t+dur);
+  filt.Q.value=0.7;
+  var env=AC.createGain();
+  env.gain.setValueAtTime(0,t);
+  env.gain.linearRampToValueAtTime(vol,t+dur*0.4);
+  env.gain.linearRampToValueAtTime(0,t+dur);
+  src.connect(filt); filt.connect(env); env.connect(MG);
+  src.start(t); src.stop(t+dur);
+}
+
+function note(freq,t,dur,vol){
+  var rev=makeReverb(3,2.8); rev.connect(MG);
+  var o=AC.createOscillator(),e=AC.createGain(),f=AC.createBiquadFilter();
+  f.type='lowpass'; f.frequency.value=1100; f.Q.value=0.3;
+  o.type='sine'; o.frequency.setValueAtTime(freq,t);
+  var lfo=AC.createOscillator(),lfoG=AC.createGain();
+  lfo.frequency.value=0.25; lfoG.gain.value=2.5;
+  lfo.connect(lfoG); lfoG.connect(o.frequency);
+  lfo.start(t); lfo.stop(t+dur+0.1);
+  e.gain.setValueAtTime(0,t);
+  e.gain.linearRampToValueAtTime(vol,t+0.1);
+  e.gain.exponentialRampToValueAtTime(vol*0.55,t+0.6);
+  e.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(f); f.connect(e); e.connect(MG); e.connect(rev);
+  o.start(t); o.stop(t+dur+0.1);
+}
+
+function pad(freq,t,dur,vol){
+  var rev=makeReverb(3.5,2.2); rev.connect(MG);
+  [1,1.498,1.782,2].forEach(function(r,i){
+    var o=AC.createOscillator(),e=AC.createGain(),f=AC.createBiquadFilter();
+    f.type='lowpass'; f.frequency.value=350;
+    o.type='sine'; o.frequency.setValueAtTime(freq*r,t);
+    o.detune.setValueAtTime((i-1.5)*8,t);
+    var v=vol/(i*0.9+1.4);
+    e.gain.setValueAtTime(0,t);
+    e.gain.linearRampToValueAtTime(v,t+1.2);
+    e.gain.setValueAtTime(v,t+dur-1.2);
+    e.gain.linearRampToValueAtTime(0,t+dur);
+    o.connect(f); f.connect(e); e.connect(MG); e.connect(rev);
+    o.start(t); o.stop(t+dur+0.1);
+  });
+}
+
+function drone(t,dur){
+  [528,264,132].forEach(function(freq,i){
+    var o=AC.createOscillator(),e=AC.createGain(),f=AC.createBiquadFilter();
+    f.type='lowpass'; f.frequency.value=260;
+    o.type='sine'; o.frequency.setValueAtTime(freq,t);
+    var v=0.025/(i+1);
+    e.gain.setValueAtTime(0,t);
+    e.gain.linearRampToValueAtTime(v,t+2);
+    e.gain.setValueAtTime(v,t+dur-2);
+    e.gain.linearRampToValueAtTime(0,t+dur);
+    o.connect(f); f.connect(e); e.connect(MG);
+    o.start(t); o.stop(t+dur+0.1);
+  });
+}
+
+// Escala pentatónica Re menor (profunda y oceánica masculina)
+var SC=[146.8,174.6,196,220,261.6,293.7,349.2,440];
+var PD=[73.4,65.4,87.3,58.3];
+var ML=[
+  [0,4,2.4],[2.6,3,2.0],[4.8,5,2.6],
+  [7.6,6,2.2],[10.0,4,1.8],[12.0,2,2.4],
+  [14.6,3,2.0],[16.8,1,2.6],[19.6,4,2.2],
+  [22.0,5,2.8],[25.0,7,2.4],[27.6,6,2.0],
+  [29.8,4,2.6],[32.6,3,3.0]
+];
+var LDUR=37;
+
+function scheduleLoop(st){
+  drone(st,LDUR);
+  [0,6,13,20,27].forEach(function(off){ wave(st+off,8,0.038); });
+  PD.forEach(function(f,i){ pad(f,st+i*9,10,0.04); });
+  ML.forEach(function(e){ note(SC[e[1]],st+e[0],e[2],0.095); });
+}
+
+function doLoop(){
+  scheduleLoop(AC.currentTime);
+  loopTmr=setTimeout(doLoop,(LDUR-0.5)*1000);
+}
+</script>
+</body>
+</html>
