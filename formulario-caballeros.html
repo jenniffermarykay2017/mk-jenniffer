@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu piel, tu escudo · Mary Kay</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1a2744; --navy-light:#2a3d6e; --steel:#3d5a8a;
+    --gold:#c9a84c; --gold-light:#f5e9c8;
+    --slate:#f0f3f8; --white:#ffffff;
+    --text:#1a2030; --text-light:#6a7a90;
+    --shadow:0 8px 40px rgba(26,39,68,0.13);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--slate);font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+  /* HERO */
+  .hero{background:linear-gradient(160deg,#0d1a35 0%,var(--navy) 45%,var(--steel) 100%);padding:55px 24px 70px;text-align:center;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 0L40 20L20 40L0 20Z'/%3E%3C/g%3E%3C/svg%3E");}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.4);border-radius:30px;padding:7px 18px;font-size:0.75rem;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;}
+  .hero-icon{font-size:3rem;margin-bottom:16px;display:block;animation:float 4s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+  .hero h1{font-family:'Cormorant Garamond',serif;font-size:2.4rem;color:white;line-height:1.2;font-weight:400;margin-bottom:12px;}
+  .hero h1 em{font-style:italic;font-weight:600;color:var(--gold);}
+  .hero-desc{color:rgba(255,255,255,0.75);font-size:0.88rem;line-height:1.7;max-width:320px;margin:0 auto 20px;}
+  .hero-sub{font-size:0.72rem;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-top:8px;}
+
+  .wave{margin-top:-2px;line-height:0;}
+  .wave svg{display:block;width:100%;}
+
+  /* PROGRESS */
+  .progress-wrap{padding:18px 22px 0;background:white;}
+  .progress-bar{height:4px;background:#e8ecf5;border-radius:4px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--navy),var(--gold));border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+  .progress-info{display:flex;justify-content:space-between;margin-top:6px;}
+  .progress-text{font-size:0.72rem;color:var(--text-light);font-weight:600;}
+  .progress-pct{font-size:0.72rem;color:var(--navy);font-weight:700;}
+
+  /* STEPS */
+  .steps-wrap{padding:0 18px 100px;background:white;}
+  .step{display:none;animation:fadeUp .4s cubic-bezier(.4,0,.2,1);}
+  .step.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+  .step-card{background:var(--slate);border-radius:22px;padding:24px 20px;margin-top:18px;box-shadow:var(--shadow);}
+  .step-block{font-size:0.67rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .step-block::before{content:'';width:16px;height:2px;background:var(--gold);border-radius:2px;}
+  .step-q{font-family:'Cormorant Garamond',serif;font-size:1.55rem;color:var(--text);line-height:1.25;margin-bottom:8px;}
+  .step-q em{font-style:italic;color:var(--navy);}
+  .step-sub{font-size:0.83rem;color:var(--text-light);line-height:1.6;margin-bottom:18px;}
+
+  /* OPTIONS */
+  .options{display:flex;flex-direction:column;gap:9px;}
+  .opt{border:2px solid #dde3f0;border-radius:14px;padding:14px 16px;cursor:pointer;transition:all .2s;background:white;text-align:left;display:flex;align-items:center;gap:13px;position:relative;}
+  .opt:hover{border-color:var(--navy);}
+  .opt.sel{border-color:var(--navy);background:linear-gradient(135deg,#eef2ff,#e8ecfa);box-shadow:0 4px 16px rgba(26,39,68,0.12);}
+  .opt.sel::after{content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--navy);font-weight:700;}
+  .opt-icon{font-size:1.4rem;flex-shrink:0;}
+  .opt-text{font-size:0.9rem;font-weight:700;color:var(--text);}
+  .opt-sub{font-size:0.76rem;color:var(--text-light);margin-top:2px;}
+
+  /* MULTI */
+  .multi-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+  .mopt{border:2px solid #dde3f0;border-radius:30px;padding:8px 15px;cursor:pointer;transition:all .2s;background:white;font-size:0.82rem;font-weight:700;color:var(--text);}
+  .mopt:hover{border-color:var(--navy);}
+  .mopt.sel{background:var(--navy);color:white;border-color:var(--navy);}
+  .mopt.gold-opt.sel{background:var(--gold);border-color:var(--gold);color:white;}
+
+  /* INPUTS */
+  .inp-group{margin-bottom:12px;}
+  .inp-group label{display:block;font-size:0.72rem;font-weight:700;color:var(--navy);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;}
+  .inp-group input,.inp-group select,.inp-group textarea{width:100%;border:2px solid #dde3f0;border-radius:12px;padding:11px 13px;font-family:'Nunito',sans-serif;font-size:0.9rem;background:white;color:var(--text);outline:none;transition:border-color .2s;appearance:none;}
+  .inp-group input:focus,.inp-group select:focus{border-color:var(--navy);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+
+  /* SCALE */
+  .scale{display:flex;gap:6px;}
+  .scale-btn{flex:1;border:2px solid #dde3f0;border-radius:12px;padding:12px 4px;cursor:pointer;text-align:center;transition:all .2s;background:white;}
+  .scale-btn:hover{border-color:var(--navy);}
+  .scale-btn.sel{background:var(--navy);border-color:var(--navy);}
+  .scale-btn .s-emoji{font-size:1.4rem;display:block;margin-bottom:3px;}
+  .scale-btn .s-label{font-size:0.6rem;font-weight:700;color:var(--text-light);line-height:1.2;}
+  .scale-btn.sel .s-label{color:white;}
+
+  /* INSIGHT */
+  .insight{background:linear-gradient(135deg,var(--gold-light),#f0e8c0);border-radius:13px;padding:13px 15px;margin-top:14px;display:flex;gap:9px;align-items:flex-start;}
+  .insight-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+  .insight-text{font-size:0.81rem;color:#7a5a10;line-height:1.6;}
+
+  .info-box{background:linear-gradient(135deg,#eef2ff,#e4eaf8);border-radius:13px;padding:13px 15px;margin-top:14px;display:flex;gap:9px;border-left:3px solid var(--navy);}
+  .info-text{font-size:0.81rem;color:var(--navy);line-height:1.6;}
+
+  /* NAV */
+  .nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #dde3f0;padding:14px 20px;display:flex;gap:10px;z-index:100;}
+  .btn{border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;border-radius:30px;padding:14px 22px;font-size:0.92rem;transition:all .2s;flex:1;text-align:center;}
+  .btn:active{transform:scale(0.97);}
+  .btn-back{background:#eef2ff;color:var(--navy);}
+  .btn-next{background:linear-gradient(135deg,var(--navy),#0d1a35);color:white;box-shadow:0 5px 18px rgba(26,39,68,0.3);}
+  .btn-next:hover{transform:translateY(-2px);}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),#a87d20);color:white;box-shadow:0 5px 18px rgba(201,168,76,0.3);}
+
+  /* THANK YOU */
+  .thankyou{padding:28px 18px 100px;background:white;}
+  .ty-hero{background:linear-gradient(160deg,#0d1a35,var(--navy));border-radius:22px;padding:30px 22px;text-align:center;color:white;margin-bottom:18px;position:relative;overflow:hidden;}
+  .ty-hero::before{content:'🛡️';position:absolute;right:-10px;bottom:-20px;font-size:100px;opacity:0.08;}
+  .ty-icon{font-size:3.2rem;margin-bottom:12px;display:block;animation:pop .5s cubic-bezier(.4,0,.2,1);}
+  @keyframes pop{0%{transform:scale(0);}80%{transform:scale(1.1);}100%{transform:scale(1);}}
+  .ty-hero h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;margin-bottom:8px;}
+  .ty-hero h2 em{font-style:italic;color:var(--gold);}
+  .ty-hero p{font-size:0.84rem;opacity:0.82;line-height:1.7;}
+
+  .diag-card{background:var(--slate);border-radius:18px;padding:20px;margin-bottom:14px;box-shadow:var(--shadow);}
+  .diag-card h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #dde3f0;}
+  .diag-item{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid #e8ecf5;align-items:flex-start;}
+  .diag-item:last-child{border:none;}
+  .diag-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+  .diag-name{font-size:0.87rem;font-weight:700;color:var(--text);margin-bottom:2px;}
+  .diag-desc{font-size:0.77rem;color:var(--text-light);line-height:1.5;}
+
+  .fragrance-card{background:linear-gradient(135deg,var(--gold-light),#efe0a0);border:2px solid #d4b84a;border-radius:18px;padding:20px;margin-bottom:14px;}
+  .fragrance-card h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#7a5010;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .fragrance-card p{font-size:0.83rem;color:#8a6020;line-height:1.7;}
+  .fragrance-item{background:white;border-radius:10px;padding:10px 14px;margin-top:8px;display:flex;gap:10px;align-items:center;}
+  .fragrance-item .f-name{font-size:0.87rem;font-weight:700;color:var(--text);}
+  .fragrance-item .f-desc{font-size:0.76rem;color:var(--text-light);margin-top:2px;}
+
+  .jennifer-card{background:linear-gradient(135deg,var(--navy),#0d1a35);border-radius:18px;padding:20px;color:white;text-align:center;}
+  .jennifer-card p{font-size:0.87rem;line-height:1.8;opacity:0.88;font-style:italic;margin-bottom:12px;}
+  .jennifer-card strong{display:block;font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:normal;color:var(--gold);}
+
+  .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--navy);color:white;padding:9px 20px;border-radius:30px;font-size:0.84rem;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">🛡️ Consulta de Cuidado Personal · Mary Kay</div>
+  <span class="hero-icon">🛡️</span>
+  <h1>Tu piel,<br><em>tu escudo</em></h1>
+  <p class="hero-desc">Responde estas preguntas y recibe una recomendación personalizada para proteger y fortalecer tu piel — sin complicaciones.</p>
+  <div class="hero-sub">Jenniffer Ivelisse · Consultora de Belleza Independiente · Mary Kay</div>
+</div>
+
+<div class="wave">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,40 C360,80 1080,0 1440,40 L1440,60 L0,60 Z" fill="white"/>
+  </svg>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  <div class="progress-info">
+    <div class="progress-text" id="progress-text">Comenzando...</div>
+    <div class="progress-pct" id="progress-pct">0%</div>
+  </div>
+</div>
+
+<div class="steps-wrap" id="steps-wrap">
+
+  <!-- STEP 1: Datos -->
+  <div class="step active" data-step="1">
+    <div class="step-card">
+      <div class="step-block">Datos</div>
+      <div class="step-q">¿Cómo te llamas? 👋</div>
+      <div class="step-sub">Toda recomendación será personalizada para ti.</div>
+      <div class="form-row">
+        <div class="inp-group"><label>Nombre *</label><input id="s-nombre" type="text" placeholder="Tu nombre"></div>
+        <div class="inp-group"><label>Apellido</label><input id="s-apellido" type="text" placeholder="Apellido"></div>
+      </div>
+      <div class="inp-group"><label>WhatsApp *</label><input id="s-tel" type="tel" placeholder="555-000-0000"></div>
+      <div class="inp-group"><label>Correo electrónico</label><input id="s-email" type="email" placeholder="correo@ejemplo.com"></div>
+      <div class="form-row">
+        <div class="inp-group"><label>Edad aproximada</label>
+          <select id="s-edad">
+            <option value="">-- Seleccionar --</option>
+            <option>20s</option><option>30s</option><option>40s</option>
+            <option>50s</option><option>60s+</option>
+          </select>
+        </div>
+        <div class="inp-group"><label>Prefiero contacto por</label>
+          <select id="s-contacto">
+            <option value="">-- Seleccionar --</option>
+            <option>WhatsApp</option><option>Llamada</option><option>Email</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Protector solar — entrada no vanidosa -->
+  <div class="step" data-step="2">
+    <div class="step-card">
+      <div class="step-block">Protección solar</div>
+      <div class="step-q">¿Actualmente usas <em>protector solar?</em> ☀️</div>
+      <div class="step-sub">El sol es el factor número uno de envejecimiento prematuro y cáncer de piel — independientemente del género.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-solar','Sí, lo uso a diario')">
+          <span class="opt-icon">✅</span>
+          <div><div class="opt-text">Sí, lo uso a diario</div><div class="opt-sub">Soy constante con la protección</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-solar','Solo cuando voy a la playa o actividades al aire libre')">
+          <span class="opt-icon">🏖️</span>
+          <div><div class="opt-text">Solo en playa o actividades al aire libre</div><div class="opt-sub">No lo uso en el día a día</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-solar','No uso protector solar')">
+          <span class="opt-icon">❌</span>
+          <div><div class="opt-text">No uso protector solar</div><div class="opt-sub">Nunca lo he considerado necesario</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-solar">
+      <div class="info-box" style="margin-top:14px;">
+        <span style="font-size:1rem;flex-shrink:0;">☀️</span>
+        <span class="info-text"><strong>Dato importante:</strong> El 80% del envejecimiento facial visible es causado por la exposición solar acumulada — no por la edad. Proteger la piel hoy es una decisión inteligente, no estética.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Actividad física -->
+  <div class="step" data-step="3">
+    <div class="step-card">
+      <div class="step-block">Tu estilo de vida</div>
+      <div class="step-q">¿Cuál es tu nivel de <em>actividad física?</em> 💪</div>
+      <div class="step-sub">Esto determina qué nivel de protección y resistencia necesitas en tus productos.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-actividad','Alto — ejercicio frecuente, deportes, trabajo al aire libre')">
+          <span class="opt-icon">🏋️</span>
+          <div><div class="opt-text">Alto</div><div class="opt-sub">Ejercicio frecuente, deportes, trabajo al aire libre</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-actividad','Moderado — camino, trabajo mixto interior/exterior')">
+          <span class="opt-icon">🚶</span>
+          <div><div class="opt-text">Moderado</div><div class="opt-sub">Camino, trabajo mixto interior/exterior</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-actividad','Bajo — trabajo de oficina, mayormente en interiores')">
+          <span class="opt-icon">💼</span>
+          <div><div class="opt-text">Bajo</div><div class="opt-sub">Trabajo de oficina, mayormente en interiores</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-actividad">
+    </div>
+  </div>
+
+  <!-- STEP 4: Lo que ve en el espejo — sin vanidad -->
+  <div class="step" data-step="4">
+    <div class="step-card">
+      <div class="step-block">Tu percepción</div>
+      <div class="step-q">Cuando te ves al espejo, <em>¿qué notas?</em> 🪞</div>
+      <div class="step-sub">Sin filtros — solo lo que observas. No hay respuestas incorrectas.</div>
+      <div class="multi-wrap">
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Poros visibles')">Poros visibles</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Líneas de expresión')">Líneas de expresión</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Manchas o tono desigual')">Manchas / tono desigual</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Piel opaca o cansada')">Piel opaca / cansada</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Sequedad o resequedad')">Sequedad</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Piel grasa o brillante')">Piel grasa / brillante</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Barba que irrita la piel')">Barba que irrita</div>
+        <div class="mopt" onclick="toggleMopt(this,'s-preocupaciones','Nada — me veo bien')">Nada — me veo bien</div>
+      </div>
+      <input type="hidden" id="s-preocupaciones" value="[]">
+    </div>
+  </div>
+
+  <!-- STEP 5: Presencia profesional — el gancho masculino -->
+  <div class="step" data-step="5">
+    <div class="step-card">
+      <div class="step-block">Tu presencia</div>
+      <div class="step-q">¿Tu apariencia refleja <em>el nivel que has alcanzado?</em> 💼</div>
+      <div class="step-sub">La primera impresión no es superficial — es estratégica. Los estudios muestran que el aspecto personal influye directamente en la percepción de autoridad y confianza.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-presencia','Sí — cuido mi imagen porque representa quién soy')">
+          <span class="opt-icon">💪</span>
+          <div><div class="opt-text">Sí — cuido mi imagen conscientemente</div><div class="opt-sub">Mi apariencia es parte de mi marca personal</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-presencia','A veces — podría mejorar pero no sé por dónde empezar')">
+          <span class="opt-icon">🤔</span>
+          <div><div class="opt-text">A veces — podría mejorar</div><div class="opt-sub">No sé exactamente qué necesito</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-presencia','No lo había considerado — pero me interesa saber más')">
+          <span class="opt-icon">💡</span>
+          <div><div class="opt-text">No lo había considerado</div><div class="opt-sub">Me interesa saber más</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-presencia">
+      <div class="insight">
+        <span class="insight-icon">📊</span>
+        <span class="insight-text"><strong>Estudio de Harvard:</strong> Las personas que cuidan su apariencia personal son percibidas como un 20% más competentes en entornos profesionales.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6: Rutina actual -->
+  <div class="step" data-step="6">
+    <div class="step-card">
+      <div class="step-block">Tu rutina</div>
+      <div class="step-q">¿Qué haces actualmente para <em>cuidar tu piel?</em> 🧴</div>
+      <div class="step-sub">Sin juzgar — solo quiero entender tu punto de partida.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-rutina','Solo agua y jabón — lo básico')">
+          <span class="opt-icon">🚿</span>
+          <div><div class="opt-text">Solo agua y jabón</div><div class="opt-sub">Lo mínimo indispensable</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-rutina','Uso algún producto ocasionalmente')">
+          <span class="opt-icon">🧴</span>
+          <div><div class="opt-text">Uso algo ocasionalmente</div><div class="opt-sub">Sin rutina definida</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-rutina','Tengo una rutina — busco optimizarla')">
+          <span class="opt-icon">⭐</span>
+          <div><div class="opt-text">Tengo una rutina</div><div class="opt-sub">Quiero optimizarla</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-rutina">
+    </div>
+  </div>
+
+  <!-- STEP 7: Tiempo — urgencia sin presión -->
+  <div class="step" data-step="7">
+    <div class="step-card">
+      <div class="step-block">Tu contexto</div>
+      <div class="step-q">¿Cuánto tiempo llevas notando estos cambios en tu piel? ⏱️</div>
+      <div class="step-sub">Esta información me ayuda a identificar qué tan prioritario es actuar.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-tiempo','Menos de un año')">
+          <span class="opt-icon">🌱</span>
+          <div><div class="opt-text">Menos de un año</div><div class="opt-sub">Cambios recientes</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-tiempo','Entre 1 y 5 años')">
+          <span class="opt-icon">📅</span>
+          <div><div class="opt-text">Entre 1 y 5 años</div><div class="opt-sub">Ha sido gradual</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-tiempo','Más de 5 años')">
+          <span class="opt-icon">⏳</span>
+          <div><div class="opt-text">Más de 5 años</div><div class="opt-sub">Lleva tiempo acumulándose</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-tiempo">
+    </div>
+  </div>
+
+  <!-- STEP 8: Fragancias — condicional -->
+  <div class="step" data-step="8">
+    <div class="step-card">
+      <div class="step-block">Opcional</div>
+      <div class="step-q">¿Te interesaría descubrir <em>tu fragancia ideal?</em> 🌺</div>
+      <div class="step-sub">Mary Kay tiene fragancias masculinas diseñadas para diferentes personalidades. Si prefieres, puedes saltarte esta parte.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-fragancia-interes','Sí, me interesa'); showFragancia();">
+          <span class="opt-icon">✅</span>
+          <div><div class="opt-text">Sí, me interesa</div><div class="opt-sub">Quiero saber cuál va conmigo</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-fragancia-interes','No, solo me interesan los productos de cuidado'); hideFragancia();">
+          <span class="opt-icon">➡️</span>
+          <div><div class="opt-text">Solo me interesan los productos de cuidado</div><div class="opt-sub">Continuar sin el quiz de fragancias</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-fragancia-interes">
+
+      <!-- QUIZ FRAGANCIA — aparece solo si dice sí -->
+      <div id="fragancia-quiz" style="display:none;margin-top:18px;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">🌺 Tu perfil de fragancia</div>
+        <div class="inp-group">
+          <label>¿Cómo describes tu personalidad?</label>
+          <div class="multi-wrap" style="margin-top:6px;">
+            <div class="mopt" onclick="selMoptSingle(this,'s-personalidad','Clásico y elegante')">🎩 Clásico</div>
+            <div class="mopt" onclick="selMoptSingle(this,'s-personalidad','Aventurero y activo')">🏔️ Aventurero</div>
+            <div class="mopt" onclick="selMoptSingle(this,'s-personalidad','Moderno y urbano')">🏙️ Urbano</div>
+            <div class="mopt" onclick="selMoptSingle(this,'s-personalidad','Tranquilo y sofisticado')">🌊 Sofisticado</div>
+          </div>
+          <input type="hidden" id="s-personalidad">
+        </div>
+        <div class="inp-group">
+          <label>¿En qué momento usarías fragancia?</label>
+          <div class="multi-wrap" style="margin-top:6px;">
+            <div class="mopt" onclick="toggleMopt(this,'s-momento-fragancia','Trabajo / reuniones')">💼 Trabajo</div>
+            <div class="mopt" onclick="toggleMopt(this,'s-momento-fragancia','Deporte / actividad física')">🏋️ Deporte</div>
+            <div class="mopt" onclick="toggleMopt(this,'s-momento-fragancia','Salidas / eventos sociales')">🎭 Eventos</div>
+            <div class="mopt" onclick="toggleMopt(this,'s-momento-fragancia','Uso diario')">☀️ Diario</div>
+          </div>
+          <input type="hidden" id="s-momento-fragancia" value="[]">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 9: Disponibilidad -->
+  <div class="step" data-step="9">
+    <div class="step-card">
+      <div class="step-block">Último paso</div>
+      <div class="step-q">¿Cuándo podría contactarte para tu <em>consulta personalizada?</em> 📅</div>
+      <div class="step-sub">Una conversación breve, directa y sin presión — a tu ritmo.</div>
+      <div class="options">
+        <div class="opt" onclick="selOpt(this,'s-disponibilidad','Mañanas — antes del mediodía')">
+          <span class="opt-icon">🌅</span>
+          <div><div class="opt-text">Mañanas</div><div class="opt-sub">Antes del mediodía</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-disponibilidad','Tardes — entre 12pm y 6pm')">
+          <span class="opt-icon">☀️</span>
+          <div><div class="opt-text">Tardes</div><div class="opt-sub">Entre 12pm y 6pm</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-disponibilidad','Noches — después de las 6pm')">
+          <span class="opt-icon">🌙</span>
+          <div><div class="opt-text">Noches</div><div class="opt-sub">Después de las 6pm</div></div>
+        </div>
+        <div class="opt" onclick="selOpt(this,'s-disponibilidad','Fines de semana')">
+          <span class="opt-icon">📅</span>
+          <div><div class="opt-text">Fines de semana</div><div class="opt-sub">Sábado o domingo</div></div>
+        </div>
+      </div>
+      <input type="hidden" id="s-disponibilidad">
+      <div class="inp-group" style="margin-top:14px;">
+        <label>¿Algo más que quieras mencionar?</label>
+        <input id="s-extra" type="text" placeholder="Alergias, preguntas, lo que sea...">
+      </div>
+    </div>
+  </div>
+
+  <!-- THANK YOU -->
+  <div class="step" data-step="10">
+    <div class="thankyou">
+      <div class="ty-hero">
+        <span class="ty-icon">🛡️</span>
+        <h2>Listo, <em><span id="ty-nombre"></span></em></h2>
+        <p>Tu perfil fue recibido. En breve me pongo en contacto contigo con tu recomendación personalizada.</p>
+      </div>
+      <div class="diag-card" id="diag-card"></div>
+      <div class="fragrance-card" id="fragrance-result" style="display:none">
+        <h4>🌺 Tu fragancia ideal</h4>
+        <div id="fragrance-content"></div>
+      </div>
+      <div class="jennifer-card">
+        <p>"Cuidar tu piel no es vanidad — es inteligencia. Los hombres que invierten en su bienestar personal proyectan más confianza, presencia y autoridad. Estoy aquí para ayudarte a lograrlo."</p>
+        <strong>— Jenniffer Ivelisse · Tu CBI Mary Kay 🛡️</strong>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav" id="nav-bar">
+  <button class="btn btn-back" id="btn-back" onclick="prevStep()" style="display:none">← Atrás</button>
+  <button class="btn btn-next" id="btn-next" onclick="nextStep()">Comenzar →</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://wkqovrklcrrxawmnefwm.supabase.co';
+const SUPA_KEY = 'sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
+const TOTAL = 9;
+let cur = 1;
+
+function updateProgress() {
+  const pct = Math.round(((cur-1)/TOTAL)*100);
+  document.getElementById('progress').style.width = pct+'%';
+  document.getElementById('progress-pct').textContent = pct+'%';
+  document.getElementById('progress-text').textContent = cur <= TOTAL ? `Pregunta ${cur} de ${TOTAL}` : '¡Completado!';
+}
+
+function showStep(n) {
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  const el = document.querySelector(`[data-step="${n}"]`);
+  if(el) el.classList.add('active');
+  document.getElementById('btn-back').style.display = n>1&&n<=TOTAL?'block':'none';
+  const btnNext = document.getElementById('btn-next');
+  if(n>TOTAL) document.getElementById('nav-bar').style.display='none';
+  else if(n===TOTAL) btnNext.textContent='Enviar 🛡️';
+  else if(n===1) btnNext.textContent='Comenzar →';
+  else btnNext.textContent='Siguiente →';
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function nextStep(){
+  if(!validateStep()) return;
+  if(cur===TOTAL){submitForm();return;}
+  cur++;showStep(cur);
+}
+function prevStep(){if(cur>1){cur--;showStep(cur);}}
+
+function validateStep(){
+  if(cur===1){
+    if(!document.getElementById('s-nombre').value.trim()){toast('Por favor ingresa tu nombre 🛡️');return false;}
+    if(!document.getElementById('s-tel').value.trim()){toast('Por favor ingresa tu WhatsApp 📱');return false;}
+  }
+  if(cur===2&&!document.getElementById('s-solar').value){toast('Selecciona una opción para continuar');return false;}
+  if(cur===4&&!JSON.parse(document.getElementById('s-preocupaciones').value||'[]').length){toast('Selecciona al menos una opción');return false;}
+  if(cur===5&&!document.getElementById('s-presencia').value){toast('Selecciona una opción para continuar');return false;}
+  if(cur===8&&!document.getElementById('s-fragancia-interes').value){toast('Selecciona una opción para continuar');return false;}
+  if(cur===9&&!document.getElementById('s-disponibilidad').value){toast('¿Cuándo podemos contactarte?');return false;}
+  return true;
+}
+
+function selOpt(el,hid,val){
+  el.closest('.step-card').querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById(hid).value=val;
+}
+function toggleMopt(el,hid,val){
+  el.classList.toggle('sel');
+  const inp=document.getElementById(hid);
+  let arr=[];try{arr=JSON.parse(inp.value);}catch(e){}
+  if(el.classList.contains('sel')){if(!arr.includes(val))arr.push(val);}
+  else{arr=arr.filter(v=>v!==val);}
+  inp.value=JSON.stringify(arr);
+}
+function selMoptSingle(el,hid,val){
+  el.parentElement.querySelectorAll('.mopt').forEach(m=>m.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById(hid).value=val;
+}
+
+function showFragancia(){document.getElementById('fragancia-quiz').style.display='block';}
+function hideFragancia(){document.getElementById('fragancia-quiz').style.display='none';}
+
+function getDiagnostico(preoc, solar, actividad, presencia) {
+  const p = JSON.parse(preoc||'[]');
+  let items = [];
+  const tieneArrugas = p.includes('Líneas de expresión');
+  const tieneSequedad = p.includes('Sequedad o resequedad');
+  const tieneManchas = p.includes('Manchas o tono desigual');
+  const actividadAlta = actividad && actividad.includes('Alto');
+
+  // Protector solar siempre primero
+  if(actividadAlta){
+    items.push({icon:'☀️', name:'Protector Solar FPS 50+ — Tu primera línea de defensa', desc:'Resistente al agua y sudoración hasta 80 minutos. Fórmula ligera sin sensación pegajosa ni brillosa. Recomendado para actividades físicas por la Skin Cancer Foundation. Protege el 98% de rayos UVA y UVB.'});
+  } else {
+    items.push({icon:'☀️', name:'Protector Solar Mineral FPS 30 — Protección diaria inteligente', desc:'Con óxido de zinc, absorbe la grasa y humedad. Biodegradable, no deja sensación grasosa. Ideal para uso diario en interiores y exteriores. Forma una barrera que refleja la radiación solar.'});
+  }
+
+  if(tieneArrugas && tieneSequedad){
+    items.push({icon:'💎', name:'TimeWise Repair — Para el hombre que exige resultados', desc:'Formulado con células madre vegetales y suero del triángulo de la juventud. Trabaja en las líneas de expresión más profundas. Resultados visibles en 2 semanas. Tu piel, en su mejor versión.'});
+  } else if(tieneArrugas || tieneManchas){
+    items.push({icon:'⚡', name:'TimeWise Miracle Set — Rutina de alto rendimiento', desc:'Limpia, exfolia y protege en pasos simples. Con SPF 30 integrado y tecnología antioxidante. Como el mantenimiento preventivo que le das a tu vehículo — pero para tu piel.'});
+  }
+
+  if(p.includes('Poros visibles') || p.includes('Piel opaca o cansada')){
+    items.push({icon:'🔬', name:'Set de Microdermoabrasión — Renovación desde la primera aplicación', desc:'Elimina células muertas y revela piel más limpia y uniforme. Resultado visible desde el primer uso. El equivalente a un "reset" para tu piel.'});
+  }
+
+  if(p.includes('Barba que irrita la piel')){
+    items.push({icon:'🧔', name:'Rutina post-afeitado — Calma y protege', desc:'La piel expuesta al afeitado necesita hidratación y protección inmediata. Evita la irritación, el enrojecimiento y el envejecimiento prematuro de la zona del rostro.'});
+  }
+
+  return items;
+}
+
+function getFragrancia(personalidad, momentos) {
+  const mom = JSON.parse(momentos||'[]');
+  if(personalidad.includes('Clásico')) return [{name:'Domain — Elegancia atemporal', desc:'Para el hombre que lidera con presencia. Notas amaderadas y especiadas que proyectan autoridad y sofisticación.'}];
+  if(personalidad.includes('Aventurero')) return [{name:'Crave — Energía y libertad', desc:'Para el hombre activo que vive con intensidad. Notas frescas y dinámicas que acompañan tu ritmo.'}];
+  if(personalidad.includes('Urbano')) return [{name:'True Original — Moderno y confiado', desc:'Para el hombre de ciudad. Fresco, directo, memorable. Deja huella sin esfuerzo.'}];
+  return [{name:'Gold — Sofisticación discreta', desc:'Para el hombre que no necesita hablar fuerte para ser escuchado. Notas cálidas y persistentes.'}];
+}
+
+async function submitForm() {
+  const nombre = document.getElementById('s-nombre').value.trim();
+  const preoc = document.getElementById('s-preocupaciones').value;
+  const solar = document.getElementById('s-solar').value;
+  const actividad = document.getElementById('s-actividad').value;
+  const presencia = document.getElementById('s-presencia').value;
+  const fragInterest = document.getElementById('s-fragancia-interes').value;
+  const personalidad = document.getElementById('s-personalidad').value;
+  const momentos = document.getElementById('s-momento-fragancia').value;
+  const g = id => { const el=document.getElementById(id); return el?el.value:''; };
+
+  const notas = `📋 FORMULARIO CABALLEROS\n\nProtector solar: ${solar}\nActividad: ${actividad}\nPresencia: ${presencia}\nRutina actual: ${g('s-rutina')}\nTiempo: ${g('s-tiempo')}\nFragrancia interés: ${fragInterest}\nPersonalidad: ${personalidad}\nDisponibilidad: ${g('s-disponibilidad')}\nExtra: ${g('s-extra')}`;
+
+  const data = {
+    id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    created_at: new Date().toISOString(),
+    nombre, apellido: g('s-apellido').trim(),
+    telefono: g('s-tel').trim(), email: g('s-email').trim(),
+    tipo: 'prospecto', edad: g('s-edad'),
+    pref_contacto: g('s-contacto'),
+    preocupaciones: preoc, necesidades: '[]',
+    ojos: '[]', labios: '[]', intereses: '[]',
+    hora_contacto: g('s-disponibilidad'), notas,
+    sin_humectante: '', tono: '', acabado: '',
+    base: '', productos_fav: '', ciudad: '', ocupacion: '',
+    ref_nombre: '', ref_tel: '', ref_relacion: ''
+  };
+
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/clientas`, {
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':`Bearer ${SUPA_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(data)
+    });
+  } catch(e){console.log('Sin conexión');}
+
+  // Show results
+  document.getElementById('ty-nombre').textContent = nombre;
+  const diags = getDiagnostico(preoc, solar, actividad, presencia);
+  document.getElementById('diag-card').innerHTML = `
+    <h3>🛡️ Tu diagnóstico personalizado, ${nombre}</h3>
+    ${diags.map(d=>`<div class="diag-item"><span class="diag-icon">${d.icon}</span><div><div class="diag-name">${d.name}</div><div class="diag-desc">${d.desc}</div></div></div>`).join('')}
+  `;
+
+  if(fragInterest.includes('Sí') && personalidad) {
+    const frags = getFragrancia(personalidad, momentos);
+    document.getElementById('fragrance-result').style.display='block';
+    document.getElementById('fragrance-content').innerHTML = frags.map(f=>`
+      <div class="fragrance-item">
+        <span style="font-size:1.2rem">🌺</span>
+        <div><div class="f-name">${f.name}</div><div class="f-desc">${f.desc}</div></div>
+      </div>`).join('');
+  }
+
+  cur = TOTAL+1;
+  showStep(TOTAL+1);
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+showStep(1);
+</script>
+</body>
+</html>
