@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Inventario · Jenniffer MK</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --rose:#c8507a;--rose-light:#f5d0df;--rose-dark:#8c2e50;
@@ -226,41 +226,45 @@ header p{font-size:.8rem;opacity:.85;margin-top:2px;}
 </style>
 </head>
 <body>
-<div class="loading-screen" id="loading"><div class="spinner"></div><h2>✨ Inventario MK</h2><p>Cargando...</p></div>
 
-<header>
-  <h1>✨ Inventario MK</h1>
-  <p>Jenniffer Ivelisse · Consultora Independiente</p>
-  <div class="header-stats">
-    <span class="stat-chip" id="hstat-total">0 productos</span>
-    <span class="stat-chip" id="hstat-low">⚠️ 0 bajos</span>
-    <span class="stat-chip" id="hstat-empty">⛔ 0 agotados</span>
-    <span class="sync-chip" id="sync-status" onclick="syncNow()">⚡ Conectando...</span>
-    <span class="price-chip" id="price-status" onclick="refreshPrices()">💰 Precios...</span>
-  </div>
-</header>
-
-<div class="bottom-nav">
-  <button class="bnav-btn active" id="bnav-inv"      onclick="showTab('inv')">      <div class="bnav-icon-wrap"><span class="icon">📦</span></div>Inventario</button>
-
-  <button class="bnav-btn"        id="bnav-entrada"  onclick="showTab('entrada')"> <div class="bnav-icon-wrap"><span class="icon">⚡</span></div>Entrada</button>
-
-  <button class="bnav-btn"        id="bnav-cart"     onclick="showTab('cart')">     <div class="bnav-icon-wrap"><span class="icon">🛒</span><span class="cart-badge" id="cart-badge" style="display:none">0</span></div>Cesta</button>
-  <button class="bnav-btn"        id="bnav-followup" onclick="showTab('followup')"> <span class="icon">📅</span>Seguimiento</button>
-  <button class="bnav-btn"        id="bnav-clients"  onclick="showTab('clients')">  <span class="icon">👥</span>Clientas</button>
+<!-- SPLASH -->
+<div id="splash" style="position:fixed;inset:0;background:linear-gradient(160deg,var(--rose-dark),var(--rose));display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;">
+  <div style="width:48px;height:48px;border:3px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin 1s linear infinite;"></div>
+  <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:white;font-weight:700;">✨ Inventario MK</div>
+  <div style="font-size:.82rem;color:rgba(255,255,255,.7);">Cargando...</div>
 </div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-brand">✨ Inventario MK</div>
+  <div class="header-sub">Jenniffer Ivelisse · Consultora Independiente</div>
+  <div class="header-stats">
+    <span class="hdr-chip" id="hdr-total">0 productos</span>
+    <span class="hdr-chip warn" id="hdr-low">⚠️ 0 bajos</span>
+    <span class="hdr-chip err" id="hdr-out">⛔ 0 agotados</span>
+    <span class="sync-badge" id="sync-status">⚡ Conectando...</span>
+  </div>
+</div>
+
+<!-- VIEWS -->
+<div class="views-wrap">
 
 <!-- ════ INVENTARIO ════ -->
 <div class="view active" id="view-inv">
   <div class="stats-row">
-    <div class="stat-box"><div class="n" id="st-total">0</div><div class="l">Productos</div></div>
-    <div class="stat-box"><div class="n" id="st-low" style="color:var(--warn)">0</div><div class="l">Stock bajo</div></div>
-    <div class="stat-box"><div class="n" id="st-empty" style="color:var(--empty)">0</div><div class="l">Agotados</div></div>
-    <div class="stat-box"><div class="n" id="st-val">$0</div><div class="l">Valor</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Productos</div></div>
+    <div class="stat-card warn"><div class="stat-num" id="stat-low">0</div><div class="stat-label">Stock bajo</div></div>
+    <div class="stat-card err"><div class="stat-num" id="stat-out">0</div><div class="stat-label">Agotados</div></div>
+    <div class="stat-card ok"><div class="stat-num" id="stat-val">$0</div><div class="stat-label">Valor</div></div>
   </div>
   <div class="toolbar">
-    <div class="search-wrap"><span>🔍</span><input id="inv-search" placeholder="Buscar producto..." oninput="renderInv()"></div>
-    <button class="btn btn-gold" style="font-size:.8rem;padding:8px 12px;" onclick="shareWhatsApp()">📤 WA</button>
+    <div class="search-wrap">
+      <span>🔍</span>
+      <input placeholder="Buscar..." oninput="invSearch=this.value;renderInventory()">
+    </div>
   </div>
   <div class="filter-row">
     <span class="fchip active" onclick="setInvFilter(this,'all')">Todos</span>
@@ -268,12 +272,11 @@ header p{font-size:.8rem;opacity:.85;margin-top:2px;}
     <span class="fchip" onclick="setInvFilter(this,'Maquillaje')">💄 Maquillaje</span>
     <span class="fchip" onclick="setInvFilter(this,'Cuerpo')">🧼 Cuerpo</span>
     <span class="fchip" onclick="setInvFilter(this,'Fragancia')">✨ Fragancia</span>
-    <span class="fchip" onclick="setInvFilter(this,'Otro')">📦 Otro</span>
-    <span class="fchip" onclick="setInvFilter(this,'__low')">⚠️ Bajos</span>
-    <span class="fchip" onclick="setInvFilter(this,'__empty')">⛔ Agotados</span>
-    <span class="fchip" onclick="setInvFilter(this,'__recent')">🗓 Recientes</span>
+    <span class="fchip" onclick="setInvFilter(this,'low')">⚠️ Bajos</span>
+    <span class="fchip" onclick="setInvFilter(this,'out')">⛔ Agotados</span>
+    <span class="fchip" onclick="setInvFilter(this,'recent')">🗓 Recientes</span>
   </div>
-  <div class="prod-list" id="inv-list"></div>
+  <div id="inv-list"></div>
   <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
 </div>
 
@@ -284,222 +287,166 @@ header p{font-size:.8rem;opacity:.85;margin-top:2px;}
     <div style="font-size:.75rem;color:var(--text-light);">Busca · selecciona · cantidad · Enter</div>
   </div>
   <div style="position:relative;margin-bottom:12px;">
-    <input type="text" id="entrada-search"
-      placeholder="Escribe el producto... ej: time, satin"
-      autocomplete="off"
+    <input type="text" id="entrada-search" placeholder="Escribe el producto... ej: time, satin" autocomplete="off"
       oninput="entradaSearch(this.value)"
-      onkeydown="entradaKey(event)"
-      style="width:100%;border:2px solid var(--rose-light);border-radius:14px;padding:12px 16px;font-family:'Nunito',sans-serif;font-size:1rem;outline:none;transition:.2s;"
-      onfocus="this.style.borderColor='var(--rose)';entradaSearch(this.value)"
-      onblur="setTimeout(()=>document.getElementById('entrada-ac').style.display='none',200)">
+      onkeydown="if(event.key==='Enter'&&entradaSelected)entradaAgregar()"
+      onfocus="entradaSearch(this.value)"
+      onblur="setTimeout(function(){const ac=document.getElementById('entrada-ac');if(ac)ac.style.display='none';},200)"
+      style="width:100%;border:2px solid var(--rose-light);border-radius:14px;padding:12px 16px;font-family:'Nunito',sans-serif;font-size:1rem;outline:none;">
     <div id="entrada-ac" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border:2px solid var(--rose-light);border-radius:14px;max-height:240px;overflow-y:auto;z-index:600;box-shadow:0 8px 24px rgba(200,80,122,.15);"></div>
   </div>
   <div id="entrada-selected" style="display:none;background:#fff8fb;border:2px solid var(--rose-light);border-radius:14px;padding:14px 16px;margin-bottom:12px;">
     <div style="font-size:.72rem;color:var(--text-light);margin-bottom:4px;">PRODUCTO SELECCIONADO</div>
     <div id="entrada-prod-name" style="font-weight:700;color:var(--rose-dark);font-size:.95rem;margin-bottom:12px;"></div>
-    <div style="display:flex;gap:10px;align-items:center;">
-      <div style="flex:1;">
-        <div style="font-size:.7rem;color:var(--text-light);margin-bottom:4px;">CANTIDAD</div>
-        <input type="number" id="entrada-qty" min="0" value="1"
-          onkeydown="entradaQtyKey(event)"
+    <div style="display:flex;gap:10px;">
+      <div style="flex:1;"><div style="font-size:.7rem;color:var(--text-light);margin-bottom:4px;">CANTIDAD</div>
+        <input type="number" id="entrada-qty" min="0" value="1" onkeydown="entradaQtyKey(event)"
           style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:1.2rem;font-weight:700;outline:none;text-align:center;">
       </div>
-      <div style="flex:1;">
-        <div style="font-size:.7rem;color:var(--text-light);margin-bottom:4px;">PRECIO ($)</div>
+      <div style="flex:1;"><div style="font-size:.7rem;color:var(--text-light);margin-bottom:4px;">PRECIO ($)</div>
         <input type="number" id="entrada-price" min="0" step="0.01"
           style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:10px 12px;font-family:'Nunito',sans-serif;font-size:1.2rem;outline:none;text-align:center;">
       </div>
     </div>
-    <button onclick="entradaAgregar()"
-      style="width:100%;margin-top:12px;padding:13px;background:var(--rose);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;">
-      ✅ Agregar · Enter
-    </button>
+    <button onclick="entradaAgregar()" style="width:100%;margin-top:12px;padding:13px;background:var(--rose);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;">✅ Agregar · Enter</button>
   </div>
   <div id="entrada-recientes" style="display:none;">
-    <div style="font-size:.7rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✔ Agregados ahora</div>
+    <div style="font-size:.7rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✔ Agregados</div>
     <div id="entrada-recientes-list"></div>
   </div>
   <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
 </div>
 
-<!-- ════ CESTA / VENTA ════ -->
+<!-- ════ CESTA ════ -->
 <div class="view" id="view-cart">
-  <div class="card-box" style="margin-bottom:10px;">
-    <div class="section-label">🛒 Agregar producto a la cesta</div>
-
-    <!-- PRODUCT SEARCH -->
-    <div class="form-group">
-      <label>Producto</label>
-      <div style="position:relative;">
-        <input type="text" id="sdrop-search" placeholder="Escribe para buscar... ej: time, satin, clear"
-          autocomplete="off"
-          oninput="cartSearch(this.value)"
-          onfocus="cartSearch(this.value)"
-          onblur="setTimeout(()=>document.getElementById('cart-ac-list').style.display='none',200)"
-          style="width:100%;border:2px solid var(--rose-light);border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;transition:.2s;"
-          onfocusin="this.style.borderColor='var(--rose)'"
-          onfocusout="this.style.borderColor='var(--rose-light)'">
-        <div id="cart-ac-list" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border:2px solid var(--rose-light);border-radius:12px;max-height:220px;overflow-y:auto;z-index:600;box-shadow:0 8px 24px rgba(200,80,122,.15);"></div>
-      </div>
-      <!-- Selected tag -->
-      <div id="cart-selected-tag" style="display:none;margin-top:6px;">
-        <span style="display:inline-flex;align-items:center;gap:6px;background:var(--rose-light);color:var(--rose-dark);border-radius:20px;padding:4px 10px 4px 12px;font-size:.82rem;font-weight:700;">
-          <span id="cart-tag-label"></span>
-          <button onclick="cartClear()" style="border:none;background:none;cursor:pointer;color:var(--rose);font-size:.9rem;padding:0;line-height:1;">✕</button>
-        </span>
-      </div>
+  <div class="card-box">
+    <div class="section-label">Producto</div>
+    <div style="position:relative;">
+      <input type="text" id="sdrop-search" placeholder="Escribe para buscar... ej: time, satin" autocomplete="off"
+        oninput="cartSearch(this.value)"
+        onfocus="cartSearch(this.value)"
+        onblur="setTimeout(function(){const ac=document.getElementById('cart-ac-list');if(ac)ac.style.display='none';},200)"
+        style="width:100%;border:2px solid var(--rose-light);border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
+      <div id="cart-ac-list" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:white;border:2px solid var(--rose-light);border-radius:12px;max-height:220px;overflow-y:auto;z-index:600;box-shadow:0 8px 24px rgba(200,80,122,.15);"></div>
+    </div>
+    <div id="cart-selected-tag" style="display:none;margin-top:6px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;background:var(--rose-light);color:var(--rose-dark);border-radius:20px;padding:4px 10px 4px 12px;font-size:.82rem;font-weight:700;">
+        <span id="cart-tag-label"></span>
+        <button onclick="cartClear()" style="border:none;background:none;cursor:pointer;color:var(--rose);font-size:.9rem;padding:0;">✕</button>
+      </span>
     </div>
     <input type="hidden" id="cart-prod-id">
     <input type="hidden" id="cart-prod-name">
-
-    <div class="form-row2">
-      <div class="form-group">
-        <label>Cantidad</label>
-        <input type="number" id="cart-qty" value="1" min="1">
+    <div class="form-row2" style="margin-top:10px;">
+      <div class="form-group"><label>Cantidad</label>
+        <input type="number" id="cart-qty" value="1" min="1" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
       </div>
-      <div class="form-group">
-        <label>Precio unitario ($)</label>
-        <input type="number" id="cart-item-price" step="0.01" placeholder="0.00">
+      <div class="form-group"><label>Precio unitario ($)</label>
+        <input type="number" id="cart-item-price" placeholder="0.00" step="0.01" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
       </div>
     </div>
-    <button class="btn btn-primary" style="width:100%;padding:11px;" onclick="addToCart()">➕ Agregar a la cesta</button>
+    <button onclick="addToCart()" style="width:100%;margin-top:10px;padding:11px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">➕ Agregar a la cesta</button>
   </div>
 
-  <!-- CART ITEMS -->
-  <div id="cart-items-section" style="display:none;">
-    <div class="section-label" style="padding:0 0 6px;border-bottom:2px solid var(--rose-light);margin-bottom:10px;">🛍 Productos en la cesta</div>
-    <div id="cart-items-list"></div>
+  <div class="section-label" style="margin-top:14px;">🛍 Productos en la cesta</div>
 
-    <!-- CLIENTA -->
-    <div class="card-box" style="margin-top:10px;">
-      <div class="section-label">👤 Clienta / Persona</div>
-
-      <!-- Mode toggle -->
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
-        <button id="cli-mode-free" onclick="setCliMode('free')"
-          style="flex:1;padding:8px;border-radius:20px;border:2px solid var(--rose);background:var(--rose);color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;">
-          ✏️ Escribir nombre
-        </button>
-        <button id="cli-mode-crm" onclick="setCliMode('crm')"
-          style="flex:1;padding:8px;border-radius:20px;border:2px solid var(--rose-light);background:white;color:var(--rose);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;">
-          👥 Buscar en CRM
-        </button>
-      </div>
-
-      <!-- FREE MODE: just type a name -->
-      <div id="cli-free-mode">
-        <input type="text" id="cli-free-name" placeholder="ej. María, la amiga de Carmen, cliente walk-in..."
-          oninput="document.getElementById('cart-client-name').value=this.value;document.getElementById('cart-client-id').value='';"
-          style="width:100%;border:2px solid var(--rose-light);border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;transition:.2s;"
-          onfocus="this.style.borderColor='var(--rose)'" onblur="this.style.borderColor='var(--rose-light)'">
-        <div style="font-size:.73rem;color:var(--text-light);margin-top:5px;">💡 Deja vacío si no quieres registrar nombre</div>
-      </div>
-
-      <!-- CRM MODE: search registered clients -->
-      <div id="cli-crm-mode" style="display:none;">
-        <div class="sdrop-wrap" id="cli-sdrop-wrap">
-          <div class="sdrop-input-row">
-            <input type="text" class="sdrop-search" id="cli-sdrop-search" placeholder="Buscar clienta del CRM..." autocomplete="off" oninput="cliSdropFilter()" onfocus="cliSdropOpen()">
-            <button class="sdrop-clear" id="cli-sdrop-clear" onclick="cliSdropClear()">✕</button>
-            <button class="sdrop-arrow" onclick="cliSdropToggle()">▾</button>
-          </div>
-          <div class="sdrop-list" id="cli-sdrop-list"></div>
-          <div id="cli-sdrop-selected-tag" style="display:none;">
-            <span class="sdrop-selected-tag"><span id="cli-sdrop-tag-label"></span><button onclick="cliSdropClear()">✕</button></span>
-          </div>
-        </div>
-      </div>
-
-      <input type="hidden" id="cart-client-id">
-      <input type="hidden" id="cart-client-name">
+  <!-- CLIENTA -->
+  <div class="card-box" style="margin-top:10px;">
+    <div class="section-label">👤 Clienta / Persona</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button id="cli-mode-free" onclick="setCliMode('free')" style="flex:1;padding:8px;border-radius:20px;border:2px solid var(--rose);background:var(--rose);color:white;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;">✏️ Escribir nombre</button>
+      <button id="cli-mode-crm" onclick="setCliMode('crm')" style="flex:1;padding:8px;border-radius:20px;border:2px solid var(--rose-light);background:white;color:var(--rose);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;">👥 Buscar en CRM</button>
     </div>
-
-    <!-- TOTALS — INTERNAL ONLY -->
-    <div class="totals-box">
-      <div style="background:#fff3f7;border-radius:10px;padding:8px 12px;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:1rem;">🔒</span>
-        <span style="font-size:.75rem;color:var(--rose-dark);font-weight:700;">Solo tú ves este desglose — la clienta solo ve el total final.</span>
-      </div>
-
-      <!-- TAX 1: IVU Municipal Puerto Rico = 1% -->
-      <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Impuestos</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="font-size:.82rem;font-weight:700;color:var(--text);flex:1;">IVU Municipal (PR)</span>
-        <div style="display:flex;align-items:center;gap:4px;">
-          <input class="tax-input" type="number" id="tax1-rate" value="1.0" step="0.1" min="0" max="100" oninput="calcTotals()" style="width:70px;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
-          <span style="font-size:.82rem;color:var(--text-light);font-weight:700;">%</span>
+    <div id="cli-free-mode">
+      <input type="text" id="cli-free-name" placeholder="ej. María, cliente walk-in..."
+        oninput="document.getElementById('cart-client-name').value=this.value;document.getElementById('cart-client-id').value='';"
+        style="width:100%;border:2px solid var(--rose-light);border-radius:12px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
+      <div style="font-size:.73rem;color:var(--text-light);margin-top:5px;">💡 Deja vacío si no quieres registrar nombre</div>
+    </div>
+    <div id="cli-crm-mode" style="display:none;">
+      <div class="sdrop-wrap" id="cli-sdrop-wrap">
+        <div class="sdrop-input-row">
+          <input type="text" class="sdrop-search" id="cli-sdrop-search" placeholder="Buscar clienta del CRM..." autocomplete="off" oninput="cliSdropFilter()" onfocus="cliSdropOpen()">
+          <button class="sdrop-clear" id="cli-sdrop-clear" onclick="cliSdropClear()">✕</button>
+          <button class="sdrop-arrow" onclick="cliSdropToggle()">▾</button>
         </div>
-      </div>
-
-      <!-- TAX 2: IVU Estatal Puerto Rico = 10.5% -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-        <span style="font-size:.82rem;font-weight:700;color:var(--text);flex:1;">IVU Estatal (PR)</span>
-        <div style="display:flex;align-items:center;gap:4px;">
-          <input class="tax-input" type="number" id="tax2-rate" value="10.5" step="0.1" min="0" max="100" oninput="calcTotals()" style="width:70px;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
-          <span style="font-size:.82rem;color:var(--text-light);font-weight:700;">%</span>
+        <div class="sdrop-list" id="cli-sdrop-list"></div>
+        <div id="cli-sdrop-selected-tag" style="display:none;">
+          <span class="sdrop-selected-tag"><span id="cli-sdrop-tag-label"></span><button onclick="cliSdropClear()">✕</button></span>
         </div>
-      </div>
-
-      <!-- FEE — hidden from receipt -->
-      <div style="border-top:1px solid var(--rose-light);margin:12px 0 8px;padding-top:12px;">
-        <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Mi cargo adicional (no aparece en recibo)</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div class="chip-group" style="margin-top:0;flex-shrink:0;">
-            <div class="chip-opt sel" id="fee-pct-btn" onclick="setFeeType('pct')">%</div>
-            <div class="chip-opt" id="fee-amt-btn" onclick="setFeeType('amt')">$</div>
-          </div>
-          <input class="tax-input" type="number" id="fee-value" value="0" min="0" step="0.01" placeholder="0" oninput="calcTotals()" style="flex:1;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
-          <span id="fee-type-label" style="font-size:.82rem;color:var(--text-light);font-weight:700;width:16px;">%</span>
-        </div>
-      </div>
-
-      <!-- DISCOUNT -->
-      <div style="border-top:1px solid var(--rose-light);margin:12px 0 8px;padding-top:12px;">
-        <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Descuento a la clienta</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div class="chip-group" style="margin-top:0;flex-shrink:0;">
-            <div class="chip-opt sel" id="disc-pct-btn" onclick="setDiscType('pct')">%</div>
-            <div class="chip-opt" id="disc-amt-btn" onclick="setDiscType('amt')">$</div>
-          </div>
-          <input class="tax-input" type="number" id="disc-value" value="0" min="0" step="0.01" placeholder="0" oninput="calcTotals()" style="flex:1;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
-          <span id="disc-type-label" style="font-size:.82rem;color:var(--text-light);font-weight:700;width:16px;">%</span>
-        </div>
-      </div>
-
-      <div id="totals-display"></div>
-      <div class="form-group" style="margin-top:12px;margin-bottom:4px;">
-        <label>Crear seguimiento automático</label>
-        <div class="chip-group">
-          <div class="chip-opt sel" onclick="selChip1(this,'cart-followup','si')">✅ Sí</div>
-          <div class="chip-opt" onclick="selChip1(this,'cart-followup','no')">❌ No</div>
-        </div>
-        <input type="hidden" id="cart-followup" value="si">
       </div>
     </div>
-
-    <div style="display:flex;gap:10px;margin-top:14px;">
-      <button class="btn btn-gray" style="flex:1;" onclick="clearCart()">🗑 Vaciar</button>
-      <button class="btn btn-primary" style="flex:2;padding:12px;" onclick="checkoutCart()">💾 Registrar venta</button>
-    </div>
-    <button class="btn btn-green" style="width:100%;margin-top:8px;padding:11px;" onclick="previewReceipt()">🧾 Ver recibo</button>
+    <input type="hidden" id="cart-client-id">
+    <input type="hidden" id="cart-client-name">
   </div>
 
-  <div id="cart-empty-msg" class="empty-state"><div class="icon">🛒</div><h3>La cesta está vacía</h3><p>Agrega productos arriba para crear una venta.</p>
-  <button class="btn btn-gray" style="margin-top:12px;width:100%;padding:11px;" onclick="openQuickReceipt()">🧾 Crear recibo rápido sin registro</button>
+  <!-- TOTALS -->
+  <div class="totals-box">
+    <div style="background:#fff3f7;border-radius:10px;padding:8px 12px;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+      <span>🔒</span><span style="font-size:.75rem;color:var(--rose-dark);font-weight:700;">Solo tú ves este desglose — la clienta solo ve el total final.</span>
+    </div>
+    <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Impuestos</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="font-size:.82rem;font-weight:700;color:var(--text);flex:1;">IVU Municipal (PR)</span>
+      <input class="tax-input" type="number" id="tax1-rate" value="1.0" step="0.1" min="0" max="100" oninput="calcTotals()" style="width:70px;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
+      <span style="font-size:.82rem;color:var(--text-light);font-weight:700;">%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <span style="font-size:.82rem;font-weight:700;color:var(--text);flex:1;">IVU Estatal (PR)</span>
+      <input class="tax-input" type="number" id="tax2-rate" value="10.5" step="0.1" min="0" max="100" oninput="calcTotals()" style="width:70px;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
+      <span style="font-size:.82rem;color:var(--text-light);font-weight:700;">%</span>
+    </div>
+    <div style="border-top:1px solid var(--rose-light);margin:12px 0 8px;padding-top:12px;">
+      <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Mi cargo adicional</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div class="chip-group" style="margin-top:0;flex-shrink:0;">
+          <div class="chip-opt sel" id="fee-pct-btn" onclick="setFeeType('pct')">%</div>
+          <div class="chip-opt" id="fee-amt-btn" onclick="setFeeType('amt')">$</div>
+        </div>
+        <input class="tax-input" type="number" id="fee-value" value="0" min="0" step="0.01" oninput="calcTotals()" style="flex:1;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
+        <span id="fee-type-label" style="font-size:.82rem;color:var(--text-light);font-weight:700;width:16px;">%</span>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--rose-light);margin:12px 0 8px;padding-top:12px;">
+      <div style="font-weight:700;font-size:.78rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Descuento a la clienta</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div class="chip-group" style="margin-top:0;flex-shrink:0;">
+          <div class="chip-opt sel" id="disc-pct-btn" onclick="setDiscType('pct')">%</div>
+          <div class="chip-opt" id="disc-amt-btn" onclick="setDiscType('amt')">$</div>
+        </div>
+        <input class="tax-input" type="number" id="disc-value" value="0" min="0" step="0.01" oninput="calcTotals()" style="flex:1;text-align:right;border:1.5px solid var(--rose-light);border-radius:8px;padding:6px 10px;font-family:'Nunito',sans-serif;outline:none;">
+        <span id="disc-type-label" style="font-size:.82rem;color:var(--text-light);font-weight:700;width:16px;">%</span>
+      </div>
+    </div>
+    <select id="followup-toggle" style="width:100%;margin-top:10px;border:1.5px solid var(--rose-light);border-radius:8px;padding:8px;font-family:'Nunito',sans-serif;font-size:.85rem;outline:none;">
+      <option value="yes">✅ Crear seguimiento automático</option>
+      <option value="no">❌ Sin seguimiento</option>
+    </select>
+    <div id="totals-display"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button onclick="clearCart()" style="flex:1;padding:11px;background:#f0e8ec;color:var(--text);border:2px solid var(--rose-light);border-radius:10px;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;">🗑 Vaciar</button>
+      <button onclick="registerSale()" style="flex:2;padding:11px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">💾 Registrar venta</button>
+    </div>
+    <button onclick="document.getElementById('receipt-modal').classList.add('open')" style="width:100%;margin-top:8px;padding:11px;background:white;color:var(--rose);border:2px solid var(--rose-light);border-radius:10px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;">🧾 Ver recibo</button>
   </div>
 
-  <div class="section-label" style="padding:0 0 6px;border-bottom:2px solid var(--rose-light);margin:16px 0 10px;">📋 Historial de ventas</div>
-  <div id="sales-list"></div>
+  <div id="cart-items" style="margin-top:10px;"></div>
+
+  <div class="card-box" style="margin-top:14px;">
+    <button onclick="document.getElementById('qr-modal').classList.add('open');qrItems=[];renderQRItems();" style="width:100%;padding:11px;background:white;color:var(--rose);border:2px solid var(--rose-light);border-radius:10px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;">🧾 Crear recibo rápido sin registro</button>
+  </div>
   <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
 </div>
 
 <!-- ════ SEGUIMIENTO ════ -->
 <div class="view" id="view-followup">
-  <div class="filter-row" style="margin-bottom:10px;">
-    <span class="fchip active" onclick="setFuFilter(this,'all')">Todos</span>
-    <span class="fchip" onclick="setFuFilter(this,'pending')">⏳ Pendientes</span>
-    <span class="fchip" onclick="setFuFilter(this,'overdue')">🚨 Vencidos</span>
-    <span class="fchip" onclick="setFuFilter(this,'done')">✅ Hechos</span>
+  <div class="filter-row">
+    <select id="followup-filter" onchange="renderFollowups()" style="border:1.5px solid var(--rose-light);border-radius:20px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;background:white;color:var(--text);">
+      <option value="all">Todos</option>
+      <option value="pending">⏳ Pendientes</option>
+      <option value="overdue">🚨 Vencidos</option>
+      <option value="done">✅ Hechos</option>
+    </select>
   </div>
   <div id="followup-list"></div>
   <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
@@ -510,92 +457,120 @@ header p{font-size:.8rem;opacity:.85;margin-top:2px;}
   <div class="toolbar" style="margin-bottom:10px;">
     <div class="search-wrap">
       <span>🔍</span>
-      <input id="cli-search" placeholder="Buscar clienta..." oninput="renderClientsView()"
-        style="width:100%;border:2px solid var(--rose-light);border-radius:30px;padding:8px 12px 8px 32px;font-family:'Nunito',sans-serif;font-size:.88rem;background:white;outline:none;">
+      <input id="cli-search" placeholder="Buscar clienta..." oninput="renderClientsView()">
     </div>
     <a href="https://crmmisclientes.netlify.app" target="_blank">
       <button class="btn btn-primary" style="font-size:.8rem;padding:8px 14px;white-space:nowrap;">+ Nueva</button>
     </a>
   </div>
+  <div class="filter-row" style="margin-bottom:10px;">
+    <span class="fchip active" onclick="setCliFilter(this,'all')">Todas</span>
+    <span class="fchip" onclick="setCliFilter(this,'VIP')">⭐ VIP</span>
+    <span class="fchip" onclick="setCliFilter(this,'frecuente')">💗 Frecuente</span>
+    <span class="fchip" onclick="setCliFilter(this,'nueva')">🌸 Nueva</span>
+    <span class="fchip" onclick="setCliFilter(this,'prospecto')">💎 Prospecto</span>
+    <span class="fchip" onclick="setCliFilter(this,'inactiva')">💤 Inactiva</span>
+  </div>
   <div id="clients-view-list"></div>
   <div class="footer-credit">Creado por: <span>Jenniffer Ivelisse</span> 🌸</div>
 </div>
 
-<button class="fab" id="fab-btn" onclick="openAddProduct()">+</button>
+</div><!-- /views-wrap -->
 
-<!-- MODAL PRODUCTO -->
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bnav-btn active" id="bnav-inv" onclick="showTab('inv')"><div class="bnav-icon-wrap"><span class="icon">📦</span></div>Inventario</button>
+  <button class="bnav-btn" id="bnav-entrada" onclick="showTab('entrada')"><div class="bnav-icon-wrap"><span class="icon">⚡</span></div>Entrada</button>
+  <button class="bnav-btn" id="bnav-cart" onclick="showTab('cart')"><div class="bnav-icon-wrap"><span class="icon">🛒</span><span class="cart-badge" id="cart-badge" style="display:none">0</span></div>Cesta</button>
+  <button class="bnav-btn" id="bnav-followup" onclick="showTab('followup')"><span class="icon">📅</span>Seguimiento</button>
+  <button class="bnav-btn" id="bnav-clients" onclick="showTab('clients')"><span class="icon">👥</span>Clientas</button>
+</nav>
+
+<!-- FAB -->
+<button class="fab" id="fab-btn" onclick="openAddModal()">+</button>
+
+<!-- MODAL: ADD/EDIT PRODUCT -->
 <div class="modal-overlay" id="prod-modal" onclick="closeModal('prod-modal',event)">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-header"><h2 id="prod-modal-title">Nuevo Producto</h2><button class="modal-close" onclick="closeModalDirect('prod-modal')">✕</button></div>
+    <div class="modal-header">
+      <h2 id="modal-title">Nuevo Producto</h2>
+      <button class="modal-close" onclick="closeModalDirect('prod-modal')">✕</button>
+    </div>
     <div class="modal-body">
-      <div class="form-group"><label>Nombre del producto *</label><input id="pf-name" type="text" placeholder="ej. TimeWise 4-in-1 Cleanser"></div>
+      <input type="hidden" id="prod-id">
+      <div class="form-group"><label>Nombre del producto *</label>
+        <input type="text" id="prod-name" placeholder="ej. TimeWise Antioxidant Moisturizer" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
+      </div>
       <div class="form-row2">
         <div class="form-group"><label>Categoría</label>
-          <select id="pf-cat"><option value="Skincare">🧴 Skincare</option><option value="Maquillaje">💄 Maquillaje</option><option value="Cuerpo">🧼 Cuerpo</option><option value="Fragancia">✨ Fragancia</option><option value="Otro">📦 Otro</option></select>
+          <select id="prod-cat" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:9px 10px;font-family:'Nunito',sans-serif;font-size:.88rem;outline:none;">
+            <option value="Skincare">🧴 Skincare</option><option value="Maquillaje">💄 Maquillaje</option>
+            <option value="Cuerpo">🧼 Cuerpo</option><option value="Fragancia">✨ Fragancia</option><option value="Otro">📦 Otro</option>
+          </select>
         </div>
-        <div class="form-group"><label>Precio ($)</label><input type="number" id="pf-price" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="form-group"><label>Precio ($)</label>
+          <input type="number" id="prod-price" placeholder="0.00" step="0.01" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
+        </div>
       </div>
       <div class="form-row2">
-        <div class="form-group"><label>Cantidad</label><input type="number" id="pf-qty" placeholder="0" min="0"></div>
-        <div class="form-group"><label>Alerta stock bajo</label><input type="number" id="pf-alert" placeholder="2" min="1"></div>
+        <div class="form-group"><label>Cantidad</label>
+          <input type="number" id="prod-qty" value="1" min="0" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
+        </div>
+        <div class="form-group"><label>Alerta stock bajo</label>
+          <input type="number" id="prod-alert" value="2" min="1" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
+        </div>
       </div>
-      <div class="actions-row">
-        <button class="btn btn-gray" onclick="closeModalDirect('prod-modal')">Cancelar</button>
-        <button class="btn btn-primary" style="flex:2;" onclick="saveProduct()">💾 Guardar</button>
-      </div><br>
+    </div>
+    <div style="padding:0 16px 16px;display:flex;gap:8px;">
+      <button onclick="deleteProductModal()" style="flex:1;padding:11px;background:#fee;color:#c00;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;" id="del-btn">🗑 Eliminar</button>
+      <button onclick="saveProductForm()" style="flex:2;padding:11px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">💾 Guardar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL VER PRODUCTO -->
-<div class="modal-overlay" id="view-modal" onclick="closeModal('view-modal',event)">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-header"><h2 id="vm-title">Producto</h2><button class="modal-close" onclick="closeModalDirect('view-modal')">✕</button></div>
-    <div class="modal-body" id="vm-body"></div>
-    <div class="actions-row" id="vm-actions" style="padding:0 16px;"></div><br>
-  </div>
-</div>
-
-<!-- MODAL RECIBO -->
+<!-- MODAL: RECEIPT -->
 <div class="modal-overlay" id="receipt-modal" onclick="closeModal('receipt-modal',event)">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-header"><h2>🧾 Recibo</h2><button class="modal-close" onclick="closeModalDirect('receipt-modal')">✕</button></div>
-    <div class="modal-body">
-      <div class="receipt-paper" id="receipt-content"></div>
-      <div style="display:flex;gap:9px;margin-top:14px;">
-        <button class="btn btn-wa" style="flex:1;" onclick="shareReceiptWA()">💬 Enviar por WhatsApp</button>
-        <button class="btn btn-gray" onclick="closeModalDirect('receipt-modal')">Cerrar</button>
-      </div><br>
+    <div class="modal-body" id="receipt-body"></div>
+    <div style="padding:0 16px 16px;display:flex;gap:8px;">
+      <button id="receipt-wa-btn" style="flex:2;padding:11px;background:#25d366;color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">💬 Enviar por WhatsApp</button>
+      <button onclick="closeModalDirect('receipt-modal')" style="flex:1;padding:11px;background:#f0e8ec;color:var(--text);border:2px solid var(--rose-light);border-radius:10px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;">Cerrar</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL RECIBO RÁPIDO -->
-<div class="modal-overlay" id="quick-receipt-modal" onclick="closeModal('quick-receipt-modal',event)">
+<!-- MODAL: QUICK RECEIPT -->
+<div class="modal-overlay" id="qr-modal" onclick="closeModal('qr-modal',event)">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-header"><h2>🧾 Recibo rápido</h2><button class="modal-close" onclick="closeModalDirect('quick-receipt-modal')">✕</button></div>
+    <div class="modal-header"><h2>🧾 Recibo rápido</h2><button class="modal-close" onclick="closeModalDirect('qr-modal')">✕</button></div>
     <div class="modal-body">
-      <div style="font-size:.8rem;color:var(--text-light);margin-bottom:12px;">Crea un recibo sin necesidad de registrar cliente ni producto en el sistema.</div>
+      <p style="font-size:.82rem;color:var(--text-light);margin-bottom:14px;">Sin necesidad de registrar cliente ni producto.</p>
       <div id="qr-items-list"></div>
-      <button onclick="addQRItem()" class="btn btn-gray" style="width:100%;margin-bottom:14px;padding:10px;">+ Agregar producto</button>
-      <div class="form-group">
-        <label>Nombre de la clienta (opcional)</label>
-        <input id="qr-client-name" type="text" placeholder="ej. María García" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
-      </div>
-      <div id="qr-totals" style="background:#fef5f8;border-radius:12px;padding:12px;margin-bottom:12px;"></div>
-      <div style="display:flex;gap:9px;">
-        <button class="btn btn-gray" onclick="closeModalDirect('quick-receipt-modal')">Cancelar</button>
-        <button class="btn btn-primary" style="flex:2;padding:11px;" onclick="generateQuickReceipt()">🧾 Generar recibo</button>
-      </div><br>
+      <button onclick="addQRItem()" style="width:100%;padding:10px;background:var(--rose-light);color:var(--rose-dark);border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;margin-bottom:12px;">+ Agregar producto</button>
+      <input type="text" id="qr-client" placeholder="Nombre de la clienta (opcional)" style="width:100%;border:2px solid var(--rose-light);border-radius:10px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;">
+    </div>
+    <div style="padding:0 16px 16px;display:flex;gap:8px;">
+      <button onclick="closeModalDirect('qr-modal')" style="flex:1;padding:11px;background:#f0e8ec;color:var(--text);border:2px solid var(--rose-light);border-radius:10px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;">Cancelar</button>
+      <button onclick="generateQR()" style="flex:2;padding:11px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">🧾 Generar recibo</button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- MODAL: CLIENT PROFILE -->
+<div class="modal-overlay" id="cli-profile-modal" onclick="closeModal('cli-profile-modal',event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h2 id="cpm-title">Perfil</h2><button class="modal-close" onclick="closeModalDirect('cli-profile-modal')">✕</button></div>
+    <div class="modal-body" id="cpm-body"></div>
+    <div style="padding:0 16px 16px;">
+      <button id="cpm-add-cart" style="width:100%;padding:11px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;">🛒 Agregar a venta</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const MK_CATALOG = [
@@ -834,42 +809,159 @@ const MK_CATALOG = [
   {name:'MK High Intensity® Sport Cologne Spray',cat:'Fragancia',price:46,variants:[{label:'Sencillo',price:46}]},
 ];
 
+
 // ══ SUPABASE ══
 const SUPA_URL='https://wkqovrklcrrxawmnefwm.supabase.co';
 const SUPA_KEY='sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
 async function supa(method,path,body){
-  const res=await fetch(`${SUPA_URL}/rest/v1/${path}`,{method,headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:body?JSON.stringify(body):undefined});
+  const res=await fetch(SUPA_URL+'/rest/v1/'+path,{method,headers:{
+    'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,
+    'Content-Type':'application/json','Prefer':'return=representation'
+  },body:body?JSON.stringify(body):undefined});
   if(!res.ok)throw new Error(await res.text());
-  const t=await res.text();return t?JSON.parse(t):null;
+  return res.json();
 }
 
 // ══ STATE ══
-let inventory = JSON.parse(localStorage.getItem('mk_inv_v2')||'[]');
-let sales     = JSON.parse(localStorage.getItem('mk_sales_v2')||'[]');
-let followups = JSON.parse(localStorage.getItem('mk_fu_v2')||'[]');
-let clients   = JSON.parse(localStorage.getItem('mk_clientas_local')||'[]');
-let mkPrices  = JSON.parse(localStorage.getItem('mk_prices')||'{}');
-let cart      = []; // [{id,name,cat,price,qty}]
-let discType  = 'pct'; // 'pct' or 'amt'
-let invFilter='all', fuFilter='all', editingProdId=null;
-const PRICE_TTL=24*60*60*1000;
+let inventory=[],clients=[],cart=[],followups=[],mkPrices={};
+let feeType='pct',discType='pct';
 
-function saveLocal(){
-  localStorage.setItem('mk_inv_v2',JSON.stringify(inventory));
-  localStorage.setItem('mk_sales_v2',JSON.stringify(sales));
-  localStorage.setItem('mk_fu_v2',JSON.stringify(followups));
-  localStorage.setItem('mk_prices',JSON.stringify(mkPrices));
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function catEmoji(c){return {Skincare:'🧴',Maquillaje:'💄',Cuerpo:'🧼',Fragancia:'✨',Otro:'📦'}[c]||'📦';}
+function toast(msg){
+  const t=document.getElementById('toast');if(!t)return;
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function setSyncStatus(state,msg){
+  const el=document.getElementById('sync-status');if(!el)return;
+  el.textContent=msg;
+  el.className='sync-badge '+(state==='ok'?'sync-ok':state==='syncing'?'sync-syncing':'sync-offline');
+}
 
-// ══ INIT ══
-async 
+// ══ LOCAL STORAGE ══
+function saveLocal(){
+  try{
+    localStorage.setItem('mk_inv',JSON.stringify(inventory));
+    localStorage.setItem('mk_followups',JSON.stringify(followups));
+    localStorage.setItem('mk_prices',JSON.stringify(mkPrices));
+  }catch(e){}
+}
+function loadLocal(){
+  try{
+    const i=localStorage.getItem('mk_inv');if(i)inventory=JSON.parse(i);
+    const f=localStorage.getItem('mk_followups');if(f)followups=JSON.parse(f);
+    const p=localStorage.getItem('mk_prices');if(p)mkPrices=JSON.parse(p);
+  }catch(e){}
+}
+
+// ══ SUPABASE SYNC ══
+async function syncInventory(){
+  try{
+    setSyncStatus('syncing','🔄');
+    for(const p of inventory){
+      await supa('POST','inventario?on_conflict=id',{id:p.id,nombre:p.name,categoria:p.cat,precio:p.price,cantidad:p.qty,alerta:p.alert,fecha:p.date});
+    }
+    setSyncStatus('ok','☁️ Sincronizado');
+    saveLocal();
+  }catch(e){setSyncStatus('offline','⚠️ Offline');saveLocal();}
+}
+async function loadInventory(){
+  try{
+    const data=await supa('GET','inventario?select=*&order=nombre');
+    inventory=data.map(r=>({id:r.id,name:r.nombre,cat:r.categoria||'Otro',price:r.precio||0,qty:r.cantidad||0,alert:r.alerta||2,date:r.fecha||''}));
+    saveLocal();
+  }catch(e){loadLocal();}
+}
+async function loadClients(){
+  try{
+    const data=await supa('GET','clientas?select=*&order=nombre');
+    clients=data||[];
+  }catch(e){}
+}
+async function saveProduct(p){
+  try{await supa('POST','inventario?on_conflict=id',{id:p.id,nombre:p.name,categoria:p.cat,precio:p.price,cantidad:p.qty,alerta:p.alert||2,fecha:p.date||''});}
+  catch(e){saveLocal();}
+}
+async function deleteProduct(id){
+  try{await supa('DELETE','inventario?id=eq.'+id);}catch(e){}
+}
+
+// ══ TABS ══
+function showTab(t){
+  ['inv','entrada','cart','followup','clients'].forEach(id=>{
+    const v=document.getElementById('view-'+id);
+    const b=document.getElementById('bnav-'+id);
+    if(v)v.classList.toggle('active',id===t);
+    if(b)b.classList.toggle('active',id===t);
+  });
+  if(t==='clients')renderClientsView();
+  if(t==='followup')renderFollowups();
+  if(t==='cart')renderCartItems();
+}
+
+// ══ INVENTORY VIEW ══
+let invFilter='all', invSearch='';
+function setInvFilter(el,f){
+  invFilter=f;
+  document.querySelectorAll('#view-inv .fchip').forEach(e=>e.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderInventory();
+}
+function renderInventory(){
+  const el=document.getElementById('inv-list');if(!el)return;
+  const q=invSearch.toLowerCase();
+  let list=inventory.filter(p=>{
+    if(q&&!p.name.toLowerCase().includes(q))return false;
+    if(invFilter==='Skincare'||invFilter==='Maquillaje'||invFilter==='Cuerpo'||invFilter==='Fragancia'||invFilter==='Otro')return p.cat===invFilter;
+    if(invFilter==='low')return p.qty>0&&p.qty<=(p.alert||2);
+    if(invFilter==='out')return p.qty===0;
+    if(invFilter==='recent'){const d=new Date();d.setDate(d.getDate()-7);return new Date(p.date)>=d;}
+    return true;
+  });
+  renderStats();
+  if(!list.length){
+    el.innerHTML='<div class="empty-state"><div class="icon">📦</div><h3>Sin productos</h3><p>Agrega productos con el botón +</p></div>';
+    return;
+  }
+  el.innerHTML=list.map(p=>{
+    const isEmpty=p.qty===0,isLow=!isEmpty&&p.qty<=(p.alert||2);
+    const statusClass=isEmpty?'status-out':isLow?'status-low':'status-ok';
+    const statusLabel=isEmpty?'⛔ Agotado':isLow?'⚠️ Bajo':'✅ '+ p.qty;
+    return '<div class="prod-card" onclick="openEditModal(\''+p.id+'\')">'+
+      '<div class="prod-badge badge-'+p.cat+'">'+catEmoji(p.cat)+'</div>'+
+      '<div class="prod-info"><div class="prod-name">'+p.name+'</div>'+
+      '<div class="prod-cat">'+p.cat+' · $'+(p.price||0).toFixed(0)+'</div></div>'+
+      '<div class="prod-right"><span class="qty-badge '+statusClass+'">'+statusLabel+'</span>'+
+      '<button class="btn-add-cart" onclick="event.stopPropagation();quickAddToCart(\''+p.id+'\')" style="margin-top:6px;font-size:.65rem;padding:3px 8px;background:var(--rose-light);color:var(--rose-dark);border:none;border-radius:8px;cursor:pointer;">🛒</button>'+
+      '</div></div>';
+  }).join('');
+}
+function renderStats(){
+  const total=inventory.length;
+  const low=inventory.filter(p=>p.qty>0&&p.qty<=(p.alert||2)).length;
+  const out=inventory.filter(p=>p.qty===0).length;
+  const val=inventory.reduce((s,p)=>s+(p.price||0)*(p.qty||0),0);
+  const els={
+    'stat-total':total,'stat-low':low,'stat-out':out,
+    'stat-val':'$'+val.toFixed(0),
+    'hdr-total':total+' productos',
+    'hdr-low':low+' bajos','hdr-out':out+' agotados'
+  };
+  Object.entries(els).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v;});
+}
+function quickAddToCart(id){
+  const p=inventory.find(x=>x.id===id);if(!p)return;
+  cart.push({cartId:uid(),prodId:p.id,name:p.name,cat:p.cat,price:p.price||0,qty:1});
+  renderCartItems();calcTotals();renderStats();
+  toast('🛒 '+p.name+' en la cesta');
+  showTab('cart');
+}
 
 // ══ ENTRADA RÁPIDA ══
-let entradaSelected = null;
-
+let entradaSelected=null;
 function entradaSearch(q){
-  const ac = document.getElementById('entrada-ac');
+  const ac=document.getElementById('entrada-ac');
   if(!q||q.length<1){ac.style.display='none';return;}
   const ql=q.toLowerCase();
   const invHits=inventory.filter(p=>p.name.toLowerCase().includes(ql)).slice(0,5);
@@ -882,67 +974,56 @@ function entradaSearch(q){
     ...catHits.map(p=>({id:null,name:p.name,cat:p.cat,price:p.price,qty:null,source:'cat'}))
   ].slice(0,10);
   if(!all.length){ac.style.display='none';return;}
-  const ico={Skincare:'🧴',Maquillaje:'💄',Cuerpo:'🧼',Fragancia:'✨',Otro:'📦'};
-  let html='';
+  ac.innerHTML='';
+  ac._items=all;
   all.forEach(function(p,i){
+    const d=document.createElement('div');
+    d.style.cssText='padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rose-light);';
     const qLabel=p.qty!==null?(p.qty===0?'⛔':p.qty+' u.'):'catálogo';
-    const priceStr='$'+(p.price||0).toFixed(0);
-    html+='<div onclick="entradaSelect('+i+')" style="padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rose-light);" onmouseenter="this.style.background='var(--rose-light)'" onmouseleave="this.style.background=''">'+
-      '<span style="font-size:1.1rem;">'+(ico[p.cat]||'📦')+'</span>'+
+    d.innerHTML='<span style="font-size:1.1rem;">'+catEmoji(p.cat)+'</span>'+
       '<span style="flex:1;font-size:.88rem;font-weight:700;">'+p.name+'</span>'+
       '<span style="font-size:.75rem;color:var(--text-light);">'+qLabel+'</span>'+
-      '<span style="font-size:.82rem;color:var(--rose);font-weight:700;">'+priceStr+'</span>'+
-      '</div>';
+      '<span style="font-size:.82rem;color:var(--rose);font-weight:700;">$'+(p.price||0).toFixed(0)+'</span>';
+    d.addEventListener('mouseenter',function(){this.style.background='var(--rose-light)';});
+    d.addEventListener('mouseleave',function(){this.style.background='';});
+    d.addEventListener('click',function(){entradaSelect(i);});
+    ac.appendChild(d);
   });
-  ac.innerHTML=html;
-  ac._items=all;
   ac.style.display='block';
 }
-
 function entradaSelect(idx){
   const ac=document.getElementById('entrada-ac');
-  const p=ac._items[idx];
-  if(!p)return;
+  const p=ac._items[idx];if(!p)return;
   entradaSelected=p;
   document.getElementById('entrada-search').value=p.name;
   document.getElementById('entrada-prod-name').textContent=p.name;
   document.getElementById('entrada-price').value=p.price||'';
   document.getElementById('entrada-qty').value=1;
   document.getElementById('entrada-selected').style.display='block';
-  document.getElementById('entrada-ac').style.display='none';
+  ac.style.display='none';
   setTimeout(function(){document.getElementById('entrada-qty').focus();},100);
 }
-
-function entradaKey(e){
-  if(e.key==='Enter'&&entradaSelected)entradaAgregar();
-}
-
-function entradaQtyKey(e){
-  if(e.key==='Enter')entradaAgregar();
-}
-
+function entradaQtyKey(e){if(e.key==='Enter')entradaAgregar();}
 function entradaAgregar(){
   if(!entradaSelected){toast('Selecciona un producto primero 🌸');return;}
   const qty=parseInt(document.getElementById('entrada-qty').value)||0;
   const price=parseFloat(document.getElementById('entrada-price').value)||entradaSelected.price||0;
   const name=entradaSelected.name;
   const cat=entradaSelected.cat||'Otro';
-  const existing=inventory.find(function(p){
-    return p.name.toLowerCase()===name.toLowerCase()||(entradaSelected.id&&p.id===entradaSelected.id);
-  });
+  const existing=inventory.find(p=>p.name.toLowerCase()===name.toLowerCase()||(entradaSelected.id&&p.id===entradaSelected.id));
   if(existing){
     existing.qty=(existing.qty||0)+qty;
     if(price)existing.price=price;
-    saveLocal();syncInventory();
-  } else {
-    inventory.push({id:uid(),name:name,cat:cat,price:price,qty:qty,alert:2,date:new Date().toISOString().split('T')[0]});
-    saveLocal();syncInventory();
+  }else{
+    inventory.push({id:uid(),name,cat,price,qty,alert:2,date:new Date().toISOString().split('T')[0]});
   }
+  saveProduct(existing||inventory[inventory.length-1]);
+  saveLocal();
   toast('✅ +'+qty+' '+name);
   const list=document.getElementById('entrada-recientes-list');
   const item=document.createElement('div');
   item.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:white;border-radius:10px;margin-bottom:6px;border:1px solid var(--rose-light);';
-  item.innerHTML='<span style="font-size:.82rem;font-weight:700;color:var(--text);">'+name+'</span><span style="font-size:.82rem;font-weight:700;color:var(--rose);">+'+qty+'</span>';
+  item.innerHTML='<span style="font-size:.82rem;font-weight:700;">'+name+'</span><span style="font-size:.82rem;font-weight:700;color:var(--rose);">+'+qty+'</span>';
   list.insertBefore(item,list.firstChild);
   document.getElementById('entrada-recientes').style.display='block';
   entradaSelected=null;
@@ -950,494 +1031,64 @@ function entradaAgregar(){
   document.getElementById('entrada-selected').style.display='none';
   document.getElementById('entrada-qty').value=1;
   document.getElementById('entrada-price').value='';
-  renderInventory();renderStats();
+  renderInventory();
   setTimeout(function(){document.getElementById('entrada-search').focus();},100);
 }
 
-// ══ CLIENTS VIEW ══
-function renderClientsQuick(){ renderClientsView(); }
-
-function renderClientsView(){
-  const el=document.getElementById('clients-view-list');if(!el)return;
-  const q=(document.getElementById('cli-search')?.value||'').toLowerCase();
-  const tl=t=>({VIP:'⭐ VIP',frecuente:'💗 Frecuente',nueva:'🌸 Nueva',prospecto:'💎 Prospecto',inactiva:'💤 Inactiva'}[t]||t);
-  let list=clients.filter(c=>{
-    return !q||`${c.nombre||''} ${c.apellido||''} ${c.telefono||''}`.toLowerCase().includes(q);
-  });
-  if(!list.length){
-    el.innerHTML='<div class="empty-state"><div class="icon">👥</div><h3>'+(q?'Sin resultados':'Sin clientas')+'</h3><p>'+(q?'Prueba con otro nombre.':'Agrégalas desde el CRM.')+'</p><a href="https://crmmisclientes.netlify.app" target="_blank"><button class="btn btn-primary" style="margin-top:12px;">Abrir CRM 💄</button></a></div>';
-    return;
+// ══ CART ══
+function renderCartItems(){
+  const el=document.getElementById('cart-items');if(!el)return;
+  const badge=document.getElementById('cart-badge');
+  if(badge){badge.textContent=cart.length;badge.style.display=cart.length?'flex':'none';}
+  if(!cart.length){
+    el.innerHTML='<div class="empty-state" style="padding:20px 0;"><div class="icon">🛒</div><h3>La cesta está vacía</h3></div>';
+    calcTotals();return;
   }
-  const isBday=c=>{if(!c.cumpleanos)return false;return new Date().getMonth()+1===parseInt((c.cumpleanos||'').split('-')[1]);};
-  el.innerHTML=list.map(c=>{
-    const initials=((c.nombre||'?')[0]+(c.apellido||'')[0]).toUpperCase();
-    const bday=isBday(c)?'<span style="position:absolute;top:-4px;right:-4px;font-size:.7rem;">🎂</span>':'';
-    const wa=c.telefono?'<a href="https://wa.me/'+c.telefono.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()" style="font-size:.72rem;color:#25d366;font-weight:700;text-decoration:none;">💬 WA</a>':'';
-    return '<div class="prod-card" onclick="cliSdropSelectById(''+c.id+'')" style="cursor:pointer;">'+
-      '<div class="prod-badge" style="background:#fde8f0;font-size:1rem;font-weight:700;color:var(--rose);font-family:'Playfair Display',serif;position:relative;">'+initials+bday+'</div>'+
-      '<div class="prod-info">'+
-        '<div class="prod-name">'+(c.nombre||'')+' '+(c.apellido||'')+'</div>'+
-        '<div class="prod-cat">'+(c.telefono||'')+''+(c.ciudad?' · '+c.ciudad:'')+'</div>'+
-        (c.productos_fav?'<div class="prod-date">💄 '+c.productos_fav+'</div>':'')+
-      '</div>'+
-      '<div class="prod-right">'+
-        '<span style="font-size:.72rem;background:var(--rose-light);color:var(--rose-dark);border-radius:10px;padding:3px 9px;font-weight:700;">'+tl(c.tipo)+'</span>'+
-        (wa?'<div style="margin-top:6px;">'+wa+'</div>':'')+
-      '</div>'+
-    '</div>';
+  el.innerHTML=cart.map(item=>{
+    return '<div class="cart-item">'+
+      '<div style="font-size:1.2rem;">'+catEmoji(item.cat)+'</div>'+
+      '<div style="flex:1;"><div style="font-weight:700;font-size:.88rem;">'+item.name+'</div>'+
+      '<div style="font-size:.75rem;color:var(--text-light);">$'+(item.price||0).toFixed(2)+' c/u</div></div>'+
+      '<div style="display:flex;align-items:center;gap:6px;">'+
+      '<button onclick="cartQty(\''+item.cartId+'\',\-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--rose-light);background:white;cursor:pointer;font-size:.9rem;">−</button>'+
+      '<span style="font-weight:700;min-width:20px;text-align:center;">'+item.qty+'</span>'+
+      '<button onclick="cartQty(\''+item.cartId+'\',1)" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--rose-light);background:white;cursor:pointer;font-size:.9rem;">+</button>'+
+      '<button onclick="cartRemove(\''+item.cartId+'\')" style="width:26px;height:26px;border-radius:50%;border:none;background:#fee;color:#c00;cursor:pointer;font-size:.85rem;">✕</button>'+
+      '</div></div>';
   }).join('');
-}
-
-function cliSdropSelectById(id){
-  const c=clients.find(x=>x.id===id);if(!c)return;
-  const name=((c.nombre||'')+' '+(c.apellido||'')).trim();
-  document.getElementById('cart-client-id').value=c.id;
-  document.getElementById('cart-client-name').value=name;
-  const freeInp=document.getElementById('cli-free-name');
-  if(freeInp)freeInp.value=name;
-  showTab('cart');
-  toast('✅ '+name+' seleccionada para la venta');
-}
-
-
-function init(){
-  renderAll();
-  document.getElementById('loading').style.display='none';
-  if(navigator.onLine){setSyncStatus('syncing','🔄 Sincronizando...');try{await syncAll();}catch(e){setSyncStatus('offline','⚠️ Modo offline');}}
-  else setSyncStatus('offline','📴 Sin conexión');
-  refreshPrices();
-  window.addEventListener('online',()=>syncAll());
-  window.addEventListener('offline',()=>setSyncStatus('offline','📴 Sin conexión'));
-  setInterval(()=>{if(navigator.onLine)syncAll();},60000);
-  document.addEventListener('click',(e)=>{
-    if(!document.getElementById('sdrop-wrap').contains(e.target))sdropClose();
-    if(!document.getElementById('cli-sdrop-wrap').contains(e.target))cliSdropClose();
-  });
   calcTotals();
 }
-
-async function syncAll(){
-  try{const r=await supa('GET','mk_inventory?select=*&order=created_at.desc');if(r){inventory=r;saveLocal();}}catch(e){}
-  try{const r=await supa('GET','mk_sales?select=*&order=created_at.desc');if(r){sales=r;saveLocal();}}catch(e){}
-  try{const r=await supa('GET','mk_followups?select=*&order=scheduled_date.asc');if(r){followups=r;saveLocal();}}catch(e){}
-  try{const r=await supa('GET','clientas?select=*&order=created_at.desc');if(r){clients=r;localStorage.setItem('mk_clientas_local',JSON.stringify(clients));}}catch(e){}
-  renderAll();setSyncStatus('online','☁️ Sincronizado');
+function cartQty(id,delta){
+  const item=cart.find(x=>x.cartId===id);if(!item)return;
+  item.qty=Math.max(1,item.qty+delta);
+  renderCartItems();
 }
-function setSyncStatus(s,t){const el=document.getElementById('sync-status');el.className='sync-chip '+s;el.textContent=t;}
-function syncNow(){if(navigator.onLine)syncAll();else setSyncStatus('offline','📴 Sin conexión');}
-
-// ══ LIVE PRICES ══
-async function refreshPrices(){
-  const el=document.getElementById('price-status');
-  if(Date.now()-(mkPrices._lastFetch||0)<PRICE_TTL&&Object.keys(mkPrices).length>1){el.className='price-chip live';el.textContent='💰 Precios al día ✓';return;}
-  if(!navigator.onLine){el.textContent='💰 Sin conexión';return;}
-  el.textContent='💰 Actualizando...';
-  try{
-    const resp=await fetch('https://mk-scan.jenniffermarykay2017.workers.dev/prices',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({})
-    });
-    const data=await resp.json();
-    if(data.prices&&Object.keys(data.prices).length){
-      const prices=data.prices;prices._lastFetch=Date.now();mkPrices=prices;saveLocal();
-      let updated=false;
-      inventory.forEach(p=>{
-        const key=Object.keys(prices).find(k=>k!=='_lastFetch'&&(p.name.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(p.name.toLowerCase().split(' ').slice(0,3).join(' '))));
-        if(key&&prices[key]&&Math.abs((p.price||0)-prices[key])>0.01){p.price=prices[key];updated=true;}
-      });
-      if(updated){saveLocal();inventory.forEach(p=>{if(navigator.onLine)try{supa('PATCH',`mk_inventory?id=eq.${p.id}`,{price:p.price});}catch(e){}});}
-      el.className='price-chip live';el.textContent='💰 Precios al día ✓';renderAll();
-    }
-  }catch(e){el.textContent='💰 Error precios';}
+function cartRemove(id){
+  cart=cart.filter(x=>x.cartId!==id);
+  renderCartItems();
 }
-
-// ══ TABS ══
-function showTab(t){
-  ['inv','entrada','cart','followup','clients'].forEach(id=>{
-    document.getElementById('view-'+id).classList.toggle('active',id===t);
-    const bn=document.getElementById('bnav-'+id);
-    if(bn)bn.classList.toggle('active',id===t);
-  });
-  document.getElementById('fab-btn').style.display=t==='inv'?'flex':'none';
-  if(t==='followup')renderFollowups();
-  if(t==='clients')renderClientsQuick();
-  if(t==='cart'){calcTotals();renderCartItems();}
+function calcTotals(){
+  const el=document.getElementById('totals-display');if(!el)return;
+  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const t1=parseFloat(document.getElementById('tax1-rate')?.value)||0;
+  const t2=parseFloat(document.getElementById('tax2-rate')?.value)||0;
+  const feeVal=parseFloat(document.getElementById('fee-value')?.value)||0;
+  const discVal=parseFloat(document.getElementById('disc-value')?.value)||0;
+  const tax1Amt=subtotal*(t1/100);
+  const tax2Amt=subtotal*(t2/100);
+  const feeAmt=feeType==='pct'?subtotal*(feeVal/100):feeVal;
+  const discAmt=discType==='pct'?subtotal*(discVal/100):discVal;
+  const total=subtotal+tax1Amt+tax2Amt+feeAmt-discAmt;
+  el.innerHTML=
+    '<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:.82rem;color:var(--text-light);border-top:1px solid var(--rose-light);margin-top:8px;">'+
+    '<span>Subtotal</span><span>$'+subtotal.toFixed(2)+'</span></div>'+
+    (t1?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.78rem;color:var(--text-light);"><span>IVU Municipal '+t1+'%</span><span>$'+tax1Amt.toFixed(2)+'</span></div>':'')+
+    (t2?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.78rem;color:var(--text-light);"><span>IVU Estatal '+t2+'%</span><span>$'+tax2Amt.toFixed(2)+'</span></div>':'')+
+    (feeAmt?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.78rem;color:var(--text-light);"><span>Mi cargo</span><span>$'+feeAmt.toFixed(2)+'</span></div>':'')+
+    (discAmt?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:.78rem;color:var(--rose-dark);"><span>Descuento</span><span>-$'+discAmt.toFixed(2)+'</span></div>':'')+
+    '<div style="display:flex;justify-content:space-between;padding:10px 0 4px;font-size:1.1rem;font-weight:700;color:var(--rose-dark);border-top:2px solid var(--rose-light);margin-top:6px;">'+
+    '<span>Total</span><span>$'+total.toFixed(2)+'</span></div>';
 }
-
-// ══ STATS ══
-function renderStats(){
-  const total=inventory.length,low=inventory.filter(p=>p.qty>0&&p.qty<=(p.alert||2)).length,empty=inventory.filter(p=>p.qty===0).length,val=inventory.reduce((s,p)=>s+(p.price||0)*(p.qty||0),0);
-  document.getElementById('st-total').textContent=total;document.getElementById('st-low').textContent=low;
-  document.getElementById('st-empty').textContent=empty;document.getElementById('st-val').textContent='$'+val.toFixed(0);
-  document.getElementById('hstat-total').textContent=total+' productos';
-  document.getElementById('hstat-low').textContent='⚠️ '+low+' bajos';
-  document.getElementById('hstat-empty').textContent='⛔ '+empty+' agotados';
-  // cart badge
-  const badge=document.getElementById('cart-badge');
-  badge.style.display=cart.length?'flex':'none';
-  badge.textContent=cart.length;
-}
-function catEmoji(c){return{Skincare:'🧴',Maquillaje:'💄',Cuerpo:'🧼',Fragancia:'✨',Otro:'📦'}[c]||'📦';}
-function renderAll(){renderInv();renderStats();renderSales();renderFollowups();renderClientsQuick();}
-
-// ══ INVENTORY ══
-function setInvFilter(el,f){invFilter=f;document.querySelectorAll('#view-inv .fchip').forEach(e=>e.classList.remove('active'));el.classList.add('active');renderInv();}
-function renderInv(){
-  const q=(document.getElementById('inv-search').value||'').toLowerCase();
-  let list=inventory.filter(p=>{
-    if(q&&!p.name.toLowerCase().includes(q))return false;
-    if(invFilter==='all')return true;
-    if(invFilter==='__low')return p.qty>0&&p.qty<=(p.alert||2);
-    if(invFilter==='__empty')return p.qty===0;
-    if(invFilter==='__recent')return(new Date()-new Date(p.created_at||0))<7*24*60*60*1000;
-    return p.cat===invFilter;
-  });
-  list.sort((a,b)=>{const r=p=>p.qty===0?0:p.qty<=(p.alert||2)?1:2;return r(a)-r(b);});
-  const el=document.getElementById('inv-list');
-  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="icon">📦</div><h3>Sin productos</h3><p>Toca + para agregar o usa la cámara.</p></div>`;return;}
-  el.innerHTML=list.map(p=>{
-    const isEmpty=p.qty===0,isLow=!isEmpty&&p.qty<=(p.alert||2);
-    const qc=isEmpty?'qty-empty':isLow?'qty-low':'qty-ok';
-    const ql=isEmpty?'⛔ Agotado':isLow?`⚠️ Solo ${p.qty}`:`✅ ${p.qty} unid.`;
-    const cc=isEmpty?'empty':isLow?'low':'';
-    const ds=p.created_at?new Date(p.created_at).toLocaleDateString('es-PR',{day:'numeric',month:'short'}):'';
-    return `<div class="prod-card ${cc}" onclick="openViewProduct('${p.id}')">
-      <div class="prod-badge badge-${p.cat||'Otro'}">${catEmoji(p.cat)}</div>
-      <div class="prod-info"><div class="prod-name">${p.name}</div><div class="prod-cat">${p.cat||'Otro'}</div>${ds?`<div class="prod-date">Agregado: ${ds}</div>`:''}</div>
-      <div class="prod-right"><div class="prod-price">$${(p.price||0).toFixed(2)}</div><div class="prod-qty ${qc}">${ql}</div></div>
-    </div>`;
-  }).join('');
-}
-
-// ══ PRODUCT CRUD ══
-function openAddProduct(){editingProdId=null;document.getElementById('prod-modal-title').textContent='Nuevo Producto ✨';['pf-name','pf-price','pf-qty','pf-alert'].forEach(id=>document.getElementById(id).value='');document.getElementById('pf-cat').value='Skincare';document.getElementById('prod-modal').classList.add('open');}
-function openEditProduct(id){const p=inventory.find(x=>x.id===id);if(!p)return;editingProdId=id;document.getElementById('prod-modal-title').textContent='Editar Producto ✏️';document.getElementById('pf-name').value=p.name;document.getElementById('pf-cat').value=p.cat||'Skincare';document.getElementById('pf-price').value=p.price||0;document.getElementById('pf-qty').value=p.qty||0;document.getElementById('pf-alert').value=p.alert||2;closeModalDirect('view-modal');document.getElementById('prod-modal').classList.add('open');}
-async function saveProduct(){
-  const name=document.getElementById('pf-name').value.trim();if(!name){toast('Escribe el nombre 🌸');return;}
-  const data={name,cat:document.getElementById('pf-cat').value,price:parseFloat(document.getElementById('pf-price').value)||0,qty:parseInt(document.getElementById('pf-qty').value)||0,alert:parseInt(document.getElementById('pf-alert').value)||2};
-  if(editingProdId){
-    const idx=inventory.findIndex(x=>x.id===editingProdId);if(idx>=0)inventory[idx]={...inventory[idx],...data};
-    saveLocal();renderAll();if(navigator.onLine)try{await supa('PATCH',`mk_inventory?id=eq.${editingProdId}`,data);}catch(e){}
-    toast('✅ Producto actualizado');
-  }else{
-    data.id=uid();data.created_at=new Date().toISOString();
-    inventory.unshift(data);saveLocal();renderAll();if(navigator.onLine)try{await supa('POST','mk_inventory?on_conflict=id',data);}catch(e){}
-    toast('✅ Producto agregado');
-  }
-  closeModalDirect('prod-modal');
-}
-async function deleteProduct(id){
-  if(!confirm('¿Eliminar este producto?'))return;
-  inventory=inventory.filter(x=>x.id!==id);saveLocal();renderAll();closeModalDirect('view-modal');
-  if(navigator.onLine)try{await supa('DELETE',`mk_inventory?id=eq.${id}`);}catch(e){}
-  toast('Producto eliminado');
-}
-function openViewProduct(id){
-  const p=inventory.find(x=>x.id===id);if(!p)return;
-  const isEmpty=p.qty===0,isLow=!isEmpty&&p.qty<=(p.alert||2);
-  const qc=isEmpty?'color:var(--empty)':isLow?'color:var(--warn)':'color:var(--ok)';
-  const ql=isEmpty?'⛔ Agotado':isLow?`⚠️ Solo ${p.qty} unidades`:`✅ ${p.qty} unidades`;
-  document.getElementById('vm-title').textContent=p.name;
-  document.getElementById('vm-body').innerHTML=`
-    <div style="text-align:center;padding:16px 0 12px;">
-      <div style="font-size:3rem;">${catEmoji(p.cat)}</div>
-      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin:8px 0 4px;">${p.name}</div>
-      <div style="font-size:.85rem;color:var(--text-light);">${p.cat||'Otro'}</div>
-    </div>
-    <div style="background:white;border-radius:14px;padding:14px;margin-bottom:10px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center;">
-        <div><div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--rose);">$${(p.price||0).toFixed(2)}</div><div style="font-size:.72rem;color:var(--text-light);">Precio sugerido</div></div>
-        <div><div style="font-size:1.3rem;font-weight:700;${qc}">${p.qty||0}</div><div style="font-size:.72rem;color:var(--text-light);">En inventario</div></div>
-      </div>
-      <div style="margin-top:12px;text-align:center;font-size:.85rem;font-weight:700;${qc}">${ql}</div>
-    </div>`;
-  document.getElementById('vm-actions').innerHTML=`<button class="btn btn-gold" style="flex:1;" onclick="openEditProduct('${id}')">✏️ Editar</button><button class="btn btn-danger" onclick="deleteProduct('${id}')">🗑</button>`;
-  document.getElementById('view-modal').classList.add('open');
-}
-
-// ══ SEARCHABLE DROPDOWN ══
-function sdropOpen(){sdropFilter();document.getElementById('sdrop-list').classList.add('open');}
-function sdropClose(){document.getElementById('sdrop-list').classList.remove('open');}
-function sdropToggle(){const l=document.getElementById('sdrop-list');if(l.classList.contains('open'))sdropClose();else sdropOpen();}
-function sdropFilter(){
-  const q=document.getElementById('sdrop-search').value;
-  const ql=q.toLowerCase().trim();
-  document.getElementById('sdrop-clear').classList.toggle('visible',q.length>0);
-  const invOpts=inventory.filter(p=>!ql||p.name.toLowerCase().includes(ql));
-  const catOpts=ql.length>=2?MK_CATALOG.filter(p=>p.name.toLowerCase().includes(ql)&&!invOpts.find(i=>i.name.toLowerCase()===p.name.toLowerCase())):[];
-  const list=document.getElementById('sdrop-list');
-  const showManual=ql.length>0&&invOpts.length===0&&catOpts.length===0;
-  document.getElementById('manual-add-box').classList.toggle('open',showManual);
-  let html='';
-  if(!invOpts.length&&!catOpts.length&&!ql){
-    html=`<div class="sdrop-item empty-opt">No hay productos — toca + para agregar</div>`;
-  } else if(showManual){
-    html=`<div class="sdrop-item manual-hint">➕ Agregar "${q}" como nuevo producto ↓</div>`;
-  } else {
-    html+=invOpts.slice(0,20).map(p=>{
-      const isEmpty=p.qty===0,isLow=!isEmpty&&p.qty<=(p.alert||2);
-      const qLabel=isEmpty?'⛔':isLow?`⚠️${p.qty}`:p.qty;
-      return `<div class="sdrop-item" onclick="sdropSelectWithVariants('inv','${p.id}','${p.name.replace(/'/g,"\'").replace(/"/g,'&quot;')}',${p.price||0},'${p.cat||'Otro'}')">
-        <span>${catEmoji(p.cat)}</span><span class="si-name">${p.name}</span>
-        <span class="si-sub">${qLabel} 📦</span><span class="si-price">$${(p.price||0).toFixed(0)}</span></div>`;
-    }).join('');
-    if(catOpts.length){
-      html+=`<div style="padding:5px 14px;font-size:.7rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;background:#fdf5f8;">Catálogo MK</div>`;
-      html+=catOpts.slice(0,10).map(p=>{
-        const hasV=p.variants&&p.variants.length>1;
-        const prices=p.variants?p.variants.filter(v=>v.price).map(v=>v.price):[];
-        const minP=prices.length?Math.min(...prices):p.price;
-        const escaped=p.name.replace(/'/g,"\'").replace(/"/g,'&quot;');
-        return `<div class="sdrop-item" onclick="sdropSelectWithVariants('cat',null,'${escaped}',${p.price||0},'${p.cat||'Skincare'}','${escaped}')">
-          <span>${catEmoji(p.cat)}</span><span class="si-name">${p.name}${hasV?' <span style="font-size:.7rem;color:var(--rose);">▾</span>':''}</span>
-          <span class="si-sub">catálogo</span><span class="si-price">${hasV?'desde ':''}$${(minP||0).toFixed(0)}</span></div>`;
-      }).join('');
-    }
-  }
-  list.innerHTML=html;list.classList.add('open');
-}
-
-function sdropSelectWithVariants(source,prodId,name,price,cat,catalogName){
-  const catEntry=MK_CATALOG.find(p=>p.name===name||(catalogName&&p.name===catalogName));
-  if(catEntry&&catEntry.variants&&catEntry.variants.length>1){
-    const list=document.getElementById('sdrop-list');
-    const escaped=catEntry.name.replace(/'/g,"\'");
-    list.innerHTML=`
-      <div style="padding:10px 12px 6px;font-size:.75rem;font-weight:700;color:var(--rose-dark);border-bottom:1px solid var(--rose-light);">
-        ${catEmoji(cat)} ${catEntry.name}<br>
-        <span style="font-weight:400;color:var(--text-light);">¿Es sencillo o en set?</span>
-      </div>
-      ${catEntry.variants.map((v,vi)=>`
-        <div class="sdrop-item" onclick="sdropFinalSelect('${prodId||''}','${escaped}',${v.price||price},'${cat}','${(v.label||'').replace(/'/g,"\'")}')">
-          <span>${v.price?'🔹':'📦'}</span>
-          <span class="si-name" style="font-weight:${v.price?'700':'400'};">${v.label}</span>
-          <span class="si-price">${v.price?'$'+v.price.toFixed(2):(v.setNote||'')}</span>
-        </div>`).join('')}
-      <div class="sdrop-item" style="color:var(--text-light);font-style:italic;" onclick="sdropOpen()">← Volver a buscar</div>`;
-    list.classList.add('open');
-    return;
-  }
-  sdropSelect(prodId||'',name,price,cat);
-}
-
-function sdropFinalSelect(prodId,name,price,cat,variantLabel){
-  const displayName=variantLabel&&variantLabel!=='Sencillo'?`${name} (${variantLabel})`:name;
-  sdropSelect(prodId,displayName,price,cat);
-}
-
-function sdropSelect(id,name,price,cat){
-  document.getElementById('cart-prod-id').value=id;
-  document.getElementById('cart-prod-name').value=name;
-  document.getElementById('cart-item-price').value=price||'';
-  document.getElementById('sdrop-search').value=name;
-  document.getElementById('sdrop-clear').classList.add('visible');
-  document.getElementById('manual-add-box').classList.remove('open');
-  sdropClose();
-}
-function sdropClear(){
-  document.getElementById('cart-prod-id').value='';document.getElementById('cart-prod-name').value='';
-  document.getElementById('sdrop-search').value='';document.getElementById('sdrop-clear').classList.remove('visible');
-  document.getElementById('manual-add-box').classList.remove('open');document.getElementById('cart-item-price').value='';
-}
-function sdropKey(e){if(e.key==='Escape')sdropClose();}
-async function sdropAddManual(){
-  const name=document.getElementById('sdrop-search').value.trim();if(!name){toast('Escribe el nombre');return;}
-  const cat=document.getElementById('ma-cat').value;const price=parseFloat(document.getElementById('ma-price').value)||0;
-  const data={id:uid(),name,cat,price,qty:0,alert:2,created_at:new Date().toISOString()};
-  inventory.unshift(data);saveLocal();renderAll();
-  if(navigator.onLine)try{await supa('POST','mk_inventory?on_conflict=id',data);}catch(e){}
-  sdropSelect(data.id,name,price,cat);
-  document.getElementById('manual-add-box').classList.remove('open');
-  toast(`✅ "${name}" agregado`);
-}
-
-// ══ CLIENT DROPDOWN ══
-function setCliMode(mode){
-  const isFree = mode === 'free';
-  document.getElementById('cli-free-mode').style.display = isFree ? 'block' : 'none';
-  document.getElementById('cli-crm-mode').style.display  = isFree ? 'none'  : 'block';
-  // button styles
-  const freeBtn = document.getElementById('cli-mode-free');
-  const crmBtn  = document.getElementById('cli-mode-crm');
-  freeBtn.style.background    = isFree ? 'var(--rose)' : 'white';
-  freeBtn.style.color         = isFree ? 'white' : 'var(--rose)';
-  freeBtn.style.borderColor   = 'var(--rose)';
-  crmBtn.style.background     = isFree ? 'white' : 'var(--rose)';
-  crmBtn.style.color          = isFree ? 'var(--rose)' : 'white';
-  crmBtn.style.borderColor    = 'var(--rose)';
-  // clear both fields on switch
-  if(isFree){
-    cliSdropClear();
-    const n = document.getElementById('cli-free-name').value;
-    document.getElementById('cart-client-name').value = n;
-    document.getElementById('cart-client-id').value   = '';
-  } else {
-    document.getElementById('cli-free-name').value    = '';
-    document.getElementById('cart-client-name').value = '';
-    document.getElementById('cart-client-id').value   = '';
-  }
-}
-
-function cliSdropOpen(){cliSdropFilter();document.getElementById('cli-sdrop-list').classList.add('open');}
-function cliSdropClose(){document.getElementById('cli-sdrop-list').classList.remove('open');}
-function cliSdropToggle(){const l=document.getElementById('cli-sdrop-list');if(l.classList.contains('open'))cliSdropClose();else cliSdropOpen();}
-function cliSdropFilter(){
-  const q=(document.getElementById('cli-sdrop-search').value||'').toLowerCase();
-  document.getElementById('cli-sdrop-clear').classList.toggle('visible',q.length>0);
-  const opts=clients.filter(c=>!q||`${c.nombre||''} ${c.apellido||''}`.toLowerCase().includes(q));
-  const tl=t=>({VIP:'⭐',frecuente:'💗',nueva:'🌸',prospecto:'💎',inactiva:'💤'}[t]||'');
-  let html=`<div class="sdrop-item" onclick="cliSdropSelect('','Sin clienta / venta directa')"><span>🛍</span><span class="si-name" style="font-style:italic;color:var(--text-light);">Sin clienta</span></div>`;
-  html+=opts.slice(0,20).map(c=>`<div class="sdrop-item" onclick="cliSdropSelect('${c.id}','${((c.nombre||'')+' '+(c.apellido||'')).trim()}')"><span>👤</span><span class="si-name">${c.nombre||''} ${c.apellido||''}</span><span class="si-sub">${tl(c.tipo)}</span></div>`).join('');
-  if(!opts.length&&q)html+=`<div class="sdrop-item empty-opt">No encontrada</div>`;
-  document.getElementById('cli-sdrop-list').innerHTML=html;document.getElementById('cli-sdrop-list').classList.add('open');
-}
-function cliSdropSelect(id,name){
-  document.getElementById('cart-client-id').value=id;document.getElementById('cart-client-name').value=name;
-  document.getElementById('cli-sdrop-search').value=id?name:'';
-  document.getElementById('cli-sdrop-tag-label').textContent=name;
-  document.getElementById('cli-sdrop-selected-tag').style.display=id?'block':'none';
-  document.getElementById('cli-sdrop-clear').classList.toggle('visible',!!id);
-  cliSdropClose();
-}
-function cliSdropClear(){document.getElementById('cart-client-id').value='';document.getElementById('cart-client-name').value='';document.getElementById('cli-sdrop-search').value='';document.getElementById('cli-sdrop-selected-tag').style.display='none';document.getElementById('cli-sdrop-clear').classList.remove('visible');}
-
-// ══ CART ══
-// ══ CART PRODUCT SEARCH (simple & clean) ══
-const catEmoji2 = c => ({Skincare:'🧴',Maquillaje:'💄',Cuerpo:'🧼',Fragancia:'✨',Otro:'📦'}[c]||'📦');
-
-function cartSearch(q){
-  const list = document.getElementById('cart-ac-list');
-  if(!q||q.length<1){list.style.display='none';return;}
-  const ql = q.toLowerCase();
-  // Search inventory first, then catalog
-  const invHits = inventory.filter(p=>p.name.toLowerCase().includes(ql)).slice(0,6);
-  const catHits = MK_CATALOG.filter(p=>
-    p.name.toLowerCase().includes(ql) &&
-    !invHits.find(i=>i.name.toLowerCase()===p.name.toLowerCase())
-  ).slice(0,8);
-  const all = [
-    ...invHits.map(p=>({id:p.id,name:p.name,cat:p.cat,price:p.price,source:'inv',qty:p.qty,variants:null})),
-    ...catHits.map(p=>({id:null,name:p.name,cat:p.cat,price:p.price,source:'cat',qty:null,variants:p.variants}))
-  ].slice(0,10);
-  if(!all.length){
-    list.innerHTML=`<div style="padding:10px 14px;font-size:.85rem;color:var(--text-light);font-style:italic;">No encontrado — puedes escribir el nombre completo</div>`;
-    list.style.display='block';return;
-  }
-  list.innerHTML = all.map(p=>{
-    const qLabel = p.source==='inv'?(p.qty===0?'⛔ Agotado':p.qty<=2?`⚠️ ${p.qty}`:`✅ ${p.qty}`):'catálogo';
-    const hasV = p.variants&&p.variants.length>1;
-    const prices = p.variants?p.variants.filter(v=>v.price).map(v=>v.price):[];
-    const minP = prices.length?Math.min(...prices):p.price;
-    return `<div onclick="cartSelectProduct(${JSON.stringify(p).replace(/"/g,'&quot;')})"
-      style="padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rose-light);"
-      onmouseenter="this.style.background='var(--rose-light)'"
-      onmouseleave="this.style.background=''">
-      <span style="font-size:1.1rem;">${catEmoji2(p.cat)}</span>
-      <span style="flex:1;font-size:.88rem;font-weight:700;">${p.name}${hasV?' <span style="font-size:.72rem;color:var(--rose);">▾ variantes</span>':''}</span>
-      <span style="font-size:.78rem;color:var(--text-light);">${qLabel}</span>
-      <span style="font-size:.85rem;color:var(--rose);font-weight:700;">${hasV?'desde ':''}$${(minP||0).toFixed(0)}</span>
-    </div>`;
-  }).join('');
-  list.style.display='block';
-}
-
-function cartSelectProduct(p){
-  const list = document.getElementById('cart-ac-list');
-  // If has variants, show variant picker
-  const catEntry = MK_CATALOG.find(c=>c.name===p.name);
-  if(catEntry&&catEntry.variants&&catEntry.variants.length>1){
-    list.innerHTML = `
-      <div style="padding:8px 14px 6px;font-size:.75rem;font-weight:700;color:var(--rose-dark);border-bottom:1px solid var(--rose-light);">
-        ${catEmoji2(p.cat)} ${p.name} — ¿sencillo o set?
-      </div>
-      ${catEntry.variants.map(v=>`
-        <div onclick="cartPickVariant('${p.name.replace(/'/g,"\'")}','${p.cat}','${(v.label||'').replace(/'/g,"\'")}',${v.price||p.price||0},'${p.id||''}')"
-          style="padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rose-light);"
-          onmouseenter="this.style.background='var(--rose-light)'"
-          onmouseleave="this.style.background=''">
-          <span>${v.price?'🔹':'📦'}</span>
-          <span style="flex:1;font-size:.86rem;font-weight:${v.price?'700':'400'};color:${v.price?'var(--text)':'var(--text-light)'};">${v.label}</span>
-          <span style="font-size:.85rem;color:var(--rose);font-weight:700;">${v.price?'$'+v.price.toFixed(2):(v.setNote||'')}</span>
-        </div>`).join('')}
-      <div onclick="cartSearch(document.getElementById('sdrop-search').value)" style="padding:8px 14px;cursor:pointer;font-size:.78rem;color:var(--text-light);">← Volver</div>`;
-    list.style.display='block';
-    return;
-  }
-  cartPickVariant(p.name, p.cat, '', p.price||0, p.id||'');
-}
-
-function cartPickVariant(name, cat, variantLabel, price, prodId){
-  const displayName = variantLabel&&variantLabel!=='Sencillo'?`${name} (${variantLabel})`:name;
-  document.getElementById('sdrop-search').value = displayName;
-  document.getElementById('cart-prod-id').value = prodId||'';
-  document.getElementById('cart-prod-name').value = displayName;
-  document.getElementById('cart-item-price').value = price||'';
-  document.getElementById('cart-tag-label').textContent = catEmoji2(cat)+' '+displayName;
-  document.getElementById('cart-selected-tag').style.display = 'block';
-  document.getElementById('cart-ac-list').style.display = 'none';
-}
-
-function cartClear(){
-  document.getElementById('sdrop-search').value='';
-  document.getElementById('cart-prod-id').value='';
-  document.getElementById('cart-prod-name').value='';
-  document.getElementById('cart-item-price').value='';
-  document.getElementById('cart-selected-tag').style.display='none';
-  document.getElementById('cart-ac-list').style.display='none';
-}
-
-function addToCart(){
-  const prodId=document.getElementById('cart-prod-id').value;
-  const prodName=document.getElementById('cart-prod-name').value||document.getElementById('sdrop-search').value.trim();
-  if(!prodName){toast('Selecciona o escribe un producto 🌸');return;}
-  const qty=parseInt(document.getElementById('cart-qty').value)||1;
-  const price=parseFloat(document.getElementById('cart-item-price').value)||0;
-  if(!price){toast('Escribe el precio unitario');return;}
-  const existing=cart.findIndex(x=>x.prodId===prodId&&prodId);
-  if(existing>=0){cart[existing].qty+=qty;cart[existing].price=price;}
-  else{
-    const prod=inventory.find(x=>x.id===prodId);
-    cart.push({cartId:uid(),prodId:prodId||null,name:prodName,cat:prod?.cat||'Otro',price,qty});
-  }
-  document.getElementById('cart-qty').value='1';document.getElementById('cart-item-price').value='';
-  renderCartItems();calcTotals();renderStats();
-  toast(`✅ ${prodName} agregado a la cesta`);
-}
-
-function renderCartItems(){
-  const sec=document.getElementById('cart-items-section');
-  const emptyMsg=document.getElementById('cart-empty-msg');
-  if(!cart.length){sec.style.display='none';emptyMsg.style.display='block';return;}
-  sec.style.display='block';emptyMsg.style.display='none';
-  document.getElementById('cart-items-list').innerHTML=cart.map((item,i)=>`
-    <div class="cart-item">
-      <div style="font-size:1.3rem;">${catEmoji(item.cat)}</div>
-      <div class="cart-item-info">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-sub">$${item.price.toFixed(2)} c/u</div>
-        <div class="cart-qty-ctrl">
-          <button class="qty-btn" onclick="cartQty(${i},-1)">−</button>
-          <span class="qty-display">${item.qty}</span>
-          <button class="qty-btn" onclick="cartQty(${i},1)">+</button>
-        </div>
-      </div>
-      <div class="cart-item-right">
-        <div class="cart-item-total">$${(item.price*item.qty).toFixed(2)}</div>
-        <button class="cart-item-remove" onclick="removeFromCart(${i})">🗑</button>
-      </div>
-    </div>`).join('');
-}
-
-function cartQty(i,delta){
-  cart[i].qty=Math.max(1,cart[i].qty+delta);
-  renderCartItems();calcTotals();renderStats();
-}
-function removeFromCart(i){cart.splice(i,1);renderCartItems();calcTotals();renderStats();}
-function clearCart(){if(!confirm('¿Vaciar la cesta?'))return;cart=[];renderCartItems();calcTotals();renderStats();sdropClear();cliSdropClear();}
-
-// ══ FEE & DISCOUNT ══
-let feeType='pct';
 function setFeeType(t){
   feeType=t;
   document.getElementById('fee-pct-btn').classList.toggle('sel',t==='pct');
@@ -1452,248 +1103,446 @@ function setDiscType(t){
   document.getElementById('disc-type-label').textContent=t==='pct'?'%':'$';
   calcTotals();
 }
-
-function calcTotals(){
-  const subtotal=cart.reduce((s,i)=>s+(i.price*i.qty),0);
-  const t1Rate=parseFloat(document.getElementById('tax1-rate')?.value||0)/100;
-  const t2Rate=parseFloat(document.getElementById('tax2-rate')?.value||0)/100;
-  const discVal=parseFloat(document.getElementById('disc-value')?.value||0);
-  const feeVal=parseFloat(document.getElementById('fee-value')?.value||0);
-  const discAmt=discType==='pct'?subtotal*(discVal/100):Math.min(discVal,subtotal);
-  const afterDisc=Math.max(0,subtotal-discAmt);
-  const tax1Amt=afterDisc*t1Rate;
-  const tax2Amt=afterDisc*t2Rate;
-  const feeAmt=feeType==='pct'?afterDisc*(feeVal/100):feeVal;
-  const total=afterDisc+tax1Amt+tax2Amt+feeAmt;
-  const t1Name='IVU Municipal (PR)';
-  const t2Name='IVU Estatal (PR)';
-  const el=document.getElementById('totals-display');
-  if(!el)return;
-  // INTERNAL breakdown — never shown to client
-  el.innerHTML=`
-    <div style="border-top:1px solid var(--rose-light);margin-top:14px;padding-top:12px;">
-      <div class="totals-row sub"><span>Subtotal productos</span><span>$${subtotal.toFixed(2)}</span></div>
-      ${discAmt>0?`<div class="totals-row sub" style="color:var(--ok);"><span>Descuento (${discType==='pct'?discVal+'%':'$'+parseFloat(discVal).toFixed(2)})</span><span>−$${discAmt.toFixed(2)}</span></div>`:''}
-      <div class="totals-row sub"><span>${t1Name} ${(t1Rate*100).toFixed(1)}%</span><span>$${tax1Amt.toFixed(2)}</span></div>
-      <div class="totals-row sub"><span>${t2Name} ${(t2Rate*100).toFixed(1)}%</span><span>$${tax2Amt.toFixed(2)}</span></div>
-      ${feeAmt>0?`<div class="totals-row sub" style="color:var(--rose-dark);"><span>Mi cargo (${feeType==='pct'?feeVal+'%':'$'+parseFloat(feeVal).toFixed(2)})</span><span>$${feeAmt.toFixed(2)}</span></div>`:''}
-      <div class="totals-row total divider"><span>TOTAL A COBRAR</span><span>$${total.toFixed(2)}</span></div>
-    </div>`;
-  return{subtotal,discAmt,tax1Amt,tax2Amt,feeAmt,total,t1Name,t2Name};
+function clearCart(){
+  if(!cart.length)return;
+  if(!confirm('¿Vaciar la cesta?'))return;
+  cart=[];renderCartItems();
+  document.getElementById('cart-client-id').value='';
+  document.getElementById('cart-client-name').value='';
+  document.getElementById('cli-free-name').value='';
 }
 
-// ══ CHECKOUT ══
-async function checkoutCart(){
-  if(!cart.length){toast('La cesta está vacía');return;}
-  const totals=calcTotals();
-  const clientId=document.getElementById('cart-client-id').value;
-  const clientName=document.getElementById('cart-client-name').value||'Venta directa';
-  const doFollowup=document.getElementById('cart-followup').value==='si';
-  const saleId=uid();
-  const saleData={id:saleId,items:JSON.stringify(cart),client_id:clientId||null,client_name:clientName,subtotal:totals.subtotal,discount:totals.discAmt,tax1:totals.tax1Amt,tax2:totals.tax2Amt,fee:totals.feeAmt,total:totals.total,created_at:new Date().toISOString()};
-  sales.unshift(saleData);saveLocal();
-  if(navigator.onLine)try{await supa('POST','mk_sales?on_conflict=id',saleData);}catch(e){}
-  for(const item of cart){
-    if(item.prodId){
-      const idx=inventory.findIndex(x=>x.id===item.prodId);
-      if(idx>=0){inventory[idx].qty=Math.max(0,(inventory[idx].qty||0)-item.qty);saveLocal();if(navigator.onLine)try{await supa('PATCH',`mk_inventory?id=eq.${item.prodId}`,{qty:inventory[idx].qty});}catch(e){}}
-    }
-  }
-  if(doFollowup&&clientId){
-    const now=new Date();const prodNames=cart.map(i=>i.name).join(', ');
-    [2,14,60].forEach(async(days,i)=>{
-      const d=new Date(now);d.setDate(d.getDate()+days);
-      const labels=['2 días','2 semanas','2 meses'];
-      const fu={id:uid(),prod_name:prodNames,client_id:clientId,client_name:clientName,type:labels[i],scheduled_date:d.toISOString().split('T')[0],done:false,created_at:new Date().toISOString()};
-      followups.push(fu);saveLocal();if(navigator.onLine)try{await supa('POST','mk_followups?on_conflict=id',fu);}catch(e){}
+// Cart product search
+function cartSearch(q){
+  const list=document.getElementById('cart-ac-list');if(!list)return;
+  if(!q||q.length<1){list.style.display='none';return;}
+  const ql=q.toLowerCase();
+  const invHits=inventory.filter(p=>p.name.toLowerCase().includes(ql)).slice(0,6);
+  const catHits=MK_CATALOG.filter(p=>p.name.toLowerCase().includes(ql)&&!invHits.find(i=>i.name.toLowerCase()===p.name.toLowerCase())).slice(0,8);
+  const all=[...invHits.map(p=>({...p,source:'inv'})),...catHits.map(p=>({...p,source:'cat'}))].slice(0,10);
+  if(!all.length){list.style.display='none';return;}
+  list.innerHTML='';
+  all.forEach(function(p,i){
+    const d=document.createElement('div');
+    d.style.cssText='padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rose-light);';
+    d.innerHTML='<span style="font-size:1.1rem;">'+catEmoji(p.cat)+'</span>'+
+      '<span style="flex:1;font-size:.88rem;font-weight:700;">'+p.name+'</span>'+
+      '<span style="font-size:.82rem;color:var(--rose);font-weight:700;">$'+(p.price||0).toFixed(0)+'</span>';
+    d.addEventListener('mouseenter',function(){this.style.background='var(--rose-light)';});
+    d.addEventListener('mouseleave',function(){this.style.background='';});
+    d.addEventListener('click',function(){cartPickProduct(i,all);});
+    list.appendChild(d);
+  });
+  list._all=all;
+  list.style.display='block';
+}
+function cartPickProduct(i,all){
+  const p=all[i];
+  const catEntry=MK_CATALOG.find(c=>c.name===p.name);
+  const list=document.getElementById('cart-ac-list');
+  if(catEntry&&catEntry.variants&&catEntry.variants.length>1){
+    list.innerHTML='';
+    const hdr=document.createElement('div');
+    hdr.style.cssText='padding:8px 14px 6px;font-size:.75rem;font-weight:700;color:var(--rose-dark);border-bottom:1px solid var(--rose-light);';
+    hdr.textContent=catEntry.name+' — ¿sencillo o set?';
+    list.appendChild(hdr);
+    catEntry.variants.forEach(function(v){
+      const d=document.createElement('div');
+      d.style.cssText='padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--rose-light);';
+      d.innerHTML='<span>'+(v.price?'🔹':'📦')+'</span>'+
+        '<span style="flex:1;font-size:.86rem;font-weight:'+(v.price?'700':'400')+';">'+v.label+'</span>'+
+        '<span style="font-size:.85rem;color:var(--rose);font-weight:700;">'+(v.price?'$'+v.price.toFixed(2):(v.setNote||''))+'</span>';
+      d.addEventListener('mouseenter',function(){this.style.background='var(--rose-light)';});
+      d.addEventListener('mouseleave',function(){this.style.background='';});
+      d.addEventListener('click',(function(pname,plabel,pprice){return function(){
+        const dname=plabel&&plabel!=='Sencillo'?pname+' ('+plabel+')':pname;
+        document.getElementById('sdrop-search').value=dname;
+        document.getElementById('cart-prod-name').value=dname;
+        document.getElementById('cart-item-price').value=pprice||'';
+        document.getElementById('cart-selected-tag').style.display='block';
+        document.getElementById('cart-tag-label').textContent=dname;
+        document.getElementById('cart-ac-list').style.display='none';
+      };})(catEntry.name,v.label,v.price||p.price||0));
+      list.appendChild(d);
     });
+    return;
   }
-  renderAll();
-  const cartSnap=[...cart];
-  cart=[];renderCartItems();calcTotals();renderStats();sdropClear();cliSdropClear();
-  toast(`✅ Venta registrada — $${totals.total.toFixed(2)}`);
-  setTimeout(()=>showReceiptModal(cartSnap,totals,clientName,new Date()),400);
+  document.getElementById('sdrop-search').value=p.name;
+  document.getElementById('cart-prod-name').value=p.name;
+  document.getElementById('cart-item-price').value=p.price||'';
+  document.getElementById('cart-selected-tag').style.display='block';
+  document.getElementById('cart-tag-label').textContent=p.name;
+  list.style.display='none';
+}
+function cartClear(){
+  document.getElementById('sdrop-search').value='';
+  document.getElementById('cart-prod-name').value='';
+  document.getElementById('cart-item-price').value='';
+  document.getElementById('cart-selected-tag').style.display='none';
+  document.getElementById('cart-ac-list').style.display='none';
+}
+function addToCart(){
+  const name=document.getElementById('cart-prod-name').value||document.getElementById('sdrop-search').value.trim();
+  if(!name){toast('Selecciona un producto 🌸');return;}
+  const price=parseFloat(document.getElementById('cart-item-price').value)||0;
+  const qty=parseInt(document.getElementById('cart-qty').value)||1;
+  const prodId=document.getElementById('cart-prod-id').value;
+  const cat=inventory.find(p=>p.id===prodId)?.cat||'Otro';
+  cart.push({cartId:uid(),prodId,name,cat,price,qty});
+  cartClear();
+  document.getElementById('cart-qty').value='1';
+  renderCartItems();calcTotals();renderStats();
+  toast('✅ '+name+' en la cesta');
 }
 
-// ══ RECEIPT — clean version for client, no tax/fee words ══
-function previewReceipt(){
-  if(!cart.length){toast('La cesta está vacía');return;}
-  const totals=calcTotals();
-  const clientName=document.getElementById('cart-client-name').value||'';
-  showReceiptModal(cart,totals,clientName,new Date());
+// ══ CLIENT MODE ══
+function setCliMode(mode){
+  const isFree=mode==='free';
+  document.getElementById('cli-free-mode').style.display=isFree?'block':'none';
+  document.getElementById('cli-crm-mode').style.display=isFree?'none':'block';
+  const fb=document.getElementById('cli-mode-free');
+  const cb=document.getElementById('cli-mode-crm');
+  if(fb){fb.style.background=isFree?'var(--rose)':'white';fb.style.color=isFree?'white':'var(--rose)';}
+  if(cb){cb.style.background=isFree?'white':'var(--rose)';cb.style.color=isFree?'var(--rose)':'white';}
+  if(isFree){
+    const n=document.getElementById('cli-free-name');
+    if(n){document.getElementById('cart-client-name').value=n.value;document.getElementById('cart-client-id').value='';}
+  }else{
+    document.getElementById('cli-free-name').value='';
+    document.getElementById('cart-client-name').value='';
+    document.getElementById('cart-client-id').value='';
+  }
 }
 
-function previewReceiptFromSale(sale){
-  let items=[];try{items=JSON.parse(sale.items||'[]');}catch(e){}
-  // Rebuild totals from sale data — no tax/fee labels
-  const totals={subtotal:sale.subtotal,discAmt:sale.discount||0,tax1Amt:sale.tax1||0,tax2Amt:sale.tax2||0,feeAmt:sale.fee||0,total:sale.total};
-  showReceiptModal(items,totals,sale.client_name||'',new Date(sale.created_at));
+// ══ REGISTER SALE ══
+async function registerSale(){
+  if(!cart.length){toast('La cesta está vacía 🌸');return;}
+  const clientName=document.getElementById('cart-client-name').value||'Cliente';
+  const clientId=document.getElementById('cart-client-id').value;
+  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const t1=parseFloat(document.getElementById('tax1-rate')?.value)||0;
+  const t2=parseFloat(document.getElementById('tax2-rate')?.value)||0;
+  const feeVal=parseFloat(document.getElementById('fee-value')?.value)||0;
+  const discVal=parseFloat(document.getElementById('disc-value')?.value)||0;
+  const feeAmt=feeType==='pct'?subtotal*(feeVal/100):feeVal;
+  const discAmt=discType==='pct'?subtotal*(discVal/100):discVal;
+  const total=subtotal+subtotal*(t1/100)+subtotal*(t2/100)+feeAmt-discAmt;
+  const totals={subtotal,t1,t2,feeAmt,discAmt,total};
+  // Reduce inventory
+  cart.forEach(item=>{
+    if(item.prodId){
+      const p=inventory.find(x=>x.id===item.prodId);
+      if(p){p.qty=Math.max(0,p.qty-item.qty);saveProduct(p);}
+    }
+  });
+  // Add followups
+  const doFollowup=document.getElementById('followup-toggle')?.value!=='no';
+  if(doFollowup&&clientName){
+    const now=new Date();
+    const addDays=(d)=>{const dt=new Date(now);dt.setDate(dt.getDate()+d);return dt.toISOString().split('T')[0];};
+    [{days:2,label:'2 días'},{days:14,label:'2 semanas'},{days:60,label:'2 meses'}].forEach(f=>{
+      followups.push({id:uid(),clientName,clientId,due:addDays(f.days),label:f.label,done:false,date:now.toISOString().split('T')[0]});
+    });
+    saveLocal();
+  }
+  showReceiptModal(cart.slice(),totals,clientName,new Date());
+  renderInventory();renderStats();
+  toast('✅ Venta registrada');
+  cart=[];renderCartItems();
 }
 
+// ══ RECEIPT ══
 function showReceiptModal(items,totals,clientName,date){
-  const dateStr=date.toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'});
-  const timeStr=date.toLocaleTimeString('es-PR',{hour:'2-digit',minute:'2-digit'});
-  const clientStr=clientName&&clientName!=='Venta directa'?`<div style="font-size:.8rem;font-weight:700;margin-top:6px;color:var(--rose-dark);">Para: ${clientName}</div>`:'';
-  // RECEIPT shows only: products list + total. Nothing about taxes, fees, or discounts.
-  document.getElementById('receipt-content').innerHTML=`
-    <div class="receipt-header">
-      <div class="receipt-logo">✨ Mary Kay</div>
-      <div class="receipt-sub">Jenniffer Ivelisse · Consultora Independiente</div>
-      <div style="font-size:.75rem;color:var(--text-light);margin-top:4px;">${dateStr} · ${timeStr}</div>
-      ${clientStr}
-    </div>
-    <div class="receipt-line header"><span style="flex:2;">Producto</span><span style="text-align:center;">Cant.</span><span style="text-align:right;">Importe</span></div>
-    ${items.map(i=>`
-      <div class="receipt-line">
-        <span style="flex:2;min-width:0;white-space:normal;font-size:.83rem;line-height:1.3;">${i.name}</span>
-        <span style="text-align:center;white-space:nowrap;padding:0 6px;">${i.qty}</span>
-        <span style="text-align:right;white-space:nowrap;">$${(i.qty*i.price).toFixed(2)}</span>
-      </div>`).join('')}
-    <div class="receipt-line total" style="margin-top:12px;padding-top:12px;border-top:2px solid var(--rose-light);">
-      <span style="flex:2;">Total</span>
-      <span></span>
-      <span style="text-align:right;">$${(totals.total||0).toFixed(2)}</span>
-    </div>
-    <div class="receipt-footer">¡Gracias por tu compra! 🌸<br>marykay.com/jenniffer/es/</div>`;
+  const el=document.getElementById('receipt-body');if(!el)return;
+  const dateStr=date.toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  let html='<div style="text-align:center;margin-bottom:16px;">'+
+    '<div style="font-family:\'Playfair Display\',serif;font-size:1.3rem;color:var(--rose);font-weight:700;">✨ Mary Kay</div>'+
+    '<div style="font-size:.78rem;color:var(--text-light);">Jenniffer Ivelisse · Consultora Independiente</div>'+
+    '<div style="font-size:.72rem;color:var(--text-light);margin-top:2px;">'+dateStr+'</div></div>'+
+    '<div style="border-top:1px dashed var(--rose-light);border-bottom:1px dashed var(--rose-light);padding:12px 0;margin-bottom:12px;">'+
+    '<div style="display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;font-size:.72rem;font-weight:700;color:var(--text-light);text-transform:uppercase;margin-bottom:6px;">'+
+    '<span>Producto</span><span>Cant.</span><span>Importe</span></div>'+
+    items.map(item=>'<div style="display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;font-size:.82rem;padding:4px 0;border-bottom:1px solid #fdf0f4;">'+
+      '<span>'+item.name+'</span><span style="text-align:center;">'+item.qty+'</span>'+
+      '<span style="text-align:right;">$'+(item.price*item.qty).toFixed(2)+'</span></div>').join('')+
+    '</div>'+
+    (clientName&&clientName!=='Cliente'?'<div style="font-size:.78rem;color:var(--text-light);margin-bottom:8px;">Para: '+clientName+'</div>':'')+
+    '<div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:700;color:var(--rose-dark);">'+
+    '<span>Total</span><span>$'+totals.total.toFixed(2)+'</span></div>'+
+    '<div style="text-align:center;margin-top:14px;font-size:.72rem;color:var(--text-light);">¡Gracias por tu compra! 🌸<br>marykay.com/jenniffer/es/</div>';
+  el.innerHTML=html;
+  const waBtn=document.getElementById('receipt-wa-btn');
+  if(waBtn){
+    const clientPhone=clients.find(c=>c.id===document.getElementById('cart-client-id').value)?.telefono;
+    waBtn.onclick=function(){
+      let msg='✨ *Mary Kay · Jenniffer Ivelisse*\n';
+      if(clientName&&clientName!=='Cliente')msg+='Hola '+clientName+' 🌸\n\n';
+      msg+='*Tu compra:*\n';
+      items.forEach(i=>{msg+='• '+i.name+' x'+i.qty+' — $'+(i.price*i.qty).toFixed(2)+'\n';});
+      msg+='\n*Total: $'+totals.total.toFixed(2)+'*\n\n¡Gracias por tu confianza! 💕';
+      const phone=clientPhone?clientPhone.replace(/\D/g,''):'';
+      window.open('https://wa.me/'+(phone||'')+encodeURIComponent(msg));
+    };
+  }
   document.getElementById('receipt-modal').classList.add('open');
 }
 
-function shareReceiptWA(){
-  const el=document.getElementById('receipt-content');
-  const text=el.innerText.replace(/\n\n+/g,'\n').trim();
-  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
-}
-
-// ══ SALES LIST ══
-function renderSales(){
-  const el=document.getElementById('sales-list');if(!el)return;
-  if(!sales.length){el.innerHTML=`<div class="empty-state"><div class="icon">🛒</div><h3>Sin ventas aún</h3><p>Registra tu primera venta arriba.</p></div>`;return;}
-  el.innerHTML=sales.slice(0,30).map(s=>{
-    let items=[];try{items=JSON.parse(s.items||'[]');}catch(e){}
-    const prodLabel=items.length>1?`${items[0].name} +${items.length-1} más`:items[0]?.name||'Venta';
-    return `<div class="sale-item" onclick="previewReceiptFromSale(${JSON.stringify(s).replace(/"/g,'&quot;')})">
-      <div class="sale-left">
-        <div class="sale-prod">${prodLabel}</div>
-        <div class="sale-client">👤 ${s.client_name||'Venta directa'}</div>
-        <div class="sale-date">${s.created_at?new Date(s.created_at).toLocaleDateString('es-PR',{day:'numeric',month:'short',year:'numeric'}):''}</div>
-      </div>
-      <div class="sale-right">
-        <div class="sale-amount">$${(s.total||0).toFixed(2)}</div>
-        <div class="sale-qty" style="color:var(--rose);font-size:.7rem;">🧾 ver recibo</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
 // ══ FOLLOWUPS ══
-function setFuFilter(el,f){fuFilter=f;document.querySelectorAll('#view-followup .fchip').forEach(e=>e.classList.remove('active'));el.classList.add('active');renderFollowups();}
 function renderFollowups(){
   const el=document.getElementById('followup-list');if(!el)return;
-  const today=new Date();today.setHours(0,0,0,0);
+  const today=new Date().toISOString().split('T')[0];
+  const filter=document.getElementById('followup-filter')?.value||'all';
   let list=followups.filter(f=>{
-    if(fuFilter==='done')return f.done;
-    if(fuFilter==='pending')return !f.done&&new Date(f.scheduled_date)>=today;
-    if(fuFilter==='overdue')return !f.done&&new Date(f.scheduled_date)<today;
+    if(filter==='pending')return!f.done&&f.due>=today;
+    if(filter==='overdue')return!f.done&&f.due<today;
+    if(filter==='done')return f.done;
     return true;
-  });
-  list.sort((a,b)=>new Date(a.scheduled_date)-new Date(b.scheduled_date));
-  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="icon">📅</div><h3>Sin seguimientos</h3><p>Al registrar una venta con clienta, se crean automáticamente.</p></div>`;return;}
-  el.innerHTML=list.map(f=>{
-    const sDate=new Date(f.scheduled_date+'T12:00:00');
-    const diff=Math.round((sDate-today)/(1000*60*60*24));
-    const isOverdue=!f.done&&diff<0;const isSoon=!f.done&&diff>=0&&diff<=2;
-    const dateLabel=f.done?'✅ Completado':isOverdue?`🚨 Venció hace ${Math.abs(diff)} día(s)`:diff===0?'⏰ Hoy':diff===1?'⏰ Mañana':sDate.toLocaleDateString('es-PR',{day:'numeric',month:'short'});
-    return `<div class="followup-card ${f.done?'done':isOverdue?'overdue':''}">
-      <div class="fu-info">
-        <div class="fu-client">👤 ${f.client_name||'Clienta'}</div>
-        <div class="fu-prod">📦 ${f.prod_name||'Producto'} · ${f.type||''}</div>
-        <div class="fu-date ${f.done?'':isOverdue?'overdue':isSoon?'soon':''}">${dateLabel}</div>
-      </div>
-      <div class="fu-actions">
-        ${!f.done?`<button class="fu-btn" style="border-color:#25d366;color:#25d366;" onclick="fuWhatsApp('${f.id}')">💬 WA</button>
-        <button class="fu-btn" style="border-color:var(--ok);color:var(--ok);" onclick="fuDone('${f.id}')">✅ Listo</button>`:
-        `<span style="font-size:.72rem;color:var(--text-light);">✅ Hecho</span>`}
-      </div>
-    </div>`;
-  }).join('');
-}
-async function fuDone(id){const idx=followups.findIndex(x=>x.id===id);if(idx<0)return;followups[idx].done=true;saveLocal();renderFollowups();if(navigator.onLine)try{await supa('PATCH',`mk_followups?id=eq.${id}`,{done:true});}catch(e){}toast('✅ Seguimiento completado');}
-function fuWhatsApp(id){const f=followups.find(x=>x.id===id);if(!f)return;const c=clients.find(x=>x.id===f.client_id);const tel=(c?.telefono||'').replace(/\D/g,'');const msg=encodeURIComponent(`Hola ${f.client_name?.split(' ')[0]||''} 🌸 Soy Jenniffer, tu consultora Mary Kay. Solo quería hacer seguimiento sobre ${f.prod_name} — ¿cómo te ha ido? ¿Necesitas algo? 💕`);window.open(`https://wa.me/${tel?tel:''}?text=${msg}`,'_blank');}
-
-// ══ CLIENTS ══
-let cliViewFilter = 'all';
-
-function setCliFilter(el, f){
-  cliViewFilter = f;
-  document.querySelectorAll('#view-clients .fchip').forEach(e=>e.classList.remove('active'));
-  if(el) el.classList.add('active');
-  renderClientsView();
-}
-
-function renderClientsQuick(){ renderClientsView(); }
-
-function renderClientsView(){
-  const el = document.getElementById('clients-view-list');
-  if(!el) return;
-  const q = (document.getElementById('cli-search')&&document.getElementById('cli-search').value||'').toLowerCase();
-  const tl = function(t){ return ({VIP:'⭐ VIP',frecuente:'💗 Frecuente',nueva:'🌸 Nueva',prospecto:'💎 Prospecto',inactiva:'💤 Inactiva'}[t]||t); };
-  const list = clients.filter(function(c){
-    const mq = !q || ((c.nombre||'')+' '+(c.apellido||'')+' '+(c.telefono||'')).toLowerCase().includes(q);
-    const mf = cliViewFilter==='all' || c.tipo===cliViewFilter;
-    return mq && mf;
-  });
+  }).sort((a,b)=>a.due.localeCompare(b.due));
   if(!list.length){
-    el.innerHTML = '<div class="empty-state"><div class="icon">👥</div><h3>'+(q?'Sin resultados':'Sin clientas')+'</h3><p>'+(q?'Prueba con otro nombre.':'Agrégalas desde el CRM.')+'</p></div>';
+    el.innerHTML='<div class="empty-state"><div class="icon">📅</div><h3>Sin seguimientos</h3><p>Aparecen al registrar una venta.</p></div>';
     return;
   }
-  el.innerHTML = list.map(function(c){
-    const initials = ((c.nombre||'?')[0]+(c.apellido||'?')[0]).toUpperCase();
-    const wa = c.telefono ? '<a href="https://wa.me/'+c.telefono.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()" style="font-size:.72rem;color:#25d366;font-weight:700;text-decoration:none;">💬 WA</a>' : '';
-    return '<div class="prod-card" onclick="openCliProfile(''+c.id+')" style="cursor:pointer;">'+
-      '<div class="prod-badge" style="background:#fde8f0;font-size:1rem;font-weight:700;color:var(--rose);font-family:'Playfair Display',serif;">'+initials+'</div>'+
-      '<div class="prod-info"><div class="prod-name">'+(c.nombre||'')+' '+(c.apellido||'')+'</div><div class="prod-cat">'+(c.telefono||'')+''+(c.ciudad?' · '+c.ciudad:'')+'</div></div>'+
-      '<div class="prod-right"><span style="font-size:.72rem;background:var(--rose-light);color:var(--rose-dark);border-radius:10px;padding:3px 9px;font-weight:700;">'+tl(c.tipo)+'</span>'+
-      (wa?'<div style="margin-top:6px;">'+wa+'</div>':'')+
-      '</div>'+
-    '</div>';
+  el.innerHTML=list.map(f=>{
+    const isOverdue=!f.done&&f.due<today;
+    const dueDate=new Date(f.due+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'short'});
+    return '<div class="prod-card" style="'+(f.done?'opacity:.6':'')+'">'+
+      '<div style="font-size:1.5rem;">'+(f.done?'✅':isOverdue?'🚨':'⏳')+'</div>'+
+      '<div class="prod-info"><div class="prod-name">'+f.clientName+'</div>'+
+      '<div class="prod-cat">'+f.label+' · '+dueDate+'</div></div>'+
+      '<div class="prod-right">'+
+      (!f.done?'<button onclick="markFollowupDone(\''+f.id+'\',event)" style="font-size:.65rem;padding:4px 10px;background:var(--ok);color:white;border:none;border-radius:8px;cursor:pointer;">✓ Hecho</button>':'')+
+      '</div></div>';
   }).join('');
 }
+function markFollowupDone(id,e){
+  e.stopPropagation();
+  const f=followups.find(x=>x.id===id);if(f)f.done=true;
+  saveLocal();renderFollowups();toast('✅ Seguimiento completado');
+}
 
+// ══ CLIENTS VIEW ══
+let cliViewFilter='all';
+function setCliFilter(el,f){
+  cliViewFilter=f;
+  document.querySelectorAll('#view-clients .fchip').forEach(e=>e.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderClientsView();
+}
+function renderClientsQuick(){renderClientsView();}
+function renderClientsView(){
+  const el=document.getElementById('clients-view-list');if(!el)return;
+  const qEl=document.getElementById('cli-search');
+  const q=qEl?qEl.value.toLowerCase():'';
+  const tl=t=>({VIP:'⭐ VIP',frecuente:'💗 Frecuente',nueva:'🌸 Nueva',prospecto:'💎 Prospecto',inactiva:'💤 Inactiva'}[t]||t);
+  const list=clients.filter(c=>{
+    const mq=!q||(c.nombre+' '+c.apellido+' '+(c.telefono||'')).toLowerCase().includes(q);
+    const mf=cliViewFilter==='all'||c.tipo===cliViewFilter;
+    return mq&&mf;
+  });
+  if(!list.length){
+    el.innerHTML='<div class="empty-state"><div class="icon">👥</div><h3>'+(q?'Sin resultados':'Sin clientas')+'</h3><p>'+(q?'Prueba otro nombre.':'Agrégalas desde el CRM.')+'</p></div>';
+    return;
+  }
+  el.innerHTML='';
+  list.forEach(function(c){
+    const initials=((c.nombre||'?')[0]+(c.apellido||'?')[0]).toUpperCase();
+    const d=document.createElement('div');
+    d.className='prod-card';
+    d.style.cursor='pointer';
+    d.innerHTML='<div class="prod-badge" style="background:#fde8f0;font-size:1rem;font-weight:700;color:var(--rose);">'+initials+'</div>'+
+      '<div class="prod-info"><div class="prod-name">'+(c.nombre||'')+' '+(c.apellido||'')+'</div>'+
+      '<div class="prod-cat">'+(c.telefono||'')+''+(c.ciudad?' · '+c.ciudad:'')+'</div></div>'+
+      '<div class="prod-right"><span style="font-size:.72rem;background:var(--rose-light);color:var(--rose-dark);border-radius:10px;padding:3px 9px;font-weight:700;">'+tl(c.tipo)+'</span>'+
+      (c.telefono?'<div style="margin-top:6px;"><a href="https://wa.me/'+c.telefono.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()" style="font-size:.72rem;color:#25d366;font-weight:700;text-decoration:none;">💬 WA</a></div>':'')+
+      '</div>';
+    d.addEventListener('click',function(){openCliProfile(c.id);});
+    el.appendChild(d);
+  });
+}
 function openCliProfile(id){
-  const c = clients.find(function(x){return x.id===id;});
-  if(!c) return;
-  const tl = function(t){ return ({VIP:'⭐ VIP',frecuente:'💗 Frecuente',nueva:'🌸 Nueva',prospecto:'💎 Prospecto',inactiva:'💤 Inactiva'}[t]||t); };
-  const initials = ((c.nombre||'?')[0]+(c.apellido||'?')[0]).toUpperCase();
-  document.getElementById('cpm-title').textContent = (c.nombre||'')+' '+(c.apellido||'');
-  document.getElementById('cpm-body').innerHTML =
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  const tl=t=>({VIP:'⭐ VIP',frecuente:'💗 Frecuente',nueva:'🌸 Nueva',prospecto:'💎 Prospecto',inactiva:'💤 Inactiva'}[t]||t);
+  const initials=((c.nombre||'?')[0]+(c.apellido||'?')[0]).toUpperCase();
+  document.getElementById('cpm-title').textContent=(c.nombre||'')+' '+(c.apellido||'');
+  document.getElementById('cpm-body').innerHTML=
     '<div style="text-align:center;padding:16px 0 12px;">'+
-    '<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-dark));margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:white;">'+initials+'</div>'+
-    '<div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;">'+(c.nombre||'')+' '+(c.apellido||'')+'</div>'+
-    '<span style="background:var(--rose-light);color:var(--rose-dark);border-radius:12px;padding:3px 12px;font-size:.75rem;font-weight:700;">'+tl(c.tipo)+'</span>'+
-    '</div>'+
+    '<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-dark));margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:white;">'+initials+'</div>'+
+    '<div style="font-size:1.1rem;font-weight:700;">'+(c.nombre||'')+' '+(c.apellido||'')+'</div>'+
+    '<span style="background:var(--rose-light);color:var(--rose-dark);border-radius:12px;padding:3px 12px;font-size:.75rem;font-weight:700;">'+tl(c.tipo)+'</span></div>'+
     (c.telefono?'<div style="padding:8px 0;border-bottom:1px solid var(--rose-light);font-size:.85rem;"><strong>📱</strong> '+c.telefono+'</div>':'')+
     (c.email?'<div style="padding:8px 0;border-bottom:1px solid var(--rose-light);font-size:.85rem;"><strong>✉️</strong> '+c.email+'</div>':'')+
     (c.ciudad?'<div style="padding:8px 0;border-bottom:1px solid var(--rose-light);font-size:.85rem;"><strong>📍</strong> '+c.ciudad+'</div>':'')+
     (c.productos_fav?'<div style="padding:8px 0;border-bottom:1px solid var(--rose-light);font-size:.85rem;"><strong>💄</strong> '+c.productos_fav+'</div>':'')+
     (c.notas?'<div style="padding:8px 0;font-size:.85rem;white-space:pre-wrap;">'+c.notas+'</div>':'')+
-    (c.telefono?'<a href="https://wa.me/'+c.telefono.replace(/\D/g,'')+'" target="_blank"><button class="btn btn-wa" style="width:100%;padding:11px;margin-top:12px;">💬 Escribir por WhatsApp</button></a>':'');
-  document.getElementById('cpm-add-cart').onclick = function(){ addCliToCart(c); };
+    (c.telefono?'<a href="https://wa.me/'+c.telefono.replace(/\D/g,'')+'" target="_blank"><button class="btn btn-wa" style="width:100%;padding:11px;margin-top:12px;">💬 WhatsApp</button></a>':'');
+  const addBtn=document.getElementById('cpm-add-cart');
+  if(addBtn)addBtn.onclick=function(){addCliToCartFromProfile(c);};
   document.getElementById('cli-profile-modal').classList.add('open');
 }
-
-function addCliToCart(c){
-  const name = ((c.nombre||'')+' '+(c.apellido||'')).trim();
-  document.getElementById('cart-client-id').value = c.id;
-  document.getElementById('cart-client-name').value = name;
-  const freeInp = document.getElementById('cli-free-name');
-  if(freeInp) freeInp.value = name;
+function addCliToCartFromProfile(c){
+  const name=((c.nombre||'')+' '+(c.apellido||'')).trim();
+  document.getElementById('cart-client-id').value=c.id;
+  document.getElementById('cart-client-name').value=name;
+  const fi=document.getElementById('cli-free-name');if(fi)fi.value=name;
   closeModalDirect('cli-profile-modal');
   showTab('cart');
-  toast('✅ '+name+' seleccionada para la venta');
+  toast('✅ '+name+' lista para la venta');
 }
 
+// ══ CRM SEARCH ══
+function cliSdropFilter(){
+  const q=(document.getElementById('cli-sdrop-search')?.value||'').toLowerCase();
+  const list=document.getElementById('cli-sdrop-list');if(!list)return;
+  document.getElementById('cli-sdrop-clear')?.classList.toggle('visible',q.length>0);
+  list.innerHTML='';
+  const opts=clients.filter(c=>!q||(c.nombre+' '+c.apellido).toLowerCase().includes(q)).slice(0,20);
+  if(!opts.length){
+    const d=document.createElement('div');d.className='sdrop-item empty-opt';
+    d.textContent=q?'Sin resultados':'Sin clientas registradas';
+    list.appendChild(d);
+  }else{
+    opts.forEach(function(c){
+      const d=document.createElement('div');d.className='sdrop-item';
+      const nm=((c.nombre||'')+' '+(c.apellido||'')).trim();
+      d.innerHTML='<span style="font-weight:700;">'+nm+'</span>'+
+        (c.telefono?'<span style="font-size:.75rem;color:var(--text-light);margin-left:8px;">'+c.telefono+'</span>':'');
+      d.addEventListener('click',function(){
+        document.getElementById('cart-client-id').value=c.id;
+        document.getElementById('cart-client-name').value=nm;
+        document.getElementById('cli-sdrop-tag-label').textContent=nm;
+        document.getElementById('cli-sdrop-selected-tag').style.display='block';
+        list.classList.remove('open');
+      });
+      list.appendChild(d);
+    });
+  }
+  list.classList.add('open');
+}
+function cliSdropOpen(){cliSdropFilter();}
+function cliSdropToggle(){const l=document.getElementById('cli-sdrop-list');l.classList.contains('open')?l.classList.remove('open'):cliSdropOpen();}
+function cliSdropClear(){
+  document.getElementById('cli-sdrop-search').value='';
+  document.getElementById('cart-client-id').value='';
+  document.getElementById('cart-client-name').value='';
+  document.getElementById('cli-sdrop-selected-tag').style.display='none';
+  document.getElementById('cli-sdrop-list').classList.remove('open');
+}
+
+// ══ ADD/EDIT PRODUCT MODAL ══
+function openAddModal(){
+  document.getElementById('modal-title').textContent='Nuevo Producto';
+  document.getElementById('prod-id').value='';
+  document.getElementById('prod-name').value='';
+  document.getElementById('prod-cat').value='Skincare';
+  document.getElementById('prod-price').value='';
+  document.getElementById('prod-qty').value='1';
+  document.getElementById('prod-alert').value='2';
+  document.getElementById('prod-modal').classList.add('open');
+}
+function openEditModal(id){
+  const p=inventory.find(x=>x.id===id);if(!p)return;
+  document.getElementById('modal-title').textContent='Editar Producto';
+  document.getElementById('prod-id').value=p.id;
+  document.getElementById('prod-name').value=p.name;
+  document.getElementById('prod-cat').value=p.cat||'Skincare';
+  document.getElementById('prod-price').value=p.price||'';
+  document.getElementById('prod-qty').value=p.qty||0;
+  document.getElementById('prod-alert').value=p.alert||2;
+  document.getElementById('prod-modal').classList.add('open');
+}
+async function saveProductForm(){
+  const id=document.getElementById('prod-id').value;
+  const name=document.getElementById('prod-name').value.trim();
+  if(!name){toast('Escribe el nombre 🌸');return;}
+  const p={
+    id:id||uid(),name,
+    cat:document.getElementById('prod-cat').value,
+    price:parseFloat(document.getElementById('prod-price').value)||0,
+    qty:parseInt(document.getElementById('prod-qty').value)||0,
+    alert:parseInt(document.getElementById('prod-alert').value)||2,
+    date:new Date().toISOString().split('T')[0]
+  };
+  if(id){const idx=inventory.findIndex(x=>x.id===id);if(idx>=0)inventory[idx]=p;else inventory.push(p);}
+  else{inventory.push(p);}
+  await saveProduct(p);
+  renderInventory();renderStats();
+  closeModalDirect('prod-modal');
+  toast('✅ '+name+' guardado');
+}
+async function deleteProductModal(){
+  const id=document.getElementById('prod-id').value;
+  if(!id||!confirm('¿Eliminar este producto?'))return;
+  inventory=inventory.filter(p=>p.id!==id);
+  await deleteProduct(id);
+  saveLocal();renderInventory();renderStats();
+  closeModalDirect('prod-modal');
+  toast('🗑 Producto eliminado');
+}
+
+// ══ MODALS ══
+function closeModal(id,e){if(e&&e.target!==document.getElementById(id))return;closeModalDirect(id);}
+function closeModalDirect(id){document.getElementById(id)?.classList.remove('open');}
+
+// ══ QUICK RECEIPT ══
+let qrItems=[];
+function addQRItem(){
+  const name=document.getElementById('qr-name-'+qrItems.length);
+  qrItems.push({name:'',price:0,qty:1});
+  renderQRItems();
+}
+function removeQRItem(i){qrItems.splice(i,1);renderQRItems();}
+function renderQRItems(){
+  const el=document.getElementById('qr-items-list');if(!el)return;
+  el.innerHTML=qrItems.map((item,i)=>
+    '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">'+
+    '<input id="qri-name-'+i+'" placeholder="Producto" value="'+item.name+'" oninput="qrItems['+i+'].name=this.value" style="flex:2;border:1.5px solid var(--rose-light);border-radius:8px;padding:8px;font-family:\'Nunito\',sans-serif;font-size:.85rem;outline:none;">'+
+    '<input id="qri-price-'+i+'" placeholder="$" type="number" value="'+item.price+'" oninput="qrItems['+i+'].price=parseFloat(this.value)||0" style="width:70px;border:1.5px solid var(--rose-light);border-radius:8px;padding:8px;font-family:\'Nunito\',sans-serif;font-size:.85rem;outline:none;text-align:right;">'+
+    '<input id="qri-qty-'+i+'" type="number" min="1" value="'+item.qty+'" oninput="qrItems['+i+'].qty=parseInt(this.value)||1" style="width:50px;border:1.5px solid var(--rose-light);border-radius:8px;padding:8px;font-family:\'Nunito\',sans-serif;font-size:.85rem;outline:none;text-align:center;">'+
+    '<button onclick="removeQRItem('+i+')" style="background:#fee;color:#c00;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;">✕</button>'+
+    '</div>'
+  ).join('');
+}
+function generateQR(){
+  if(!qrItems.length){toast('Agrega al menos un producto 🌸');return;}
+  const items=qrItems.filter(i=>i.name);
+  if(!items.length){toast('Escribe los nombres 🌸');return;}
+  const total=items.reduce((s,i)=>s+i.price*i.qty,0);
+  const clientName=document.getElementById('qr-client').value||'';
+  showReceiptModal(items,{subtotal:total,t1:0,t2:0,feeAmt:0,discAmt:0,total},clientName,new Date());
+  closeModalDirect('qr-modal');
+  qrItems=[];renderQRItems();
+}
+
+// ══ RENDER STATS ══ (already defined above)
+
+// ══ INIT ══
+async function init(){
+  loadLocal();
+  renderInventory();renderStats();renderFollowups();
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('#sdrop-wrap')&&!e.target.closest('.sdrop-wrap'))
+      document.querySelectorAll('.sdrop-list').forEach(l=>l.classList.remove('open'));
+    if(!e.target.closest('#entrada-search')&&!e.target.closest('#entrada-ac'))
+      {const ac=document.getElementById('entrada-ac');if(ac)ac.style.display='none';}
+    if(!e.target.closest('#sdrop-search')&&!e.target.closest('#cart-ac-list'))
+      {const ac=document.getElementById('cart-ac-list');if(ac)ac.style.display='none';}
+  });
+  window.addEventListener('online',function(){syncAll();});
+  try{
+    setSyncStatus('syncing','🔄 Conectando...');
+    await Promise.all([loadInventory(),loadClients()]);
+    renderInventory();renderStats();renderClientsView();
+    setSyncStatus('ok','☁️ Sincronizado');
+  }catch(e){setSyncStatus('offline','⚠️ Offline');}
+  document.getElementById('splash')?.remove();
+}
+async function syncAll(){
+  await Promise.all([loadInventory(),loadClients()]);
+  renderInventory();renderStats();renderClientsView();
+}
 
 init();
+
 </script>
 </body>
 </html>
