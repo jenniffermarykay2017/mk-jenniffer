@@ -813,6 +813,14 @@ const MK_CATALOG = [
 // ══ SUPABASE ══
 const SUPA_URL='https://wkqovrklcrrxawmnefwm.supabase.co';
 const SUPA_KEY='sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
+const SHEETS_URL='https://script.google.com/macros/s/AKfycbwsQWRHZ7Q_Z8Syrc_65hCHwdOt1xBB6Nos6nCd195grFD9ZJ04ONagsHnBMGikDJw/exec';
+async function syncToSheets(){
+  try{
+    const data=inventory.map(p=>[p.name,p.cat,p.price||0,p.qty||0,p.alert||2,p.date||'']);
+    await fetch(SHEETS_URL,{method:'POST',body:JSON.stringify(data)});
+    console.log('Sheets sync OK');
+  }catch(e){console.log('Sheets sync failed:',e);}
+}
 async function supa(method,path,body){
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{method,headers:{
     'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,
@@ -871,6 +879,7 @@ async function loadInventory(){
     const data=await supa('GET','inventario?select=*&order=nombre');
     inventory=data.map(r=>({id:r.id,name:r.nombre,cat:r.categoria||'Otro',price:r.precio||0,qty:r.cantidad||0,alert:r.alerta||2,date:r.fecha||''}));
     saveLocal();
+    syncToSheets();
   }catch(e){loadLocal();}
 }
 async function loadClients(){
@@ -882,6 +891,7 @@ async function loadClients(){
 async function saveProduct(p){
   try{await supa('POST','inventario?on_conflict=id',{id:p.id,nombre:p.name,categoria:p.cat,precio:p.price,cantidad:p.qty,alerta:p.alert||2,fecha:p.date||''});}
   catch(e){saveLocal();}
+  syncToSheets();
 }
 async function deleteProduct(id){
   try{await supa('DELETE','inventario?id=eq.'+id);}catch(e){}
