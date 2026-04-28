@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>JI · Mis Clientas</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --ink:#0e0609;--deep:#18080f;--surface:rgba(255,255,255,.05);--surface2:rgba(255,255,255,.09);
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --rose:#c4536a;--rose-dim:rgba(196,83,106,.14);--gold:#c8964a;--gold-light:#e8b870;
+  --gold-dim:rgba(200,150,74,.12);--cream:#f8f0ea;
+  --text:rgba(255,255,255,.88);--text-mid:rgba(255,255,255,.54);--text-dim:rgba(255,255,255,.3);
+  --ok:#5db87a;--warn:#e0a050;--hot:#e05050;--cool:#5090d0;--pause:#7878a0;
+}
+html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:var(--ink);color:var(--text);}
+.amb{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 15% 10%,rgba(196,83,106,.07) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 40% at 85% 85%,rgba(200,150,74,.05) 0%,transparent 55%);}
+.app{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{flex-shrink:0;background:rgba(14,6,9,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+.topbar-main{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;}
+.page-title{font-family:"Cormorant Garamond",serif;font-size:1.12rem;font-style:italic;color:var(--cream);flex:1;}
+.btn-add{background:var(--rose);color:white;border:none;border-radius:20px;padding:8px 16px;
+  font-family:"Jost",sans-serif;font-size:.76rem;font-weight:500;cursor:pointer;transition:background .22s;white-space:nowrap;}
+.btn-add:hover{background:#a83d52;}
+.tabs{display:flex;border-bottom:1px solid var(--border);}
+.tab{flex:1;padding:9px 4px;font-size:.65rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-dim);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all .22s;
+  background:none;border-top:none;border-left:none;border-right:none;font-family:"Jost",sans-serif;}
+.tab.active{color:var(--rose);border-bottom-color:var(--rose);}
+.search-row{padding:10px 16px 6px;position:relative;}
+.search-inp{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:28px;
+  padding:10px 16px 10px 38px;color:var(--text);font-family:"Jost",sans-serif;font-size:.86rem;outline:none;transition:border-color .22s;}
+.search-inp::placeholder{color:var(--text-dim);}
+.search-inp:focus{border-color:rgba(196,83,106,.4);background:rgba(196,83,106,.05);}
+.search-ico{position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:.8rem;opacity:.32;}
+.chips{display:flex;gap:7px;padding:0 16px 8px;overflow-x:auto;scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{flex-shrink:0;background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  padding:5px 12px;font-size:.67rem;font-weight:500;cursor:pointer;color:var(--text-dim);transition:all .22s;}
+.chip.on{background:var(--rose-dim);border-color:var(--rose);color:var(--cream);}
+.chip:hover{border-color:var(--border2);color:var(--text);}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 16px 90px;-webkit-overflow-scrolling:touch;}
+.scroll::-webkit-scrollbar{display:none;}
+.slabel{font-size:.52rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);
+  padding:12px 0 8px;display:flex;align-items:center;gap:8px;}
+.slabel::after{content:"";flex:1;height:1px;background:rgba(200,150,74,.15);}
+.clist{display:flex;flex-direction:column;gap:8px;}
+.ccard{background:var(--surface);border:1px solid var(--border);border-radius:15px;
+  padding:13px 13px 13px 16px;cursor:pointer;transition:all .25s;
+  display:flex;align-items:center;gap:11px;position:relative;overflow:hidden;}
+.ccard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--cc,var(--rose));border-radius:3px 0 0 3px;}
+.ccard:hover{background:var(--surface2);transform:translateX(2px);border-color:var(--border2);}
+.ccard.paused{opacity:.55;}
+.avatar{width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Cormorant Garamond",serif;font-size:1rem;font-weight:500;color:var(--cream);
+  background:var(--av,linear-gradient(135deg,#5c1a2a,#2d0f1a));position:relative;}
+.bday-ring{position:absolute;inset:-2px;border-radius:50%;
+  border:2px solid var(--gold);animation:ringPulse 2s ease infinite;}
+@keyframes ringPulse{0%,100%{opacity:.45}50%{opacity:1}}
+.cbody{flex:1;min-width:0;}
+.cname{font-size:.88rem;font-weight:600;color:var(--cream);margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmeta{font-size:.68rem;color:var(--text-dim);margin-bottom:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ctags{display:flex;gap:5px;flex-wrap:wrap;}
+.tag{font-size:.58rem;font-weight:600;letter-spacing:.5px;padding:2px 8px;border-radius:8px;text-transform:uppercase;}
+.t-vip{background:rgba(200,150,74,.18);color:var(--gold-light);border:1px solid rgba(200,150,74,.25);}
+.t-freq{background:rgba(196,83,106,.18);color:#f0a0b0;border:1px solid rgba(196,83,106,.25);}
+.t-nueva{background:rgba(93,184,122,.14);color:#90e8a8;border:1px solid rgba(93,184,122,.2);}
+.t-prosp{background:rgba(80,144,208,.14);color:#a0c8f8;border:1px solid rgba(80,144,208,.2);}
+.t-inact{background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid var(--border);}
+.t-cons{background:rgba(200,150,74,.2);color:var(--gold-light);border:1px solid rgba(200,150,74,.3);}
+.t-pause{background:rgba(120,120,160,.15);color:var(--pause);border:1px solid rgba(120,120,160,.2);}
+.wa-mini{background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2);color:#5de870;
+  border-radius:16px;padding:4px 10px;font-size:.64rem;font-weight:600;cursor:pointer;text-decoration:none;flex-shrink:0;}
+.empty{text-align:center;padding:48px 20px;}
+.empty-ico{font-size:2.4rem;margin-bottom:12px;opacity:.35;}
+.empty-txt{font-size:.8rem;color:var(--text-dim);line-height:1.7;max-width:240px;margin:0 auto;}
+.moverlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
+  display:none;align-items:flex-end;justify-content:center;}
+.moverlay.open{display:flex;}
+.modal{background:var(--deep);border:1px solid var(--border2);border-radius:24px 24px 0 0;
+  width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .32s cubic-bezier(.4,0,.2,1);}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhandle{width:36px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:14px auto 0;}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);}
+.mtitle{font-family:"Cormorant Garamond",serif;font-size:1.05rem;font-style:italic;color:var(--cream);}
+.mclose{background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;padding:4px;}
+.mbody{padding:18px 20px;}
+.mfoot{padding:14px 20px 24px;border-top:1px solid var(--border);display:flex;gap:9px;}
+.fsec{font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);
+  margin:18px 0 12px;display:flex;align-items:center;gap:8px;}
+.fsec::after{content:"";flex:1;height:1px;background:rgba(200,150,74,.18);}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.frow1{margin-bottom:10px;}
+.flabel{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:5px;}
+.finput{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;
+  padding:11px 13px;color:var(--text);font-family:"Jost",sans-serif;font-size:.86rem;outline:none;transition:border-color .22s;}
+.finput::placeholder{color:rgba(255,255,255,.2);}
+.finput:focus{border-color:rgba(196,83,106,.5);background:rgba(196,83,106,.05);}
+.fselect{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;
+  padding:11px 13px;color:var(--text);font-family:"Jost",sans-serif;font-size:.86rem;outline:none;-webkit-appearance:none;cursor:pointer;}
+.fselect option{background:var(--deep);}
+.ftextarea{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;
+  padding:11px 13px;color:var(--text);font-family:"Jost",sans-serif;font-size:.86rem;
+  outline:none;resize:none;min-height:90px;line-height:1.6;}
+.ftextarea::placeholder{color:rgba(255,255,255,.2);}
+.ftextarea:focus{border-color:rgba(196,83,106,.5);}
+.chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+.copt{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:6px 13px;font-size:.7rem;cursor:pointer;color:var(--text-dim);transition:all .22s;}
+.copt.sel{background:var(--rose-dim);border-color:var(--rose);color:var(--cream);}
+.copt:hover{border-color:var(--border2);color:var(--text);}
+.temp-row{display:flex;gap:8px;margin-bottom:10px;}
+.topt{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:10px 8px;font-size:.72rem;text-align:center;cursor:pointer;transition:all .22s;color:var(--text-dim);}
+.topt.sel-hot{background:rgba(224,80,80,.15);border-color:var(--hot);color:#f09090;}
+.topt.sel-warm{background:rgba(224,160,80,.15);border-color:var(--warn);color:#f0c080;}
+.topt.sel-cold{background:rgba(80,144,208,.15);border-color:var(--cool);color:#a0c8f8;}
+.btn-save{flex:2;background:var(--rose);color:white;border:none;border-radius:11px;
+  padding:13px;font-family:"Jost",sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:background .22s;}
+.btn-save:hover{background:#a83d52;}
+.btn-del{flex:1;background:rgba(200,80,80,.1);color:#f08080;border:1px solid rgba(200,80,80,.22);
+  border-radius:11px;padding:13px;font-family:"Jost",sans-serif;font-size:.85rem;cursor:pointer;transition:all .22s;}
+.btn-can{flex:1;background:var(--surface);color:var(--text-dim);border:1px solid var(--border);
+  border-radius:11px;padding:13px;font-family:"Jost",sans-serif;font-size:.85rem;cursor:pointer;transition:all .22s;}
+.cg-card{background:linear-gradient(135deg,rgba(200,150,74,.12),rgba(196,83,106,.07));
+  border:1px solid rgba(200,150,74,.22);border-radius:14px;padding:16px 18px;margin:16px 20px 0;}
+.cg-label{font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.cg-days{font-family:"Cormorant Garamond",serif;font-size:1.6rem;color:var(--cream);line-height:1;}
+.cg-days-sub{font-size:.64rem;color:var(--text-dim);margin-top:2px;}
+.cg-bar-wrap{background:rgba(255,255,255,.06);border-radius:4px;height:5px;overflow:hidden;margin:10px 0;}
+.cg-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--rose),var(--gold));transition:width .8s;}
+.cg-info{font-size:.72rem;color:var(--text-dim);line-height:1.6;margin-bottom:10px;}
+.cg-earn{background:rgba(93,184,122,.1);border:1px solid rgba(93,184,122,.18);border-radius:10px;padding:10px 14px;margin-bottom:10px;}
+.cg-earn-title{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--ok);margin-bottom:5px;}
+.cg-earn-text{font-size:.78rem;color:rgba(255,255,255,.75);line-height:1.5;}
+.cg-status{font-size:.68rem;font-weight:600;padding:4px 10px;border-radius:10px;}
+.cg-ok{background:rgba(93,184,122,.15);color:#90e8a8;border:1px solid rgba(93,184,122,.2);}
+.cg-warn{background:rgba(224,160,80,.15);color:#f0c080;border:1px solid rgba(224,160,80,.22);}
+.cg-hot{background:rgba(224,80,80,.15);color:#f09090;border:1px solid rgba(224,80,80,.22);}
+.cg-done{background:rgba(200,150,74,.2);color:var(--gold-light);border:1px solid rgba(200,150,74,.3);}
+.cg-exp{background:rgba(120,120,160,.15);color:var(--pause);border:1px solid rgba(120,120,160,.2);}
+.cg-wa{width:100%;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;
+  border-radius:10px;padding:11px;font-family:"Jost",sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;}
+.pause-row{display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin:12px 20px 0;}
+.toggle{width:42px;height:24px;background:rgba(255,255,255,.12);border-radius:12px;
+  position:relative;cursor:pointer;transition:background .25s;flex-shrink:0;}
+.toggle.on{background:rgba(120,120,160,.5);}
+.toggle::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;
+  background:white;top:3px;left:3px;transition:transform .25s;}
+.toggle.on::after{transform:translateX(18px);}
+.prof-hero{text-align:center;padding:22px 20px 16px;border-bottom:1px solid var(--border);}
+.prof-av{width:68px;height:68px;border-radius:50%;margin:0 auto 12px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:500;color:var(--cream);
+  box-shadow:0 6px 24px rgba(0,0,0,.5),0 0 0 5px rgba(255,255,255,.05);}
+.prof-name{font-family:"Cormorant Garamond",serif;font-size:1.25rem;font-style:italic;color:var(--cream);margin-bottom:8px;}
+.prof-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+.pdet{display:flex;align-items:flex-start;gap:12px;padding:11px 20px;
+  border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem;}
+.pdet:last-child{border-bottom:none;}
+.pdet-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0;margin-top:1px;}
+.pdet-label{font-size:.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
+.pdet-val{color:var(--cream);font-size:.84rem;line-height:1.5;}
+.pdet-note{font-style:italic;color:var(--text-mid);white-space:pre-wrap;}
+.toast{position:fixed;bottom:20px;left:50%;z-index:500;transform:translateX(-50%) translateY(16px);
+  background:rgba(14,6,9,.97);border:1px solid rgba(196,83,106,.3);border-radius:28px;
+  padding:10px 20px;font-size:.8rem;color:var(--cream);opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.loader{position:fixed;inset:0;z-index:500;background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.lring{width:36px;height:36px;border-radius:50%;border:2px solid rgba(196,83,106,.2);
+  border-top-color:var(--rose);animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltxt{font-family:"Cormorant Garamond",serif;font-size:.95rem;font-style:italic;color:var(--text-dim);}
+.loader.gone{opacity:0;pointer-events:none;transition:opacity .35s ease .15s;}
+</style>
+</head>
+<body>
+<div class="amb"></div>
+<div class="loader" id="loader"><div class="lring"></div><div class="ltxt">Cargando...</div></div>
+<div class="toast" id="toast"></div>
+<div class="app" id="app" style="opacity:0;transition:opacity .35s ease;">
+  <div class="topbar">
+    <div class="topbar-main">
+      <div class="page-title">Mis Clientas</div>
+      <button class="btn-add" id="btn-add" onclick="openAddModal()">+ Nueva</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tab-clientas" onclick="switchTab('clientas')">👥 Clientas</button>
+      <button class="tab" id="tab-consultoras" onclick="switchTab('consultoras')">⭐ Equipo</button>
+    </div>
+    <div class="search-row">
+      <span class="search-ico">🔍</span>
+      <input class="search-inp" id="search-inp" type="text" placeholder="Buscar por nombre..." oninput="renderAll()">
+    </div>
+    <div class="chips" id="filter-chips"></div>
+  </div>
+  <div class="scroll" id="scroll-area"></div>
+</div>
+
+<!-- MODAL FORM -->
+<div class="moverlay" id="modal-form" onclick="if(event.target===this)closeM('modal-form')">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <div class="mtitle" id="form-title">Nueva clienta</div>
+      <button class="mclose" onclick="closeM('modal-form')">✕</button>
+    </div>
+    <div class="mbody">
+      <input type="hidden" id="f-id">
+      <input type="hidden" id="f-mode">
+      <div class="fsec">Información personal</div>
+      <div class="frow2">
+        <div><label class="flabel">Nombre *</label><input class="finput" id="f-nombre" placeholder="Nombre"></div>
+        <div><label class="flabel">Apellido</label><input class="finput" id="f-apellido" placeholder="Apellido"></div>
+      </div>
+      <div class="frow2">
+        <div><label class="flabel">Teléfono / WA</label><input class="finput" id="f-tel" type="tel" placeholder="787-XXX-XXXX"></div>
+        <div><label class="flabel">Cumpleaños</label><input class="finput" id="f-bday" type="date"></div>
+      </div>
+      <div class="frow1"><label class="flabel">Email</label><input class="finput" id="f-email" type="email" placeholder="correo@email.com"></div>
+      <div class="frow2">
+        <div><label class="flabel">Ciudad</label><input class="finput" id="f-ciudad" placeholder="ej: San Juan"></div>
+        <div><label class="flabel">Género</label>
+          <select class="fselect" id="f-genero">
+            <option value="">— Opcional —</option>
+            <option>Dama</option><option>Caballero</option><option>Prefiero no decir</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="sec-clienta">
+        <div class="fsec">Perfil de clienta</div>
+        <div class="frow2">
+          <div><label class="flabel">Tono de piel</label>
+            <select class="fselect" id="f-piel">
+              <option value="">— Selecciona —</option>
+              <option>Clara/Fair</option><option>Media/Medium</option><option>Oscura/Deep</option>
+            </select>
+          </div>
+          <div><label class="flabel">Tipo de piel</label>
+            <select class="fselect" id="f-tipo-piel">
+              <option value="">— Selecciona —</option>
+              <option>Normal</option><option>Seca</option><option>Grasa</option><option>Mixta</option><option>Sensible</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow1"><label class="flabel">Productos favoritos</label>
+          <input class="finput" id="f-prods" placeholder="ej: TimeWise, CC Cream..."></div>
+
+        <div class="fsec">Temperatura</div>
+        <div class="temp-row">
+          <div class="topt" data-val="hot" onclick="selTemp(this)">🔥<br><span style="font-size:.6rem">Lista ya</span></div>
+          <div class="topt" data-val="warm" onclick="selTemp(this)">🌡️<br><span style="font-size:.6rem">Interesada</span></div>
+          <div class="topt" data-val="cold" onclick="selTemp(this)">❄️<br><span style="font-size:.6rem">Fría</span></div>
+        </div>
+
+        <div class="fsec">Estado</div>
+        <div class="chip-row" id="est-sel">
+          <div class="copt" data-val="VIP" onclick="selOne(this,'est-sel')">⭐ VIP</div>
+          <div class="copt" data-val="Frecuente" onclick="selOne(this,'est-sel')">💗 Frecuente</div>
+          <div class="copt" data-val="Nueva" onclick="selOne(this,'est-sel')">🌸 Nueva</div>
+          <div class="copt" data-val="Prospecto" onclick="selOne(this,'est-sel')">💎 Prospecto</div>
+          <div class="copt" data-val="Inactiva" onclick="selOne(this,'est-sel')">💤 Inactiva</div>
+        </div>
+
+        <div class="fsec">Prefiere contacto</div>
+        <div class="chip-row" id="cont-sel">
+          <div class="copt" data-val="WhatsApp" onclick="selOne(this,'cont-sel')">💬 WhatsApp</div>
+          <div class="copt" data-val="Llamada" onclick="selOne(this,'cont-sel')">📞 Llamada</div>
+          <div class="copt" data-val="Email" onclick="selOne(this,'cont-sel')">✉️ Email</div>
+          <div class="copt" data-val="Mañana" onclick="selOne(this,'cont-sel')">☀️ Mañana</div>
+          <div class="copt" data-val="Tarde" onclick="selOne(this,'cont-sel')">🌤 Tarde</div>
+          <div class="copt" data-val="Noche" onclick="selOne(this,'cont-sel')">🌙 Noche</div>
+        </div>
+
+        <div class="fsec">Etiquetas · Profesión</div>
+        <div class="chip-row" id="etiq-sel">
+          <div class="copt" data-val="Secretaria" onclick="selMulti(this)">Secretaria</div>
+          <div class="copt" data-val="Enfermera" onclick="selMulti(this)">Enfermera</div>
+          <div class="copt" data-val="Maestra" onclick="selMulti(this)">Maestra</div>
+          <div class="copt" data-val="Médico" onclick="selMulti(this)">Médico</div>
+          <div class="copt" data-val="Farmacéutica" onclick="selMulti(this)">Farmacéutica</div>
+          <div class="copt" data-val="Abogada" onclick="selMulti(this)">Abogada</div>
+          <div class="copt" data-val="Radioaficionada" onclick="selMulti(this)">Radioaficionada</div>
+          <div class="copt" data-val="Fotógrafa" onclick="selMulti(this)">Fotógrafa</div>
+          <div class="copt" data-val="Chef" onclick="selMulti(this)">Chef</div>
+          <div class="copt" data-val="Contable" onclick="selMulti(this)">Contable</div>
+          <div class="copt" data-val="Estilista" onclick="selMulti(this)">Estilista</div>
+          <div class="copt" data-val="Periodista" onclick="selMulti(this)">Periodista</div>
+          <div class="copt" data-val="Psicóloga" onclick="selMulti(this)">Psicóloga</div>
+          <div class="copt" data-val="Militar" onclick="selMulti(this)">Militar</div>
+          <div class="copt" data-val="Madre" onclick="selMulti(this)">Madre</div>
+        </div>
+        <div class="frow1" style="margin-top:6px;">
+          <label class="flabel">Otra profesión (se añade como etiqueta)</label>
+          <input class="finput" id="f-etiq-custom" placeholder="ej: Bombera, Pastora, Atleta...">
+        </div>
+
+        <div class="fsec">¿Cómo llegó?</div>
+        <div class="chip-row" id="fuente-sel">
+          <div class="copt" data-val="Facebook" onclick="selOne(this,'fuente-sel')">Facebook</div>
+          <div class="copt" data-val="TikTok" onclick="selOne(this,'fuente-sel')">TikTok</div>
+          <div class="copt" data-val="Referido" onclick="selOne(this,'fuente-sel')">Referido</div>
+          <div class="copt" data-val="Quiz piel" onclick="selOne(this,'fuente-sel')">Quiz piel</div>
+          <div class="copt" data-val="Quiz labiales" onclick="selOne(this,'fuente-sel')">Quiz labiales</div>
+          <div class="copt" data-val="WhatsApp" onclick="selOne(this,'fuente-sel')">WhatsApp</div>
+          <div class="copt" data-val="Evento" onclick="selOne(this,'fuente-sel')">Evento</div>
+          <div class="copt" data-val="Zoom" onclick="selOne(this,'fuente-sel')">Zoom</div>
+        </div>
+      </div>
+
+      <div id="sec-consultora" style="display:none;">
+        <div class="fsec">Datos de consultora</div>
+        <div class="frow2">
+          <div><label class="flabel">Número consultora</label><input class="finput" id="f-numcons" placeholder="ej: MK-12345"></div>
+          <div><label class="flabel">Fecha de ingreso</label><input class="finput" id="f-ingreso" type="date"></div>
+        </div>
+        <div class="frow1"><label class="flabel">Pedido inicial realizado ($)</label>
+          <input class="finput" id="f-pedido" type="number" placeholder="0" min="0" step="10">
+        </div>
+        <div style="background:var(--gold-dim);border:1px solid rgba(200,150,74,.2);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Comienzo Grandioso</div>
+          <div style="font-size:.76rem;color:rgba(255,255,255,.65);line-height:1.6;">Necesita $600+ en los primeros 3 meses para calificar.<br>Cuando califica, tú ganas <strong style="color:var(--gold-light);">$50 en efectivo</strong> y hasta <strong style="color:var(--gold-light);">$220 en productos</strong>.</div>
+        </div>
+      </div>
+
+      <div class="fsec">Quién es ella · Notas privadas</div>
+      <textarea class="ftextarea" id="f-notas" placeholder="Su historia, lo que la motiva, si está en pausa y cuándo puede volver...&#10;&#10;Este espacio es solo tuyo."></textarea>
+    </div>
+    <div class="mfoot">
+      <button class="btn-del" id="btn-del" onclick="deleteRec()" style="display:none">🗑</button>
+      <button class="btn-can" onclick="closeM('modal-form')">Cancelar</button>
+      <button class="btn-save" onclick="saveRec()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROFILE -->
+<div class="moverlay" id="modal-prof" onclick="if(event.target===this)closeM('modal-prof')">
+  <div class="modal"><div class="mhandle"></div><div id="prof-content"></div></div>
+</div>
+
+<script>
+var SUPA_URL='https://wkqovrklcrrxawmnefwm.supabase.co';
+var SUPA_KEY='sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
+var IBC_URL='https://www.marykay.com/jenniffer/es/ibcprofile';
+var records=[];
+var currentTab='clientas';
+var activeFilter='all';
+var editingId=null;
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function toast(msg,dur){
+  dur=dur||2500;
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},dur);
+}
+function saveLocal(){localStorage.setItem('mk_clients',JSON.stringify(records));}
+function loadLocal(){try{var d=localStorage.getItem('mk_clients');if(d)records=JSON.parse(d);}catch(e){}}
+function fullName(r){return ((r.nombre||'')+' '+(r.apellido||'')).trim();}
+function initials(r){return ((r.nombre||'?')[0]+((r.apellido||'')[0]||'')).toUpperCase();}
+function tempIcon(t){return t==='hot'?'🔥':t==='warm'?'🌡️':'❄️';}
+function daysBetween(a,b){return Math.round((b-a)/(1000*60*60*24));}
+
+function switchTab(tab){
+  currentTab=tab;activeFilter='all';
+  document.getElementById('tab-clientas').classList.toggle('active',tab==='clientas');
+  document.getElementById('tab-consultoras').classList.toggle('active',tab==='consultoras');
+  document.getElementById('btn-add').textContent=tab==='clientas'?'+ Nueva':'+ Consultora';
+  renderFilters();renderAll();
+}
+
+function renderFilters(){
+  var el=document.getElementById('filter-chips');
+  var opts=currentTab==='clientas'
+    ?[['all','Todas'],['VIP','⭐ VIP'],['Frecuente','💗 Frecuente'],['Nueva','🌸 Nueva'],['Prospecto','💎 Prospecto'],['Inactiva','💤 Inactiva'],['hot','🔥 Listas']]
+    :[['all','Todas'],['activa','⭐ Activas'],['pausa','😴 En pausa'],['calificada','🎉 Calificadas']];
+  el.innerHTML=opts.map(function(f){
+    return '<div class="chip'+(activeFilter===f[0]?' on':'')+'" onclick="setFilter(\'' + f[0] + '\')">'+f[1]+'</div>';
+  }).join('');
+}
+function setFilter(f){activeFilter=f;renderFilters();renderAll();}
+
+function calcCG(r){
+  if(!r.ingreso)return null;
+  var ingreso=new Date(r.ingreso+'T12:00:00');
+  var deadline=new Date(ingreso);
+  deadline.setMonth(deadline.getMonth()+3);
+  var today=new Date();today.setHours(0,0,0,0);
+  var daysLeft=daysBetween(today,deadline);
+  var pedido=parseFloat(r.pedido)||0;
+  var needed=Math.max(0,600-pedido);
+  var pct=Math.min(100,(pedido/600)*100);
+  return {daysLeft:daysLeft,deadline:deadline,pedido:pedido,needed:needed,pct:pct,qualified:pedido>=600,expired:daysLeft<0};
+}
+
+function renderAll(){
+  var q=(document.getElementById('search-inp').value||'').toLowerCase();
+  var area=document.getElementById('scroll-area');
+  var list=records.filter(function(r){
+    var isc=r.tipo==='consultora';
+    if(currentTab==='clientas'&&isc)return false;
+    if(currentTab==='consultoras'&&!isc)return false;
+    if(q&&!fullName(r).toLowerCase().includes(q))return false;
+    if(activeFilter==='all')return true;
+    if(currentTab==='clientas'){
+      if(activeFilter==='hot')return r.temperatura==='hot';
+      return r.estado===activeFilter;
+    }else{
+      if(activeFilter==='pausa')return !!r.pausa;
+      if(activeFilter==='activa')return !r.pausa&&!r.calificada;
+      if(activeFilter==='calificada')return !!r.calificada;
+      return true;
+    }
+  });
+  if(!list.length){
+    area.innerHTML='<div class="empty"><div class="empty-ico">'+(currentTab==='clientas'?'👥':'⭐')+'</div><div class="empty-txt">'+(q?'Sin resultados para "'+q+'"':'Toca + para agregar tu primera '+(currentTab==='clientas'?'clienta':'consultora')+'.')+'</div></div>';
+    return;
+  }
+  var html='';
+  if(currentTab==='consultoras'){
+    var activas=list.filter(function(r){return !r.pausa&&!r.calificada;});
+    var calis=list.filter(function(r){return !!r.calificada;});
+    var pausas=list.filter(function(r){return !!r.pausa;});
+    if(activas.length)html+='<div class="slabel">En camino · '+activas.length+'</div><div class="clist">'+activas.map(consCard).join('')+'</div>';
+    if(calis.length)html+='<div class="slabel">🎉 Calificadas Comienzo Grandioso</div><div class="clist">'+calis.map(consCard).join('')+'</div>';
+    if(pausas.length)html+='<div class="slabel">😴 En pausa</div><div class="clist">'+pausas.map(consCard).join('')+'</div>';
+  }else{
+    var today=new Date();
+    var bdays=list.filter(function(r){
+      if(!r.cumpleanos)return false;
+      var p=r.cumpleanos.split('-');
+      return parseInt(p[1])===today.getMonth()+1&&parseInt(p[2])===today.getDate();
+    });
+    var rest=list.filter(function(r){return !bdays.find(function(b){return b.id===r.id;});});
+    if(bdays.length)html+='<div class="slabel">🎂 Cumpleaños hoy</div><div class="clist">'+bdays.map(clientCard).join('')+'</div>';
+    if(rest.length)html+='<div class="slabel">Clientas · '+rest.length+'</div><div class="clist">'+rest.map(clientCard).join('')+'</div>';
+  }
+  area.innerHTML=html;
+}
+
+function clientCard(r){
+  var colors={VIP:'var(--gold)',Frecuente:'var(--rose)',Nueva:'var(--ok)',Prospecto:'var(--cool)',Inactiva:'var(--pause)'};
+  var cc=colors[r.estado]||'var(--rose)';
+  var tClass={VIP:'t-vip',Frecuente:'t-freq',Nueva:'t-nueva',Prospecto:'t-prosp',Inactiva:'t-inact'}[r.estado]||'t-nueva';
+  var today=new Date();
+  var isBday=r.cumpleanos?(function(){var p=r.cumpleanos.split('-');return parseInt(p[1])===today.getMonth()+1&&parseInt(p[2])===today.getDate();}()):false;
+  var etags=(r.etiquetas||[]).slice(0,2).map(function(e){return '<span class="tag t-prosp">'+e+'</span>';}).join('');
+  var wa=r.telefono?'<a class="wa-mini" href="https://wa.me/'+r.telefono.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'';
+  return '<div class="ccard" data-id="'+r.id+'" style="--cc:'+cc+'" onclick="openProf(this.dataset.id)"><div class="avatar" style="background:linear-gradient(135deg,'+cc+','+cc+'88)">'+(isBday?'<div class="bday-ring"></div>':'')+initials(r)+'</div><div class="cbody"><div class="cname">'+fullName(r)+'</div><div class="cmeta">'+(r.telefono||'')+(r.ciudad?' · '+r.ciudad:'')+'</div><div class="ctags"><span class="tag '+tClass+'">'+(r.estado||'Nueva')+'</span>'+etags+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;"><span style="font-size:.9rem;">'+tempIcon(r.temperatura)+'</span>'+wa+'</div></div>';
+}
+
+function consCard(r){
+  var cg=calcCG(r);
+  var cc=r.calificada?'var(--gold)':r.pausa?'var(--pause)':'var(--rose)';
+  var cgBadge='';
+  if(cg&&!r.calificada&&!r.pausa){
+    if(cg.expired)cgBadge='<span style="font-size:.6rem;color:var(--text-dim);">Venció</span>';
+    else if(cg.daysLeft<=7)cgBadge='<span style="font-size:.6rem;color:#f09090;">'+cg.daysLeft+'d ⚠️</span>';
+    else cgBadge='<span style="font-size:.6rem;color:var(--text-dim);">'+cg.daysLeft+'d</span>';
+  }
+  var wa=r.telefono?'<a class="wa-mini" href="https://wa.me/'+r.telefono.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'';
+  var badge=r.calificada?'<span class="tag t-vip">🎉 Calificada</span>':r.pausa?'<span class="tag t-pause">😴 Pausa</span>':'<span class="tag t-cons">⭐ Consultora</span>';
+  return '<div class="ccard'+(r.pausa?' paused':'')+'" data-id="'+r.id+'" style="--cc:'+cc+'" onclick="openProf(this.dataset.id)"><div class="avatar" style="background:linear-gradient(135deg,'+cc+','+cc+'88)">'+initials(r)+'</div><div class="cbody"><div class="cname">'+fullName(r)+'</div><div class="cmeta">'+(r.numcons?'#'+r.numcons+' · ':'')+( r.ingreso?'Ingresó '+new Date(r.ingreso+'T12:00:00').toLocaleDateString('es-PR',{month:'short',year:'numeric'}):'')+'</div><div class="ctags">'+badge+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">'+cgBadge+wa+'</div></div>';
+}
+
+function openProf(id){
+  var r=records.find(function(x){return x.id===id;});
+  if(!r)return;
+  var iscons=r.tipo==='consultora';
+  var cc=iscons?'var(--gold)':{VIP:'var(--gold)',Frecuente:'var(--rose)',Nueva:'var(--ok)',Prospecto:'var(--cool)',Inactiva:'var(--pause)'}[r.estado]||'var(--rose)';
+  var av='linear-gradient(135deg,'+cc+','+cc+'88)';
+  var html='<div class="mhead" style="border:none;"><div class="mtitle">Perfil</div><div style="display:flex;gap:8px;"><button style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:6px 14px;color:var(--text-mid);font-family:Jost,sans-serif;font-size:.72rem;cursor:pointer;" onclick="editFromProf(this.dataset.id)" data-id="'+id+'">✏️ Editar</button><button class="mclose" onclick="closeProf()">✕</button></div></div>';
+  html+='<div class="prof-hero"><div class="prof-av" style="background:'+av+'">'+initials(r)+'</div><div class="prof-name">'+fullName(r)+'</div><div class="prof-tags">';
+  if(iscons){
+    html+='<span class="tag '+(r.calificada?'t-vip':r.pausa?'t-pause':'t-cons')+'">'+(r.calificada?'🎉 Calificada':r.pausa?'😴 En pausa':'⭐ Consultora')+'</span>';
+  }else{
+    var tc={VIP:'t-vip',Frecuente:'t-freq',Nueva:'t-nueva',Prospecto:'t-prosp',Inactiva:'t-inact'}[r.estado]||'t-nueva';
+    html+='<span class="tag '+tc+'">'+(r.estado||'Nueva')+'</span>';
+    if(r.temperatura)html+='<span style="font-size:1rem;margin-left:4px;">'+tempIcon(r.temperatura)+'</span>';
+  }
+  html+='</div></div>';
+
+  // COMIENZO GRANDIOSO
+  if(iscons){
+    var cg=calcCG(r);
+    if(cg&&!r.pausa){
+      var sc,sl;
+      if(r.calificada){sc='cg-done';sl='🎉 ¡Calificó!';}
+      else if(cg.expired){sc='cg-exp';sl='Venció';}
+      else if(cg.daysLeft<=7){sc='cg-hot';sl='⚠️ '+cg.daysLeft+'d';}
+      else if(cg.daysLeft<=14){sc='cg-warn';sl=cg.daysLeft+'d restantes';}
+      else{sc='cg-ok';sl=cg.daysLeft+'d restantes';}
+      html+='<div class="cg-card">';
+      html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">';
+      html+='<div><div class="cg-label">Comienzo Grandioso</div>';
+      html+='<div class="cg-days">'+(r.calificada?'🎉':cg.expired?'—':cg.daysLeft)+'</div>';
+      html+='<div class="cg-days-sub">'+(r.calificada?'¡Calificó!':cg.expired?'Venció':'días para calificar')+'</div></div>';
+      html+='<span class="cg-status '+sc+'">'+sl+'</span></div>';
+      html+='<div class="cg-bar-wrap"><div class="cg-bar" style="width:'+cg.pct+'%"></div></div>';
+      html+='<div class="cg-info">';
+      if(r.calificada)html+='¡Lo logró! Sigue apoyándola. 🌸';
+      else if(cg.expired)html+='El plazo venció. Motívala a seguir adelante.';
+      else html+='Pedido: <strong style="color:var(--cream)">$'+cg.pedido.toFixed(0)+'</strong> de $600.'+(cg.needed>0?' Le faltan <strong style="color:var(--warn)">$'+cg.needed.toFixed(0)+'</strong>.':'');
+      html+='</div>';
+      html+='<div class="cg-earn"><div class="cg-earn-title">💵 Lo que tú ganas cuando ella califique</div>';
+      if(r.calificada)html+='<div class="cg-earn-text">Ya ganaste tu gratificación de $50. ¡Felicidades! 🎉</div>';
+      else html+='<div class="cg-earn-text">• <strong>$50 en efectivo</strong> por desarrollo de equipo<br>• Hasta <strong>$220 en paquetes de productos</strong><br>• Sin límite de reclutas</div>';
+      html+='</div>';
+      if(r.telefono&&!r.calificada&&!cg.expired){
+        html+='<button class="cg-wa" data-tel="'+r.telefono+'" data-name="'+fullName(r)+'" data-days="'+cg.daysLeft+'" data-needed="'+cg.needed+'" onclick="waConsultora(this.dataset.tel,this.dataset.name,this.dataset.days,this.dataset.needed)">💬 Escribirle ahora</button>';
+      }
+      html+='</div>';
+    }
+    // PAUSE TOGGLE
+    html+='<div class="pause-row"><div><div style="font-size:.8rem;color:var(--text-mid);">Modo pausa</div><div style="font-size:.66rem;color:var(--text-dim);margin-top:2px;">Respeta su espacio · Sin avisos</div></div>';
+    html+='<div class="toggle'+(r.pausa?' on':'')+'" onclick="togglePausa(this.dataset.id)" data-id="'+r.id+'"></div></div>';
+  }
+
+  // DETAILS
+  var dets=[];
+  if(r.telefono)dets.push({i:'📱',l:'Teléfono',v:r.telefono});
+  if(r.email)dets.push({i:'✉️',l:'Email',v:r.email});
+  if(r.cumpleanos)dets.push({i:'🎂',l:'Cumpleaños',v:new Date(r.cumpleanos+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long'})});
+  if(r.ciudad)dets.push({i:'📍',l:'Ciudad',v:r.ciudad});
+  if(!iscons){
+    if(r.piel)dets.push({i:'🌸',l:'Tono de piel',v:r.piel});
+    if(r.tipo_piel)dets.push({i:'💧',l:'Tipo de piel',v:r.tipo_piel});
+    if(r.productos_fav)dets.push({i:'💄',l:'Productos favoritos',v:r.productos_fav});
+    if(r.fuente)dets.push({i:'📡',l:'Llegó por',v:r.fuente});
+    if(r.contacto_pref)dets.push({i:'💬',l:'Prefiere contacto',v:r.contacto_pref});
+  var callTime=getBestCallTime(r);
+  if(callTime)dets.push({i:'🕐',l:'Mejor hora para llamar',v:callTime});
+    if(r.etiquetas&&r.etiquetas.length)dets.push({i:'🏷️',l:'Profesión/Etiquetas',v:r.etiquetas.join(' · ')});
+  }else{
+    if(r.numcons)dets.push({i:'🆔',l:'Número consultora',v:'#'+r.numcons});
+    if(r.ingreso)dets.push({i:'📅',l:'Fecha ingreso',v:new Date(r.ingreso+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'})});
+  }
+  if(r.notas)dets.push({i:'📝',l:'Notas',v:r.notas,note:true});
+  dets.forEach(function(d){
+    html+='<div class="pdet"><span class="pdet-icon">'+d.i+'</span><div><div class="pdet-label">'+d.l+'</div><div class="pdet-val'+(d.note?' pdet-note':'')+'" >'+d.v+'</div></div></div>';
+  });
+
+  // ACTION BUTTONS
+  html+='<div style="padding:12px 20px 28px;display:flex;flex-direction:column;gap:9px;">';
+  if(r.telefono)html+='<a href="https://wa.me/'+r.telefono.replace(/\D/g,'')+'" target="_blank" style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;border-radius:11px;padding:12px;font-family:Jost,sans-serif;font-size:.84rem;font-weight:600;text-align:center;text-decoration:none;display:block;">💬 WhatsApp</a>';
+  html+='<a href="'+IBC_URL+'" target="_blank" style="background:var(--gold-dim);border:1px solid rgba(200,150,74,.22);color:var(--gold-light);border-radius:11px;padding:12px;font-family:Jost,sans-serif;font-size:.8rem;font-weight:600;text-align:center;text-decoration:none;display:block;">✨ Invitar a registrarse en Mary Kay</a>';
+  html+='</div>';
+
+  document.getElementById('prof-content').innerHTML=html;
+  document.getElementById('modal-prof').classList.add('open');
+}
+
+function waConsultora(tel,name,daysLeft,needed){
+  var nl=String.fromCharCode(10);
+  var msg='Hola '+name+' '+String.fromCharCode(127800)+nl+nl+'Estaba pensando en ti. ';
+  if(parseFloat(needed)>0)msg+='Con $'+parseFloat(needed).toFixed(0)+' mas en tu pedido calificas para el Comienzo Grandioso. ';
+  if(parseFloat(daysLeft)<=7&&parseFloat(daysLeft)>0)msg+='Solo quedan '+daysLeft+' dias. Tu puedes! ';
+  msg+=nl+nl+'Como te esta yendo? Aqui estoy para apoyarte. '+nl+nl+'Jenniffer - Mary Kay';
+  window.open('https://wa.me/'+tel.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+function togglePausa(id){
+  var r=records.find(function(x){return x.id===id;});if(!r)return;
+  r.pausa=!r.pausa;
+  saveLocal();syncRec(r);renderAll();closeM('modal-prof');
+  toast(r.pausa?'😴 En pausa — sin avisos':'✅ Activa de nuevo');
+}
+
+function editFromProf(id){closeM('modal-prof');setTimeout(function(){openEditModal(id);},200);}
+
+function openAddModal(){
+  editingId=null;
+  document.getElementById('form-title').textContent=currentTab==='clientas'?'Nueva clienta':'Nueva consultora';
+  document.getElementById('f-mode').value=currentTab;
+  document.getElementById('sec-clienta').style.display=currentTab==='clientas'?'block':'none';
+  document.getElementById('sec-consultora').style.display=currentTab==='consultoras'?'block':'none';
+  document.getElementById('btn-del').style.display='none';
+  clearForm();
+  document.getElementById('modal-form').classList.add('open');
+}
+
+function openEditModal(id){
+  var r=records.find(function(x){return x.id===id;});if(!r)return;
+  editingId=id;
+  var iscons=r.tipo==='consultora';
+  document.getElementById('form-title').textContent='Editar '+(iscons?'consultora':'clienta');
+  document.getElementById('f-id').value=id;
+  document.getElementById('f-mode').value=iscons?'consultoras':'clientas';
+  document.getElementById('sec-clienta').style.display=iscons?'none':'block';
+  document.getElementById('sec-consultora').style.display=iscons?'block':'none';
+  document.getElementById('btn-del').style.display='flex';
+  clearForm();
+  document.getElementById('f-nombre').value=r.nombre||'';
+  document.getElementById('f-apellido').value=r.apellido||'';
+  document.getElementById('f-tel').value=r.telefono||'';
+  document.getElementById('f-bday').value=r.cumpleanos||'';
+  document.getElementById('f-email').value=r.email||'';
+  document.getElementById('f-ciudad').value=r.ciudad||'';
+  document.getElementById('f-genero').value=r.genero||'';
+  document.getElementById('f-notas').value=r.notas||'';
+  if(!iscons){
+    document.getElementById('f-piel').value=r.piel||'';
+    document.getElementById('f-tipo-piel').value=r.tipo_piel||'';
+    document.getElementById('f-prods').value=r.productos_fav||'';
+    if(r.temperatura){document.querySelectorAll('.topt').forEach(function(t){if(t.dataset.val===r.temperatura)selTemp(t);});}
+    if(r.estado){document.querySelectorAll('#est-sel .copt').forEach(function(c){if(c.dataset.val===r.estado)c.classList.add('sel');});}
+    if(r.contacto_pref){document.querySelectorAll('#cont-sel .copt').forEach(function(c){if(c.dataset.val===r.contacto_pref)c.classList.add('sel');});}
+    if(r.fuente){document.querySelectorAll('#fuente-sel .copt').forEach(function(c){if(c.dataset.val===r.fuente)c.classList.add('sel');});}
+    if(r.etiquetas){document.querySelectorAll('#etiq-sel .copt').forEach(function(c){if(r.etiquetas.includes(c.dataset.val))c.classList.add('sel');});}
+  }else{
+    document.getElementById('f-numcons').value=r.numcons||'';
+    document.getElementById('f-ingreso').value=r.ingreso||'';
+    document.getElementById('f-pedido').value=r.pedido||'';
+  }
+  document.getElementById('modal-form').classList.add('open');
+}
+
+function clearForm(){
+  ['f-nombre','f-apellido','f-tel','f-bday','f-email','f-ciudad','f-notas',
+   'f-piel','f-tipo-piel','f-prods','f-etiq-custom','f-numcons','f-ingreso','f-pedido'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('f-genero').value='';
+  document.querySelectorAll('.topt').forEach(function(t){t.className='topt';});
+  document.querySelectorAll('.copt').forEach(function(c){c.classList.remove('sel');});
+}
+function selTemp(el){
+  document.querySelectorAll('.topt').forEach(function(t){t.className='topt';});
+  el.classList.add('sel-'+el.dataset.val);
+}
+function selOne(el,group){
+  document.querySelectorAll('#'+group+' .copt').forEach(function(c){c.classList.remove('sel');});
+  el.classList.add('sel');
+}
+function selMulti(el){el.classList.toggle('sel');}
+
+function saveRec(){
+  var nombre=document.getElementById('f-nombre').value.trim();
+  if(!nombre){toast('Escribe el nombre 🌸');return;}
+  var iscons=document.getElementById('f-mode').value==='consultoras';
+  var id=editingId||uid();
+  var r={id:id,nombre:nombre,tipo:iscons?'consultora':'clienta',
+    apellido:document.getElementById('f-apellido').value.trim(),
+    telefono:document.getElementById('f-tel').value.trim(),
+    cumpleanos:document.getElementById('f-bday').value,
+    email:document.getElementById('f-email').value.trim(),
+    ciudad:document.getElementById('f-ciudad').value.trim(),
+    genero:document.getElementById('f-genero').value,
+    notas:document.getElementById('f-notas').value.trim(),
+    fecha_registro:new Date().toISOString().split('T')[0]};
+  if(!iscons){
+    r.piel=document.getElementById('f-piel').value;
+    r.tipo_piel=document.getElementById('f-tipo-piel').value;
+    r.productos_fav=document.getElementById('f-prods').value.trim();
+    var ts=document.querySelector('.topt[class*="sel-"]');
+    r.temperatura=ts?ts.dataset.val:'';
+    var es=document.querySelector('#est-sel .copt.sel');
+    r.estado=es?es.dataset.val:'Nueva';
+    var cs=document.querySelector('#cont-sel .copt.sel');
+    r.contacto_pref=cs?cs.dataset.val:'';
+    var fs=document.querySelector('#fuente-sel .copt.sel');
+    r.fuente=fs?fs.dataset.val:'';
+    var etqs=[].slice.call(document.querySelectorAll('#etiq-sel .copt.sel')).map(function(c){return c.dataset.val;});
+    var custom=document.getElementById('f-etiq-custom').value.trim();
+    if(custom)etqs.push(custom);
+    r.etiquetas=etqs;
+  }else{
+    r.numcons=document.getElementById('f-numcons').value.trim();
+    r.ingreso=document.getElementById('f-ingreso').value;
+    r.pedido=parseFloat(document.getElementById('f-pedido').value)||0;
+    r.calificada=r.pedido>=600;
+    r.pausa=editingId?((records.find(function(x){return x.id===editingId;})||{}).pausa||false):false;
+  }
+  if(editingId){var idx=records.findIndex(function(x){return x.id===editingId;});if(idx>=0)records[idx]=r;}
+  else{records.push(r);}
+  saveLocal();syncRec(r);renderAll();closeM('modal-form');
+  toast('✅ '+nombre+' guardada');
+}
+
+function deleteRec(){
+  if(!editingId||!confirm('¿Eliminar este registro?'))return;
+  records=records.filter(function(x){return x.id!==editingId;});
+  saveLocal();
+  try{fetch(SUPA_URL+'/rest/v1/clientas?id=eq.'+editingId,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});}catch(e){}
+  renderAll();closeM('modal-form');toast('🗑 Eliminado');
+}
+
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function closeProf(){document.getElementById('modal-prof').classList.remove('open');}
+
+async function syncRec(r){
+  try{
+    await fetch(SUPA_URL+'/rest/v1/clientas?on_conflict=id',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify({id:r.id,nombre:r.nombre,apellido:r.apellido,telefono:r.telefono,
+        cumpleanos:r.cumpleanos,email:r.email,ciudad:r.ciudad,genero:r.genero,notas:r.notas,
+        tipo:r.tipo,estado:r.estado,temperatura:r.temperatura,piel:r.piel,tipo_piel:r.tipo_piel,
+        productos_fav:r.productos_fav,fuente:r.fuente,contacto_pref:r.contacto_pref,
+        etiquetas:r.etiquetas?JSON.stringify(r.etiquetas):null,
+        numcons:r.numcons,ingreso:r.ingreso,pedido:r.pedido,calificada:r.calificada,pausa:r.pausa,
+        fecha_registro:r.fecha_registro})
+    });
+  }catch(e){console.log('Offline');}
+}
+
+async function loadSupa(){
+  try{
+    var res=await fetch(SUPA_URL+'/rest/v1/clientas?select=*&order=nombre',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    var data=await res.json();
+    if(data&&data.length){
+      records=data.map(function(r){return Object.assign({},r,{etiquetas:r.etiquetas?JSON.parse(r.etiquetas):[]});});
+      saveLocal();
+    }
+  }catch(e){console.log('Offline');}
+}
+
+
+function getBestCallTime(r){
+  var etqs=r.etiquetas||[];
+  var pref=r.contacto_pref||'';
+  var isMom=etqs.includes('Madre');
+  var timeStr='';
+  if(pref==='Mañana') timeStr='☀️ Mañana · 10am-12pm';
+  else if(pref==='Tarde') timeStr='🌤 Tarde · 2pm-4pm';
+  else if(pref==='Noche') timeStr='🌙 Noche · después 7pm';
+  else if(isMom) timeStr='👶 10am-12pm (niños en escuela) · o después 3pm';
+  else timeStr='📊 Martes-Jueves · 10am-11am (mayor tasa de respuesta)';
+  return timeStr;
+}
+
+async function init(){
+  loadLocal();renderFilters();renderAll();
+  document.getElementById('app').style.opacity='1';
+  document.getElementById('loader').classList.add('gone');
+  if(navigator.onLine){await loadSupa();renderAll();}
+}
+window.addEventListener('online',function(){loadSupa().then(function(){renderAll();});});
+init();
+</script>
+</body>
+</html>
