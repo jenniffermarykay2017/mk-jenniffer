@@ -219,7 +219,7 @@ padding-top:10px; border-top:1px solid rgba(255,255,255,.06); }
 .vol-label { font-size:.6rem; color:var(–text-dim); }
 .vol-slider { flex:1; accent-color:var(–gold); cursor:pointer; }
 
-.loader.gone{opacity:0;pointer-events:none;transition:opacity .35s ease .15s;}
+.loader.gone{opacity:0;pointer-events:none;transition:opacity .35s ease .15s;visibility:hidden;}
 </style>
 
 </head>
@@ -891,10 +891,20 @@ banner.innerHTML=html;
 }
 
 async function init(){
+// Always show app immediately from localStorage
 loadLocal();renderFilters();renderAll();renderTodayBanner();renderBdayBannerCRM();
 document.getElementById(‘app’).style.opacity=‘1’;
 document.getElementById(‘loader’).classList.add(‘gone’);
-if(navigator.onLine){await loadSupa();renderAll();renderTodayBanner();renderBdayBannerCRM();}
+// Try Supabase in background — never blocks the UI
+if(navigator.onLine){
+try{
+await Promise.race([
+loadSupa(),
+new Promise(function(r){setTimeout(r,5000);}) // 5s timeout
+]);
+renderAll();renderTodayBanner();renderBdayBannerCRM();
+}catch(e){console.log(‘Sync error’,e);}
+}
 }
 window.addEventListener(‘online’,function(){loadSupa().then(function(){renderAll();renderTodayBanner();renderBdayBannerCRM();});});
 init();
