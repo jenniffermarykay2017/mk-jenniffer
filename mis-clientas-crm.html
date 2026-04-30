@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -185,43 +184,42 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
 
 /* MUSIC PLAYER */
 .music-btn {
-position:fixed; bottom:80px; right:16px; z-index:100;
-width:42px; height:42px; border-radius:50%;
-background:rgba(200,150,74,.15); border:1px solid rgba(200,150,74,.3);
-display:flex; align-items:center; justify-content:center;
-cursor:pointer; transition:all .3s ease; font-size:1.1rem;
-backdrop-filter:blur(8px);
+  position:fixed; bottom:80px; right:16px; z-index:100;
+  width:42px; height:42px; border-radius:50%;
+  background:rgba(200,150,74,.15); border:1px solid rgba(200,150,74,.3);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .3s ease; font-size:1.1rem;
+  backdrop-filter:blur(8px);
 }
 .music-btn:hover { background:rgba(200,150,74,.25); transform:scale(1.08); }
-.music-btn.playing { background:rgba(200,150,74,.2); border-color:var(–gold);
-box-shadow:0 0 16px rgba(200,150,74,.25); animation:musicPulse 2s ease infinite; }
+.music-btn.playing { background:rgba(200,150,74,.2); border-color:var(--gold);
+  box-shadow:0 0 16px rgba(200,150,74,.25); animation:musicPulse 2s ease infinite; }
 @keyframes musicPulse { 0%,100%{box-shadow:0 0 8px rgba(200,150,74,.2)} 50%{box-shadow:0 0 20px rgba(200,150,74,.4)} }
 
 .music-panel {
-position:fixed; bottom:132px; right:16px; z-index:100;
-background:rgba(18,8,15,.96); border:1px solid rgba(200,150,74,.2);
-border-radius:16px; padding:14px 16px; width:200px;
-display:none; backdrop-filter:blur(16px);
-animation:fadeUp .25s ease;
+  position:fixed; bottom:132px; right:16px; z-index:100;
+  background:rgba(18,8,15,.96); border:1px solid rgba(200,150,74,.2);
+  border-radius:16px; padding:14px 16px; width:200px;
+  display:none; backdrop-filter:blur(16px);
+  animation:fadeUp .25s ease;
 }
 .music-panel.show { display:block; }
 .music-panel-title { font-size:.56rem; letter-spacing:3px; text-transform:uppercase;
-color:var(–gold); margin-bottom:12px; }
+  color:var(--gold); margin-bottom:12px; }
 .freq-opt { display:flex; align-items:center; gap:10px; padding:8px 10px;
-border-radius:10px; cursor:pointer; transition:all .22s; margin-bottom:4px; }
+  border-radius:10px; cursor:pointer; transition:all .22s; margin-bottom:4px; }
 .freq-opt:hover { background:rgba(200,150,74,.08); }
 .freq-opt.active { background:rgba(200,150,74,.12); border:1px solid rgba(200,150,74,.2); }
 .freq-icon { font-size:.9rem; width:20px; text-align:center; }
-.freq-name { font-size:.75rem; color:var(–cream); font-weight:500; }
-.freq-desc { font-size:.6rem; color:var(–text-dim); margin-top:1px; }
+.freq-name { font-size:.75rem; color:var(--cream); font-weight:500; }
+.freq-desc { font-size:.6rem; color:var(--text-dim); margin-top:1px; }
 .vol-row { display:flex; align-items:center; gap:8px; margin-top:10px;
-padding-top:10px; border-top:1px solid rgba(255,255,255,.06); }
-.vol-label { font-size:.6rem; color:var(–text-dim); }
-.vol-slider { flex:1; accent-color:var(–gold); cursor:pointer; }
+  padding-top:10px; border-top:1px solid rgba(255,255,255,.06); }
+.vol-label { font-size:.6rem; color:var(--text-dim); }
+.vol-slider { flex:1; accent-color:var(--gold); cursor:pointer; }
 
 .loader.gone{opacity:0;pointer-events:none;transition:opacity .35s ease .15s;visibility:hidden;}
 </style>
-
 </head>
 <body>
 <div class="amb"></div>
@@ -252,7 +250,6 @@ padding-top:10px; border-top:1px solid rgba(255,255,255,.06); }
 </div>
 
 <!-- MODAL FORM -->
-
 <div class="moverlay" id="modal-form" onclick="if(event.target===this)closeM('modal-form')">
   <div class="modal">
     <div class="mhandle"></div>
@@ -288,118 +285,114 @@ padding-top:10px; border-top:1px solid rgba(255,255,255,.06); }
         </div>
       </div>
 
-```
-  <div id="sec-clienta">
-    <div class="fsec">Perfil de clienta</div>
-    <div class="frow2">
-      <div><label class="flabel">Tono de piel</label>
-        <select class="fselect" id="f-piel">
-          <option value="">— Selecciona —</option>
-          <option>Clara/Fair</option><option>Media/Medium</option><option>Oscura/Deep</option>
-        </select>
+      <div id="sec-clienta">
+        <div class="fsec">Perfil de clienta</div>
+        <div class="frow2">
+          <div><label class="flabel">Tono de piel</label>
+            <select class="fselect" id="f-piel">
+              <option value="">— Selecciona —</option>
+              <option>Clara/Fair</option><option>Media/Medium</option><option>Oscura/Deep</option>
+            </select>
+          </div>
+          <div><label class="flabel">Tipo de piel</label>
+            <select class="fselect" id="f-tipo-piel">
+              <option value="">— Selecciona —</option>
+              <option>Normal</option><option>Seca</option><option>Grasa</option><option>Mixta</option><option>Sensible</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow1"><label class="flabel">Productos favoritos</label>
+          <input class="finput" id="f-prods" placeholder="ej: TimeWise, CC Cream..."></div>
+
+        <div class="fsec">Temperatura</div>
+        <div class="temp-row">
+          <div class="topt" data-val="hot" onclick="selTemp(this)">🔥<br><span style="font-size:.6rem">Lista ya</span></div>
+          <div class="topt" data-val="warm" onclick="selTemp(this)">🌡️<br><span style="font-size:.6rem">Interesada</span></div>
+          <div class="topt" data-val="cold" onclick="selTemp(this)">❄️<br><span style="font-size:.6rem">Fría</span></div>
+        </div>
+
+        <div class="fsec">Estado</div>
+        <div class="chip-row" id="est-sel">
+          <div class="copt" data-val="VIP" onclick="selOne(this,'est-sel')">⭐ VIP</div>
+          <div class="copt" data-val="Frecuente" onclick="selOne(this,'est-sel')">💗 Frecuente</div>
+          <div class="copt" data-val="Nueva" onclick="selOne(this,'est-sel')">🌸 Nueva</div>
+          <div class="copt" data-val="Prospecto" onclick="selOne(this,'est-sel')">💎 Prospecto</div>
+          <div class="copt" data-val="Inactiva" onclick="selOne(this,'est-sel')">💤 Inactiva</div>
+        </div>
+
+        <div class="fsec">Prefiere contacto</div>
+        <div class="chip-row" id="cont-sel">
+          <div class="copt" data-val="WhatsApp" onclick="selOne(this,'cont-sel')">💬 WhatsApp</div>
+          <div class="copt" data-val="Llamada" onclick="selOne(this,'cont-sel')">📞 Llamada</div>
+          <div class="copt" data-val="Email" onclick="selOne(this,'cont-sel')">✉️ Email</div>
+          <div class="copt" data-val="Mañana" onclick="selOne(this,'cont-sel')">☀️ Mañana</div>
+          <div class="copt" data-val="Tarde" onclick="selOne(this,'cont-sel')">🌤 Tarde</div>
+          <div class="copt" data-val="Noche" onclick="selOne(this,'cont-sel')">🌙 Noche</div>
+        </div>
+
+        <div class="fsec">Etiquetas · Profesión</div>
+        <div class="chip-row" id="etiq-sel">
+          <div class="copt" data-val="Secretaria" onclick="selMulti(this)">Secretaria</div>
+          <div class="copt" data-val="Enfermera" onclick="selMulti(this)">Enfermera</div>
+          <div class="copt" data-val="Maestra" onclick="selMulti(this)">Maestra</div>
+          <div class="copt" data-val="Médico" onclick="selMulti(this)">Médico</div>
+          <div class="copt" data-val="Farmacéutica" onclick="selMulti(this)">Farmacéutica</div>
+          <div class="copt" data-val="Abogada" onclick="selMulti(this)">Abogada</div>
+          <div class="copt" data-val="Radioaficionada" onclick="selMulti(this)">Radioaficionada</div>
+          <div class="copt" data-val="Fotógrafa" onclick="selMulti(this)">Fotógrafa</div>
+          <div class="copt" data-val="Chef" onclick="selMulti(this)">Chef</div>
+          <div class="copt" data-val="Contable" onclick="selMulti(this)">Contable</div>
+          <div class="copt" data-val="Estilista" onclick="selMulti(this)">Estilista</div>
+          <div class="copt" data-val="Periodista" onclick="selMulti(this)">Periodista</div>
+          <div class="copt" data-val="Psicóloga" onclick="selMulti(this)">Psicóloga</div>
+          <div class="copt" data-val="Militar" onclick="selMulti(this)">Militar</div>
+          <div class="copt" data-val="Madre" onclick="selMulti(this)">Madre</div>
+        </div>
+        <div class="frow1" style="margin-top:6px;">
+          <label class="flabel">Otra profesión (se añade como etiqueta)</label>
+          <input class="finput" id="f-etiq-custom" placeholder="ej: Bombera, Pastora, Atleta...">
+        </div>
+
+        <div class="fsec">¿Cómo llegó?</div>
+        <div class="chip-row" id="fuente-sel">
+          <div class="copt" data-val="Facebook" onclick="selOne(this,'fuente-sel')">Facebook</div>
+          <div class="copt" data-val="TikTok" onclick="selOne(this,'fuente-sel')">TikTok</div>
+          <div class="copt" data-val="Referido" onclick="selOne(this,'fuente-sel')">Referido</div>
+          <div class="copt" data-val="Quiz piel" onclick="selOne(this,'fuente-sel')">Quiz piel</div>
+          <div class="copt" data-val="Quiz labiales" onclick="selOne(this,'fuente-sel')">Quiz labiales</div>
+          <div class="copt" data-val="WhatsApp" onclick="selOne(this,'fuente-sel')">WhatsApp</div>
+          <div class="copt" data-val="Evento" onclick="selOne(this,'fuente-sel')">Evento</div>
+          <div class="copt" data-val="Zoom" onclick="selOne(this,'fuente-sel')">Zoom</div>
+        </div>
       </div>
-      <div><label class="flabel">Tipo de piel</label>
-        <select class="fselect" id="f-tipo-piel">
-          <option value="">— Selecciona —</option>
-          <option>Normal</option><option>Seca</option><option>Grasa</option><option>Mixta</option><option>Sensible</option>
-        </select>
+
+      <div id="sec-consultora" style="display:none;">
+        <div class="fsec">Datos de consultora</div>
+        <div class="frow2">
+          <div><label class="flabel">Número consultora</label><input class="finput" id="f-numcons" placeholder="ej: MK-12345"></div>
+          <div><label class="flabel">Fecha de ingreso</label><input class="finput" id="f-ingreso" type="date"></div>
+        </div>
+        <div class="frow1"><label class="flabel">Pedido inicial realizado ($)</label>
+          <input class="finput" id="f-pedido" type="number" placeholder="0" min="0" step="10">
+        </div>
+        <div style="background:var(--gold-dim);border:1px solid rgba(200,150,74,.2);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Comienzo Grandioso</div>
+          <div style="font-size:.76rem;color:rgba(255,255,255,.65);line-height:1.6;">Necesita $600+ en los primeros 3 meses para calificar.<br>Cuando califica, tú ganas <strong style="color:var(--gold-light);">$50 en efectivo</strong> y hasta <strong style="color:var(--gold-light);">$220 en productos</strong>.</div>
+        </div>
       </div>
-    </div>
-    <div class="frow1"><label class="flabel">Productos favoritos</label>
-      <input class="finput" id="f-prods" placeholder="ej: TimeWise, CC Cream..."></div>
 
-    <div class="fsec">Temperatura</div>
-    <div class="temp-row">
-      <div class="topt" data-val="hot" onclick="selTemp(this)">🔥<br><span style="font-size:.6rem">Lista ya</span></div>
-      <div class="topt" data-val="warm" onclick="selTemp(this)">🌡️<br><span style="font-size:.6rem">Interesada</span></div>
-      <div class="topt" data-val="cold" onclick="selTemp(this)">❄️<br><span style="font-size:.6rem">Fría</span></div>
+      <div class="fsec">Quién es ella · Notas privadas</div>
+      <textarea class="ftextarea" id="f-notas" placeholder="Su historia, lo que la motiva, si está en pausa y cuándo puede volver...&#10;&#10;Este espacio es solo tuyo."></textarea>
     </div>
-
-    <div class="fsec">Estado</div>
-    <div class="chip-row" id="est-sel">
-      <div class="copt" data-val="VIP" onclick="selOne(this,'est-sel')">⭐ VIP</div>
-      <div class="copt" data-val="Frecuente" onclick="selOne(this,'est-sel')">💗 Frecuente</div>
-      <div class="copt" data-val="Nueva" onclick="selOne(this,'est-sel')">🌸 Nueva</div>
-      <div class="copt" data-val="Prospecto" onclick="selOne(this,'est-sel')">💎 Prospecto</div>
-      <div class="copt" data-val="Inactiva" onclick="selOne(this,'est-sel')">💤 Inactiva</div>
+    <div class="mfoot">
+      <button class="btn-del" id="btn-del" onclick="deleteRec()" style="display:none">🗑</button>
+      <button class="btn-can" onclick="closeM('modal-form')">Cancelar</button>
+      <button class="btn-save" onclick="saveRec()">💾 Guardar</button>
     </div>
-
-    <div class="fsec">Prefiere contacto</div>
-    <div class="chip-row" id="cont-sel">
-      <div class="copt" data-val="WhatsApp" onclick="selOne(this,'cont-sel')">💬 WhatsApp</div>
-      <div class="copt" data-val="Llamada" onclick="selOne(this,'cont-sel')">📞 Llamada</div>
-      <div class="copt" data-val="Email" onclick="selOne(this,'cont-sel')">✉️ Email</div>
-      <div class="copt" data-val="Mañana" onclick="selOne(this,'cont-sel')">☀️ Mañana</div>
-      <div class="copt" data-val="Tarde" onclick="selOne(this,'cont-sel')">🌤 Tarde</div>
-      <div class="copt" data-val="Noche" onclick="selOne(this,'cont-sel')">🌙 Noche</div>
-    </div>
-
-    <div class="fsec">Etiquetas · Profesión</div>
-    <div class="chip-row" id="etiq-sel">
-      <div class="copt" data-val="Secretaria" onclick="selMulti(this)">Secretaria</div>
-      <div class="copt" data-val="Enfermera" onclick="selMulti(this)">Enfermera</div>
-      <div class="copt" data-val="Maestra" onclick="selMulti(this)">Maestra</div>
-      <div class="copt" data-val="Médico" onclick="selMulti(this)">Médico</div>
-      <div class="copt" data-val="Farmacéutica" onclick="selMulti(this)">Farmacéutica</div>
-      <div class="copt" data-val="Abogada" onclick="selMulti(this)">Abogada</div>
-      <div class="copt" data-val="Radioaficionada" onclick="selMulti(this)">Radioaficionada</div>
-      <div class="copt" data-val="Fotógrafa" onclick="selMulti(this)">Fotógrafa</div>
-      <div class="copt" data-val="Chef" onclick="selMulti(this)">Chef</div>
-      <div class="copt" data-val="Contable" onclick="selMulti(this)">Contable</div>
-      <div class="copt" data-val="Estilista" onclick="selMulti(this)">Estilista</div>
-      <div class="copt" data-val="Periodista" onclick="selMulti(this)">Periodista</div>
-      <div class="copt" data-val="Psicóloga" onclick="selMulti(this)">Psicóloga</div>
-      <div class="copt" data-val="Militar" onclick="selMulti(this)">Militar</div>
-      <div class="copt" data-val="Madre" onclick="selMulti(this)">Madre</div>
-    </div>
-    <div class="frow1" style="margin-top:6px;">
-      <label class="flabel">Otra profesión (se añade como etiqueta)</label>
-      <input class="finput" id="f-etiq-custom" placeholder="ej: Bombera, Pastora, Atleta...">
-    </div>
-
-    <div class="fsec">¿Cómo llegó?</div>
-    <div class="chip-row" id="fuente-sel">
-      <div class="copt" data-val="Facebook" onclick="selOne(this,'fuente-sel')">Facebook</div>
-      <div class="copt" data-val="TikTok" onclick="selOne(this,'fuente-sel')">TikTok</div>
-      <div class="copt" data-val="Referido" onclick="selOne(this,'fuente-sel')">Referido</div>
-      <div class="copt" data-val="Quiz piel" onclick="selOne(this,'fuente-sel')">Quiz piel</div>
-      <div class="copt" data-val="Quiz labiales" onclick="selOne(this,'fuente-sel')">Quiz labiales</div>
-      <div class="copt" data-val="WhatsApp" onclick="selOne(this,'fuente-sel')">WhatsApp</div>
-      <div class="copt" data-val="Evento" onclick="selOne(this,'fuente-sel')">Evento</div>
-      <div class="copt" data-val="Zoom" onclick="selOne(this,'fuente-sel')">Zoom</div>
-    </div>
-  </div>
-
-  <div id="sec-consultora" style="display:none;">
-    <div class="fsec">Datos de consultora</div>
-    <div class="frow2">
-      <div><label class="flabel">Número consultora</label><input class="finput" id="f-numcons" placeholder="ej: MK-12345"></div>
-      <div><label class="flabel">Fecha de ingreso</label><input class="finput" id="f-ingreso" type="date"></div>
-    </div>
-    <div class="frow1"><label class="flabel">Pedido inicial realizado ($)</label>
-      <input class="finput" id="f-pedido" type="number" placeholder="0" min="0" step="10">
-    </div>
-    <div style="background:var(--gold-dim);border:1px solid rgba(200,150,74,.2);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
-      <div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Comienzo Grandioso</div>
-      <div style="font-size:.76rem;color:rgba(255,255,255,.65);line-height:1.6;">Necesita $600+ en los primeros 3 meses para calificar.<br>Cuando califica, tú ganas <strong style="color:var(--gold-light);">$50 en efectivo</strong> y hasta <strong style="color:var(--gold-light);">$220 en productos</strong>.</div>
-    </div>
-  </div>
-
-  <div class="fsec">Quién es ella · Notas privadas</div>
-  <textarea class="ftextarea" id="f-notas" placeholder="Su historia, lo que la motiva, si está en pausa y cuándo puede volver...&#10;&#10;Este espacio es solo tuyo."></textarea>
-</div>
-<div class="mfoot">
-  <button class="btn-del" id="btn-del" onclick="deleteRec()" style="display:none">🗑</button>
-  <button class="btn-can" onclick="closeM('modal-form')">Cancelar</button>
-  <button class="btn-save" onclick="saveRec()">💾 Guardar</button>
-</div>
-```
-
   </div>
 </div>
 
 <!-- MODAL PROFILE -->
-
 <div class="moverlay" id="modal-prof" onclick="if(event.target===this)closeM('modal-prof')">
   <div class="modal"><div class="mhandle"></div><div id="prof-content"></div></div>
 </div>
@@ -608,310 +601,307 @@ function openProf(id){
     prodSection = '<div style="margin:0 20px 8px;">'
       + '<div style="font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:14px 0 10px;display:flex;align-items:center;gap:8px;">Productos que usa<span style="flex:1;height:1px;background:rgba(200,150,74,.15);display:block;"></span></div>'
       + '<textarea id="prod-usa-'+r.id+'" placeholder="ej: TimeWise Miracle Set, CC Cream Beige 1..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;color:var(--text);font-family:Jost,sans-serif;font-size:.82rem;outline:none;resize:none;min-height:64px;line-height:1.6;">'+(r.productos_usa||r.productos_fav||'')+'</textarea>'
+      + '<div style="font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:14px 0 10px;display:flex;align-items:center;gap:8px;">Muestras dadas<span style="flex:1;height:1px;background:rgba(200,150,74,.15);display:block;"></span></div>'
+      + '<textarea id="muestras-'+r.id+'" placeholder="ej: Muestra TimeWise 3D 12/mar, Fragancia Illuminea 15/mar..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;color:var(--text);font-family:Jost,sans-serif;font-size:.82rem;outline:none;resize:none;min-height:64px;line-height:1.6;">'+(r.muestras||'')+'</textarea>'
+      + '<button data-sid="'+r.id+'" onclick="saveProdsAndSamples(this.dataset.sid)" style="width:100%;background:var(--rose);color:white;border:none;border-radius:10px;padding:11px;font-family:Jost,sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;margin-top:8px;">💾 Guardar productos y muestras</button>'
+      + '</div>';
+  }
+  dets.forEach(function(d){
+    html+='<div class="pdet"><span class="pdet-icon">'+d.i+'</span><div><div class="pdet-label">'+d.l+'</div><div class="pdet-val'+(d.note?' pdet-note':'')+'" >'+d.v+'</div></div></div>';
+  });
 
-```
-  + '<div style="font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:14px 0 10px;display:flex;align-items:center;gap:8px;">Muestras dadas<span style="flex:1;height:1px;background:rgba(200,150,74,.15);display:block;"></span></div>'
-  + '<textarea id="muestras-'+r.id+'" placeholder="ej: Muestra TimeWise 3D 12/mar, Fragancia Illuminea 15/mar..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;color:var(--text);font-family:Jost,sans-serif;font-size:.82rem;outline:none;resize:none;min-height:64px;line-height:1.6;">'+(r.muestras||'')+'</textarea>'
-  + '<button data-sid="'+r.id+'" onclick="saveProdsAndSamples(this.dataset.sid)" style="width:100%;background:var(--rose);color:white;border:none;border-radius:10px;padding:11px;font-family:Jost,sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;margin-top:8px;">💾 Guardar productos y muestras</button>'
-  + '</div>';
-```
+  // ACTION BUTTONS
+  html += prodSection;
+  // Maps button if address exists
+  if(r.direccion){
+    var mapsQuery=encodeURIComponent((r.direccion||'')+', '+(r.ciudad||'')+', Puerto Rico '+(r.cp||''));
+    html+='<div style="padding:8px 20px 0;">'
+      +'<a href="https://www.google.com/maps/search/?api=1&query='+mapsQuery+'" target="_blank" '
+      +'style="display:flex;align-items:center;gap:10px;background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.25);'
+      +'color:#7ab3f8;border-radius:11px;padding:12px 16px;text-decoration:none;font-family:Jost,sans-serif;font-size:.82rem;font-weight:500;">'
+      +'<span style="font-size:1rem;">📍</span>'
+      +'<div><div style="font-weight:600;margin-bottom:1px;">Ver en Google Maps</div>'
+      +'<div style="font-size:.68rem;opacity:.7;">'+r.direccion+(r.ciudad?', '+r.ciudad:'')+'</div></div>'
+      +'<span style="margin-left:auto;font-size:.8rem;opacity:.6;">→</span>'
+      +'</a></div>';
+  }
+  html+='<div style="padding:12px 20px 28px;display:flex;flex-direction:column;gap:9px;">';
+  if(r.telefono)html+='<a href="https://wa.me/'+r.telefono.replace(/\D/g,'')+'" target="_blank" style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;border-radius:11px;padding:12px;font-family:Jost,sans-serif;font-size:.84rem;font-weight:600;text-align:center;text-decoration:none;display:block;">💬 WhatsApp</a>';
+  html+='<a href="'+IBC_URL+'" target="_blank" style="background:var(--gold-dim);border:1px solid rgba(200,150,74,.22);color:var(--gold-light);border-radius:11px;padding:12px;font-family:Jost,sans-serif;font-size:.8rem;font-weight:600;text-align:center;text-decoration:none;display:block;">✨ Invitar a registrarse en Mary Kay</a>';
+  html+='</div>';
 
-}
-dets.forEach(function(d){
-html+=’<div class="pdet"><span class="pdet-icon">’+d.i+’</span><div><div class="pdet-label">’+d.l+’</div><div class="pdet-val'+(d.note?' pdet-note':'')+'" >’+d.v+’</div></div></div>’;
-});
-
-// ACTION BUTTONS
-html += prodSection;
-// Maps button if address exists
-if(r.direccion){
-var mapsQuery=encodeURIComponent((r.direccion||’’)+’, ‘+(r.ciudad||’’)+’, Puerto Rico ‘+(r.cp||’’));
-html+=’<div style="padding:8px 20px 0;">’
-+’<a href=“https://www.google.com/maps/search/?api=1&query=’+mapsQuery+’” target=”_blank” ’
-+‘style=“display:flex;align-items:center;gap:10px;background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.25);’
-+‘color:#7ab3f8;border-radius:11px;padding:12px 16px;text-decoration:none;font-family:Jost,sans-serif;font-size:.82rem;font-weight:500;”>’
-+’<span style="font-size:1rem;">📍</span>’
-+’<div><div style="font-weight:600;margin-bottom:1px;">Ver en Google Maps</div>’
-+’<div style="font-size:.68rem;opacity:.7;">’+r.direccion+(r.ciudad?’, ‘+r.ciudad:’’)+’</div></div>’
-+’<span style="margin-left:auto;font-size:.8rem;opacity:.6;">→</span>’
-+’</a></div>’;
-}
-html+=’<div style="padding:12px 20px 28px;display:flex;flex-direction:column;gap:9px;">’;
-if(r.telefono)html+=’<a href="https://wa.me/'+r.telefono.replace(/\D/g,'')+'" target="_blank" style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;border-radius:11px;padding:12px;font-family:Jost,sans-serif;font-size:.84rem;font-weight:600;text-align:center;text-decoration:none;display:block;">💬 WhatsApp</a>’;
-html+=’<a href="'+IBC_URL+'" target="_blank" style="background:var(--gold-dim);border:1px solid rgba(200,150,74,.22);color:var(--gold-light);border-radius:11px;padding:12px;font-family:Jost,sans-serif;font-size:.8rem;font-weight:600;text-align:center;text-decoration:none;display:block;">✨ Invitar a registrarse en Mary Kay</a>’;
-html+=’</div>’;
-
-document.getElementById(‘prof-content’).innerHTML=html;
-document.getElementById(‘modal-prof’).classList.add(‘open’);
+  document.getElementById('prof-content').innerHTML=html;
+  document.getElementById('modal-prof').classList.add('open');
 }
 
 function waConsultora(tel,name,daysLeft,needed){
-var nl=String.fromCharCode(10);
-var msg=’Hola ‘+name+’ ’+String.fromCharCode(127800)+nl+nl+‘Estaba pensando en ti. ‘;
-if(parseFloat(needed)>0)msg+=‘Con $’+parseFloat(needed).toFixed(0)+’ mas en tu pedido calificas para el Comienzo Grandioso. ‘;
-if(parseFloat(daysLeft)<=7&&parseFloat(daysLeft)>0)msg+=‘Solo quedan ‘+daysLeft+’ dias. Tu puedes! ‘;
-msg+=nl+nl+‘Como te esta yendo? Aqui estoy para apoyarte. ‘+nl+nl+‘Jenniffer - Mary Kay’;
-window.open(‘https://wa.me/’+tel.replace(/[^0-9]/g,’’)+’?text=’+encodeURIComponent(msg),’_blank’);
+  var nl=String.fromCharCode(10);
+  var msg='Hola '+name+' '+String.fromCharCode(127800)+nl+nl+'Estaba pensando en ti. ';
+  if(parseFloat(needed)>0)msg+='Con $'+parseFloat(needed).toFixed(0)+' mas en tu pedido calificas para el Comienzo Grandioso. ';
+  if(parseFloat(daysLeft)<=7&&parseFloat(daysLeft)>0)msg+='Solo quedan '+daysLeft+' dias. Tu puedes! ';
+  msg+=nl+nl+'Como te esta yendo? Aqui estoy para apoyarte. '+nl+nl+'Jenniffer - Mary Kay';
+  window.open('https://wa.me/'+tel.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(msg),'_blank');
 }
 
 function togglePausa(id){
-var r=records.find(function(x){return x.id===id;});if(!r)return;
-r.pausa=!r.pausa;
-saveLocal();syncRec(r);renderAll();closeM(‘modal-prof’);
-toast(r.pausa?‘😴 En pausa — sin avisos’:‘✅ Activa de nuevo’);
+  var r=records.find(function(x){return x.id===id;});if(!r)return;
+  r.pausa=!r.pausa;
+  saveLocal();syncRec(r);renderAll();closeM('modal-prof');
+  toast(r.pausa?'😴 En pausa — sin avisos':'✅ Activa de nuevo');
 }
 
-function editFromProf(id){closeM(‘modal-prof’);setTimeout(function(){openEditModal(id);},200);}
+function editFromProf(id){closeM('modal-prof');setTimeout(function(){openEditModal(id);},200);}
 
 function openAddModal(){
-editingId=null;
-document.getElementById(‘form-title’).textContent=currentTab===‘clientas’?‘Nueva clienta’:‘Nueva consultora’;
-document.getElementById(‘f-mode’).value=currentTab;
-document.getElementById(‘sec-clienta’).style.display=currentTab===‘clientas’?‘block’:‘none’;
-document.getElementById(‘sec-consultora’).style.display=currentTab===‘consultoras’?‘block’:‘none’;
-document.getElementById(‘btn-del’).style.display=‘none’;
-clearForm();
-document.getElementById(‘modal-form’).classList.add(‘open’);
+  editingId=null;
+  document.getElementById('form-title').textContent=currentTab==='clientas'?'Nueva clienta':'Nueva consultora';
+  document.getElementById('f-mode').value=currentTab;
+  document.getElementById('sec-clienta').style.display=currentTab==='clientas'?'block':'none';
+  document.getElementById('sec-consultora').style.display=currentTab==='consultoras'?'block':'none';
+  document.getElementById('btn-del').style.display='none';
+  clearForm();
+  document.getElementById('modal-form').classList.add('open');
 }
 
 function openEditModal(id){
-var r=records.find(function(x){return x.id===id;});if(!r)return;
-editingId=id;
-var iscons=r.tipo===‘consultora’;
-document.getElementById(‘form-title’).textContent=‘Editar ‘+(iscons?‘consultora’:‘clienta’);
-document.getElementById(‘f-id’).value=id;
-document.getElementById(‘f-mode’).value=iscons?‘consultoras’:‘clientas’;
-document.getElementById(‘sec-clienta’).style.display=iscons?‘none’:‘block’;
-document.getElementById(‘sec-consultora’).style.display=iscons?‘block’:‘none’;
-document.getElementById(‘btn-del’).style.display=‘flex’;
-clearForm();
-document.getElementById(‘f-nombre’).value=r.nombre||’’;
-document.getElementById(‘f-apellido’).value=r.apellido||’’;
-document.getElementById(‘f-tel’).value=r.telefono||’’;
-document.getElementById(‘f-bday’).value=r.cumpleanos||’’;
-document.getElementById(‘f-email’).value=r.email||’’;
-document.getElementById(‘f-ciudad’).value=r.ciudad||’’;
-var cpEl=document.getElementById(‘f-cp’);if(cpEl)cpEl.value=r.cp||’’;
-var dirEl=document.getElementById(‘f-direccion’);if(dirEl)dirEl.value=r.direccion||’’;
-document.getElementById(‘f-genero’).value=r.genero||’’;
-document.getElementById(‘f-notas’).value=r.notas||’’;
-if(!iscons){
-document.getElementById(‘f-piel’).value=r.piel||’’;
-document.getElementById(‘f-tipo-piel’).value=r.tipo_piel||’’;
-document.getElementById(‘f-prods’).value=r.productos_fav||’’;
-if(r.temperatura){document.querySelectorAll(’.topt’).forEach(function(t){if(t.dataset.val===r.temperatura)selTemp(t);});}
-if(r.estado){document.querySelectorAll(’#est-sel .copt’).forEach(function(c){if(c.dataset.val===r.estado)c.classList.add(‘sel’);});}
-if(r.contacto_pref){document.querySelectorAll(’#cont-sel .copt’).forEach(function(c){if(c.dataset.val===r.contacto_pref)c.classList.add(‘sel’);});}
-if(r.fuente){document.querySelectorAll(’#fuente-sel .copt’).forEach(function(c){if(c.dataset.val===r.fuente)c.classList.add(‘sel’);});}
-if(r.etiquetas){document.querySelectorAll(’#etiq-sel .copt’).forEach(function(c){if(r.etiquetas.includes(c.dataset.val))c.classList.add(‘sel’);});}
-}else{
-document.getElementById(‘f-numcons’).value=r.numcons||’’;
-document.getElementById(‘f-ingreso’).value=r.ingreso||’’;
-document.getElementById(‘f-pedido’).value=r.pedido||’’;
-}
-document.getElementById(‘modal-form’).classList.add(‘open’);
+  var r=records.find(function(x){return x.id===id;});if(!r)return;
+  editingId=id;
+  var iscons=r.tipo==='consultora';
+  document.getElementById('form-title').textContent='Editar '+(iscons?'consultora':'clienta');
+  document.getElementById('f-id').value=id;
+  document.getElementById('f-mode').value=iscons?'consultoras':'clientas';
+  document.getElementById('sec-clienta').style.display=iscons?'none':'block';
+  document.getElementById('sec-consultora').style.display=iscons?'block':'none';
+  document.getElementById('btn-del').style.display='flex';
+  clearForm();
+  document.getElementById('f-nombre').value=r.nombre||'';
+  document.getElementById('f-apellido').value=r.apellido||'';
+  document.getElementById('f-tel').value=r.telefono||'';
+  document.getElementById('f-bday').value=r.cumpleanos||'';
+  document.getElementById('f-email').value=r.email||'';
+  document.getElementById('f-ciudad').value=r.ciudad||'';
+  var cpEl=document.getElementById('f-cp');if(cpEl)cpEl.value=r.cp||'';
+  var dirEl=document.getElementById('f-direccion');if(dirEl)dirEl.value=r.direccion||'';
+  document.getElementById('f-genero').value=r.genero||'';
+  document.getElementById('f-notas').value=r.notas||'';
+  if(!iscons){
+    document.getElementById('f-piel').value=r.piel||'';
+    document.getElementById('f-tipo-piel').value=r.tipo_piel||'';
+    document.getElementById('f-prods').value=r.productos_fav||'';
+    if(r.temperatura){document.querySelectorAll('.topt').forEach(function(t){if(t.dataset.val===r.temperatura)selTemp(t);});}
+    if(r.estado){document.querySelectorAll('#est-sel .copt').forEach(function(c){if(c.dataset.val===r.estado)c.classList.add('sel');});}
+    if(r.contacto_pref){document.querySelectorAll('#cont-sel .copt').forEach(function(c){if(c.dataset.val===r.contacto_pref)c.classList.add('sel');});}
+    if(r.fuente){document.querySelectorAll('#fuente-sel .copt').forEach(function(c){if(c.dataset.val===r.fuente)c.classList.add('sel');});}
+    if(r.etiquetas){document.querySelectorAll('#etiq-sel .copt').forEach(function(c){if(r.etiquetas.includes(c.dataset.val))c.classList.add('sel');});}
+  }else{
+    document.getElementById('f-numcons').value=r.numcons||'';
+    document.getElementById('f-ingreso').value=r.ingreso||'';
+    document.getElementById('f-pedido').value=r.pedido||'';
+  }
+  document.getElementById('modal-form').classList.add('open');
 }
 
 function clearForm(){
-[‘f-nombre’,‘f-apellido’,‘f-tel’,‘f-bday’,‘f-email’,‘f-ciudad’,‘f-cp’,‘f-direccion’,‘f-notas’,
-‘f-piel’,‘f-tipo-piel’,‘f-prods’,‘f-etiq-custom’,‘f-numcons’,‘f-ingreso’,‘f-pedido’].forEach(function(id){
-var el=document.getElementById(id);if(el)el.value=’’;
-});
-document.getElementById(‘f-genero’).value=’’;
-document.querySelectorAll(’.topt’).forEach(function(t){t.className=‘topt’;});
-document.querySelectorAll(’.copt’).forEach(function(c){c.classList.remove(‘sel’);});
+  ['f-nombre','f-apellido','f-tel','f-bday','f-email','f-ciudad','f-cp','f-direccion','f-notas',
+   'f-piel','f-tipo-piel','f-prods','f-etiq-custom','f-numcons','f-ingreso','f-pedido'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('f-genero').value='';
+  document.querySelectorAll('.topt').forEach(function(t){t.className='topt';});
+  document.querySelectorAll('.copt').forEach(function(c){c.classList.remove('sel');});
 }
 function selTemp(el){
-document.querySelectorAll(’.topt’).forEach(function(t){t.className=‘topt’;});
-el.classList.add(‘sel-’+el.dataset.val);
+  document.querySelectorAll('.topt').forEach(function(t){t.className='topt';});
+  el.classList.add('sel-'+el.dataset.val);
 }
 function selOne(el,group){
-document.querySelectorAll(’#’+group+’ .copt’).forEach(function(c){c.classList.remove(‘sel’);});
-el.classList.add(‘sel’);
+  document.querySelectorAll('#'+group+' .copt').forEach(function(c){c.classList.remove('sel');});
+  el.classList.add('sel');
 }
-function selMulti(el){el.classList.toggle(‘sel’);}
+function selMulti(el){el.classList.toggle('sel');}
 
 function saveRec(){
-var nombre=document.getElementById(‘f-nombre’).value.trim();
-if(!nombre){toast(‘Escribe el nombre 🌸’);return;}
-var iscons=document.getElementById(‘f-mode’).value===‘consultoras’;
-var id=editingId||uid();
-var r={id:id,nombre:nombre,tipo:iscons?‘consultora’:‘clienta’,
-apellido:document.getElementById(‘f-apellido’).value.trim(),
-telefono:document.getElementById(‘f-tel’).value.trim(),
-cumpleanos:document.getElementById(‘f-bday’).value,
-email:document.getElementById(‘f-email’).value.trim(),
-ciudad:document.getElementById(‘f-ciudad’).value.trim(),
-cp:(document.getElementById(‘f-cp’)||{value:’’}).value.trim(),
-direccion:(document.getElementById(‘f-direccion’)||{value:’’}).value.trim(),
-genero:document.getElementById(‘f-genero’).value,
-notas:document.getElementById(‘f-notas’).value.trim(),
-fecha_registro:new Date().toISOString().split(‘T’)[0]};
-if(!iscons){
-r.piel=document.getElementById(‘f-piel’).value;
-r.tipo_piel=document.getElementById(‘f-tipo-piel’).value;
-r.productos_fav=document.getElementById(‘f-prods’).value.trim();
-var ts=document.querySelector(’.topt[class*=“sel-”]’);
-r.temperatura=ts?ts.dataset.val:’’;
-var es=document.querySelector(’#est-sel .copt.sel’);
-r.estado=es?es.dataset.val:‘Nueva’;
-var cs=document.querySelector(’#cont-sel .copt.sel’);
-r.contacto_pref=cs?cs.dataset.val:’’;
-var fs=document.querySelector(’#fuente-sel .copt.sel’);
-r.fuente=fs?fs.dataset.val:’’;
-var etqs=[].slice.call(document.querySelectorAll(’#etiq-sel .copt.sel’)).map(function(c){return c.dataset.val;});
-var custom=document.getElementById(‘f-etiq-custom’).value.trim();
-if(custom)etqs.push(custom);
-r.etiquetas=etqs;
-}else{
-r.numcons=document.getElementById(‘f-numcons’).value.trim();
-r.ingreso=document.getElementById(‘f-ingreso’).value;
-r.pedido=parseFloat(document.getElementById(‘f-pedido’).value)||0;
-r.calificada=r.pedido>=600;
-r.pausa=editingId?((records.find(function(x){return x.id===editingId;})||{}).pausa||false):false;
-}
-if(editingId){var idx=records.findIndex(function(x){return x.id===editingId;});if(idx>=0)records[idx]=r;}
-else{records.push(r);}
-saveLocal();syncRec(r);renderAll();closeM(‘modal-form’);
-toast(‘✅ ‘+nombre+’ guardada’);
+  var nombre=document.getElementById('f-nombre').value.trim();
+  if(!nombre){toast('Escribe el nombre 🌸');return;}
+  var iscons=document.getElementById('f-mode').value==='consultoras';
+  var id=editingId||uid();
+  var r={id:id,nombre:nombre,tipo:iscons?'consultora':'clienta',
+    apellido:document.getElementById('f-apellido').value.trim(),
+    telefono:document.getElementById('f-tel').value.trim(),
+    cumpleanos:document.getElementById('f-bday').value,
+    email:document.getElementById('f-email').value.trim(),
+    ciudad:document.getElementById('f-ciudad').value.trim(),
+    cp:(document.getElementById('f-cp')||{value:''}).value.trim(),
+    direccion:(document.getElementById('f-direccion')||{value:''}).value.trim(),
+    genero:document.getElementById('f-genero').value,
+    notas:document.getElementById('f-notas').value.trim(),
+    fecha_registro:new Date().toISOString().split('T')[0]};
+  if(!iscons){
+    r.piel=document.getElementById('f-piel').value;
+    r.tipo_piel=document.getElementById('f-tipo-piel').value;
+    r.productos_fav=document.getElementById('f-prods').value.trim();
+    var ts=document.querySelector('.topt[class*="sel-"]');
+    r.temperatura=ts?ts.dataset.val:'';
+    var es=document.querySelector('#est-sel .copt.sel');
+    r.estado=es?es.dataset.val:'Nueva';
+    var cs=document.querySelector('#cont-sel .copt.sel');
+    r.contacto_pref=cs?cs.dataset.val:'';
+    var fs=document.querySelector('#fuente-sel .copt.sel');
+    r.fuente=fs?fs.dataset.val:'';
+    var etqs=[].slice.call(document.querySelectorAll('#etiq-sel .copt.sel')).map(function(c){return c.dataset.val;});
+    var custom=document.getElementById('f-etiq-custom').value.trim();
+    if(custom)etqs.push(custom);
+    r.etiquetas=etqs;
+  }else{
+    r.numcons=document.getElementById('f-numcons').value.trim();
+    r.ingreso=document.getElementById('f-ingreso').value;
+    r.pedido=parseFloat(document.getElementById('f-pedido').value)||0;
+    r.calificada=r.pedido>=600;
+    r.pausa=editingId?((records.find(function(x){return x.id===editingId;})||{}).pausa||false):false;
+  }
+  if(editingId){var idx=records.findIndex(function(x){return x.id===editingId;});if(idx>=0)records[idx]=r;}
+  else{records.push(r);}
+  saveLocal();syncRec(r);renderAll();closeM('modal-form');
+  toast('✅ '+nombre+' guardada');
 }
 
 function deleteRec(){
-if(!editingId||!confirm(’¿Eliminar este registro?’))return;
-records=records.filter(function(x){return x.id!==editingId;});
-saveLocal();
-try{fetch(SUPA_URL+’/rest/v1/clientas?id=eq.’+editingId,{method:‘DELETE’,headers:{‘apikey’:SUPA_KEY,‘Authorization’:’Bearer ’+SUPA_KEY}});}catch(e){}
-renderAll();closeM(‘modal-form’);toast(‘🗑 Eliminado’);
+  if(!editingId||!confirm('¿Eliminar este registro?'))return;
+  records=records.filter(function(x){return x.id!==editingId;});
+  saveLocal();
+  try{fetch(SUPA_URL+'/rest/v1/clientas?id=eq.'+editingId,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});}catch(e){}
+  renderAll();closeM('modal-form');toast('🗑 Eliminado');
 }
 
-function closeM(id){document.getElementById(id).classList.remove(‘open’);}
-function closeProf(){document.getElementById(‘modal-prof’).classList.remove(‘open’);}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function closeProf(){document.getElementById('modal-prof').classList.remove('open');}
 
 async function syncRec(r){
-try{
-await fetch(SUPA_URL+’/rest/v1/clientas?on_conflict=id’,{
-method:‘POST’,
-headers:{‘apikey’:SUPA_KEY,‘Authorization’:’Bearer ’+SUPA_KEY,‘Content-Type’:‘application/json’,‘Prefer’:‘return=representation’},
-body:JSON.stringify({id:r.id,nombre:r.nombre,apellido:r.apellido,telefono:r.telefono,
-cumpleanos:r.cumpleanos,email:r.email,ciudad:r.ciudad,genero:r.genero,notas:r.notas,
-tipo:r.tipo,estado:r.estado,temperatura:r.temperatura,piel:r.piel,tipo_piel:r.tipo_piel,
-productos_fav:r.productos_fav,fuente:r.fuente,contacto_pref:r.contacto_pref,
-etiquetas:r.etiquetas?JSON.stringify(r.etiquetas):null,
-numcons:r.numcons,ingreso:r.ingreso,pedido:r.pedido,calificada:r.calificada,pausa:r.pausa,
-fecha_registro:r.fecha_registro})
-});
-}catch(e){console.log(‘Offline’);}
+  try{
+    await fetch(SUPA_URL+'/rest/v1/clientas?on_conflict=id',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify({id:r.id,nombre:r.nombre,apellido:r.apellido,telefono:r.telefono,
+        cumpleanos:r.cumpleanos,email:r.email,ciudad:r.ciudad,genero:r.genero,notas:r.notas,
+        tipo:r.tipo,estado:r.estado,temperatura:r.temperatura,piel:r.piel,tipo_piel:r.tipo_piel,
+        productos_fav:r.productos_fav,fuente:r.fuente,contacto_pref:r.contacto_pref,
+        etiquetas:r.etiquetas?JSON.stringify(r.etiquetas):null,
+        numcons:r.numcons,ingreso:r.ingreso,pedido:r.pedido,calificada:r.calificada,pausa:r.pausa,
+        fecha_registro:r.fecha_registro})
+    });
+  }catch(e){console.log('Offline');}
 }
 
 async function loadSupa(){
-try{
-var res=await fetch(SUPA_URL+’/rest/v1/clientas?select=*&order=nombre’,{headers:{‘apikey’:SUPA_KEY,‘Authorization’:’Bearer ’+SUPA_KEY}});
-var data=await res.json();
-if(data&&data.length){
-records=data.map(function(r){return Object.assign({},r,{etiquetas:r.etiquetas?JSON.parse(r.etiquetas):[]});});
-saveLocal();
+  try{
+    var res=await fetch(SUPA_URL+'/rest/v1/clientas?select=*&order=nombre',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    var data=await res.json();
+    if(data&&data.length){
+      records=data.map(function(r){return Object.assign({},r,{etiquetas:r.etiquetas?JSON.parse(r.etiquetas):[]});});
+      saveLocal();
+    }
+  }catch(e){console.log('Offline');}
 }
-}catch(e){console.log(‘Offline’);}
-}
+
 
 function getBestCallTime(r){
-var etqs=r.etiquetas||[];
-var pref=r.contacto_pref||’’;
-var isMom=etqs.includes(‘Madre’);
-var timeStr=’’;
-if(pref===‘Mañana’) timeStr=‘☀️ Mañana · 10am-12pm’;
-else if(pref===‘Tarde’) timeStr=‘🌤 Tarde · 2pm-4pm’;
-else if(pref===‘Noche’) timeStr=‘🌙 Noche · después 7pm’;
-else if(isMom) timeStr=‘👶 10am-12pm (niños en escuela) · o después 3pm’;
-else timeStr=‘📊 Martes-Jueves · 10am-11am (mayor tasa de respuesta)’;
-return timeStr;
+  var etqs=r.etiquetas||[];
+  var pref=r.contacto_pref||'';
+  var isMom=etqs.includes('Madre');
+  var timeStr='';
+  if(pref==='Mañana') timeStr='☀️ Mañana · 10am-12pm';
+  else if(pref==='Tarde') timeStr='🌤 Tarde · 2pm-4pm';
+  else if(pref==='Noche') timeStr='🌙 Noche · después 7pm';
+  else if(isMom) timeStr='👶 10am-12pm (niños en escuela) · o después 3pm';
+  else timeStr='📊 Martes-Jueves · 10am-11am (mayor tasa de respuesta)';
+  return timeStr;
 }
 
+
 function saveProdsAndSamples(id){
-var r=records.find(function(x){return x.id===id;});if(!r)return;
-var usaEl=document.getElementById(‘prod-usa-’+id);
-var muEl=document.getElementById(‘muestras-’+id);
-if(usaEl) r.productos_usa=usaEl.value;
-if(muEl) r.muestras=muEl.value;
-saveLocal();syncRec(r);
-toast(‘✅ Guardado’);
+  var r=records.find(function(x){return x.id===id;});if(!r)return;
+  var usaEl=document.getElementById('prod-usa-'+id);
+  var muEl=document.getElementById('muestras-'+id);
+  if(usaEl) r.productos_usa=usaEl.value;
+  if(muEl) r.muestras=muEl.value;
+  saveLocal();syncRec(r);
+  toast('✅ Guardado');
 }
 
 function renderTodayBanner(){
-var today=new Date().toISOString().split(‘T’)[0];
-var tom=new Date();tom.setDate(tom.getDate()+1);
-var tomStr=tom.toISOString().split(‘T’)[0];
-var fups=[];
-try{fups=JSON.parse(localStorage.getItem(‘mk_followups’)||’[]’);}catch(e){}
-var overdue=fups.filter(function(f){return !f.done&&f.due<today;});
-var todayF=fups.filter(function(f){return !f.done&&f.due===today;});
-var tomF=fups.filter(function(f){return !f.done&&f.due===tomStr;});
-var banner=document.getElementById(‘today-banner’);
-if(!banner)return;
-var all=[].concat(overdue,todayF,tomF);
-if(!all.length){banner.style.display=‘none’;return;}
-banner.style.display=‘block’;
-var html=’<div style="font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--warn);margin-bottom:10px;">⏰ Pendientes hoy · ‘+all.length+’</div>’;
-html+=all.slice(0,3).map(function(f){
-var isOv=f.due<today;
-var badge=isOv?’<span style="font-size:.6rem;background:rgba(224,80,80,.2);color:#f09090;padding:2px 8px;border-radius:8px;">Vencido</span>’:’<span style="font-size:.6rem;background:rgba(224,160,80,.18);color:#f0c080;padding:2px 8px;border-radius:8px;">Hoy</span>’;
-return ‘<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);">’
-+’<div><div style="font-size:.82rem;color:var(--cream);font-weight:500;">’+f.clientName+’</div>’
-+’<div style="font-size:.68rem;color:var(--text-dim);">’+(f.label||‘Seguimiento’)+’</div></div>’
-+badge+’</div>’;
-}).join(’’);
-if(all.length>3)html+=’<div style="font-size:.68rem;color:var(--text-dim);margin-top:6px;">+ ‘+(all.length-3)+’ más…</div>’;
-banner.innerHTML=html;
+  var today=new Date().toISOString().split('T')[0];
+  var tom=new Date();tom.setDate(tom.getDate()+1);
+  var tomStr=tom.toISOString().split('T')[0];
+  var fups=[];
+  try{fups=JSON.parse(localStorage.getItem('mk_followups')||'[]');}catch(e){}
+  var overdue=fups.filter(function(f){return !f.done&&f.due<today;});
+  var todayF=fups.filter(function(f){return !f.done&&f.due===today;});
+  var tomF=fups.filter(function(f){return !f.done&&f.due===tomStr;});
+  var banner=document.getElementById('today-banner');
+  if(!banner)return;
+  var all=[].concat(overdue,todayF,tomF);
+  if(!all.length){banner.style.display='none';return;}
+  banner.style.display='block';
+  var html='<div style="font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--warn);margin-bottom:10px;">⏰ Pendientes hoy · '+all.length+'</div>';
+  html+=all.slice(0,3).map(function(f){
+    var isOv=f.due<today;
+    var badge=isOv?'<span style="font-size:.6rem;background:rgba(224,80,80,.2);color:#f09090;padding:2px 8px;border-radius:8px;">Vencido</span>':'<span style="font-size:.6rem;background:rgba(224,160,80,.18);color:#f0c080;padding:2px 8px;border-radius:8px;">Hoy</span>';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);">'
+      +'<div><div style="font-size:.82rem;color:var(--cream);font-weight:500;">'+f.clientName+'</div>'
+      +'<div style="font-size:.68rem;color:var(--text-dim);">'+(f.label||'Seguimiento')+'</div></div>'
+      +badge+'</div>';
+  }).join('');
+  if(all.length>3)html+='<div style="font-size:.68rem;color:var(--text-dim);margin-top:6px;">+ '+(all.length-3)+' más...</div>';
+  banner.innerHTML=html;
 }
 
 function renderBdayBannerCRM(){
-var today=new Date();
-var thisMonth=today.getMonth()+1;
-var todayDay=today.getDate();
-var bdays=records.filter(function(r){
-if(!r.cumpleanos)return false;
-var p=r.cumpleanos.split(’-’);
-return parseInt(p[1])===thisMonth;
-}).map(function(r){
-var day=parseInt((r.cumpleanos.split(’-’)[2])||0);
-return {name:((r.nombre||’’)+’ ‘+(r.apellido||’’)).trim(),day:day,isToday:day===todayDay};
-}).sort(function(a,b){return a.day-b.day;});
-var banner=document.getElementById(‘bday-banner’);
-if(!banner||!bdays.length){if(banner)banner.style.display=‘none’;return;}
-banner.style.display=‘block’;
-var html=’<div style="font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">🎂 Cumpleaños este mes · ‘+bdays.length+’</div>’;
-html+=bdays.slice(0,3).map(function(b){
-return ‘<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);">’
-+’<div style="font-size:.82rem;color:var(--cream);">’+b.name+’</div>’
-+’<span style="font-size:.68rem;color:'+(b.isToday?'var(--gold)':'var(--text-dim)')+';">’+(b.isToday?‘🎂 Hoy’:‘Día ‘+b.day)+’</span>’
-+’</div>’;
-}).join(’’);
-if(bdays.length>3)html+=’<div style="font-size:.68rem;color:var(--text-dim);margin-top:6px;">+ ‘+(bdays.length-3)+’ más…</div>’;
-banner.innerHTML=html;
+  var today=new Date();
+  var thisMonth=today.getMonth()+1;
+  var todayDay=today.getDate();
+  var bdays=records.filter(function(r){
+    if(!r.cumpleanos)return false;
+    var p=r.cumpleanos.split('-');
+    return parseInt(p[1])===thisMonth;
+  }).map(function(r){
+    var day=parseInt((r.cumpleanos.split('-')[2])||0);
+    return {name:((r.nombre||'')+' '+(r.apellido||'')).trim(),day:day,isToday:day===todayDay};
+  }).sort(function(a,b){return a.day-b.day;});
+  var banner=document.getElementById('bday-banner');
+  if(!banner||!bdays.length){if(banner)banner.style.display='none';return;}
+  banner.style.display='block';
+  var html='<div style="font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">🎂 Cumpleaños este mes · '+bdays.length+'</div>';
+  html+=bdays.slice(0,3).map(function(b){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);">'
+      +'<div style="font-size:.82rem;color:var(--cream);">'+b.name+'</div>'
+      +'<span style="font-size:.68rem;color:'+(b.isToday?'var(--gold)':'var(--text-dim)')+';">'+(b.isToday?'🎂 Hoy':'Día '+b.day)+'</span>'
+      +'</div>';
+  }).join('');
+  if(bdays.length>3)html+='<div style="font-size:.68rem;color:var(--text-dim);margin-top:6px;">+ '+(bdays.length-3)+' más...</div>';
+  banner.innerHTML=html;
 }
 
 async function init(){
-// Always show app immediately from localStorage
-loadLocal();renderFilters();renderAll();renderTodayBanner();renderBdayBannerCRM();
-document.getElementById(‘app’).style.opacity=‘1’;
-document.getElementById(‘loader’).classList.add(‘gone’);
-// Try Supabase in background — never blocks the UI
-if(navigator.onLine){
-try{
-await Promise.race([
-loadSupa(),
-new Promise(function(r){setTimeout(r,5000);}) // 5s timeout
-]);
-renderAll();renderTodayBanner();renderBdayBannerCRM();
-}catch(e){console.log(‘Sync error’,e);}
+  // Always show app immediately from localStorage
+  loadLocal();renderFilters();renderAll();renderTodayBanner();renderBdayBannerCRM();
+  document.getElementById('app').style.opacity='1';
+  document.getElementById('loader').classList.add('gone');
+  // Try Supabase in background — never blocks the UI
+  if(navigator.onLine){
+    try{
+      await Promise.race([
+        loadSupa(),
+        new Promise(function(r){setTimeout(r,5000);}) // 5s timeout
+      ]);
+      renderAll();renderTodayBanner();renderBdayBannerCRM();
+    }catch(e){console.log('Sync error',e);}
+  }
 }
-}
-window.addEventListener(‘online’,function(){loadSupa().then(function(){renderAll();renderTodayBanner();renderBdayBannerCRM();});});
+window.addEventListener('online',function(){loadSupa().then(function(){renderAll();renderTodayBanner();renderBdayBannerCRM();});});
 init();
 </script>
 
 <!-- MUSIC PLAYER -->
-
 <button class="music-btn" id="music-btn" onclick="toggleMusicPanel()" title="Música de enfoque">
   🎵
 </button>
