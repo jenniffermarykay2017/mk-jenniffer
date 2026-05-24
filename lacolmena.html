@@ -236,6 +236,7 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
     <button class="tab on" id="tc" onclick="ctab('c')">👥 Clientas</button>
     <button class="tab" id="te" onclick="ctab('e')">⭐ Equipo</button>
   </div>
+  <button id="sync-btn" onclick="syncTodas()" style="width:100%;background:linear-gradient(135deg,rgba(200,150,74,.15),rgba(196,83,106,.08));border:1px solid rgba(200,150,74,.3);border-radius:12px;padding:11px;color:var(--gl);font-family:'Jost',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;margin-bottom:10px;display:none">☁️ Subir mis clientas a la nube</button>
   <div class="srow"><span class="sico">🔍</span><input class="sinp" id="csearch" placeholder="Buscar..." oninput="renderC()"></div>
   <div class="chips" id="chips"></div>
   <div id="clist"></div>
@@ -1021,7 +1022,60 @@ async function seedFragancias(){
 
 /* SUPABASE */
 async function syncRec(r){try{await fetch(S+'/rest/v1/clientas?on_conflict=id',{method:'POST',headers:{apikey:K,'Authorization':'Bearer '+K,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify({id:r.id,nombre:r.nombre,apellido:r.apellido,telefono:r.telefono,cumpleanos:r.cumpleanos,email:r.email,ciudad:r.ciudad,notas:r.notas,tipo:r.tipo,estado:r.estado,temperatura:r.temperatura,piel:r.piel,tipo_piel:r.tipo_piel,productos_fav:r.productos_fav,fuente:r.fuente,contacto_pref:r.contacto_pref,etiquetas:r.etiquetas?JSON.stringify(r.etiquetas):null,numcons:r.numcons,ingreso:r.ingreso,pedido:r.pedido,calificada:r.calificada,pausa:r.pausa,cp:r.cp,direccion:r.direccion,fecha_registro:r.fecha_registro})});}catch(e){console.log('Offline');}}
-async function loadSupa(){try{var res=await fetch(S+'/rest/v1/clientas?select=*&order=nombre',{headers:{apikey:K,'Authorization':'Bearer '+K}});var data=await res.json();if(data&&data.length){recs=data.map(function(r){return Object.assign({},r,{etiquetas:r.etiquetas?JSON.parse(r.etiquetas):[]});});sv('mk_clients',recs);}document.getElementById('sdot').className='sdot ok';}catch(e){document.getElementById('sdot').className='sdot off';}}
+async function syncTodas(){
+  if(!recs.length){toast('No hay clientas en este dispositivo');return;}
+  var btn=document.getElementById('sync-btn');
+  btn.textContent='☁️ Subiendo...';btn.disabled=true;
+  var ok=0,err=0;
+  for(var i=0;i<recs.length;i++){
+    try{
+      await fetch(S+'/rest/v1/clientas?on_conflict=id',{
+        method:'POST',
+        headers:{apikey:K,'Authorization':'Bearer '+K,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({
+          id:recs[i].id,nombre:recs[i].nombre,apellido:recs[i].apellido,
+          telefono:recs[i].telefono,cumpleanos:recs[i].cumpleanos,
+          email:recs[i].email,ciudad:recs[i].ciudad,notas:recs[i].notas,
+          tipo:recs[i].tipo,estado:recs[i].estado,temperatura:recs[i].temperatura,
+          piel:recs[i].piel,tipo_piel:recs[i].tipo_piel,productos_fav:recs[i].productos_fav,
+          fuente:recs[i].fuente,contacto_pref:recs[i].contacto_pref,
+          etiquetas:recs[i].etiquetas?JSON.stringify(recs[i].etiquetas):null,
+          numcons:recs[i].numcons,ingreso:recs[i].ingreso,pedido:recs[i].pedido,
+          calificada:recs[i].calificada,pausa:recs[i].pausa,cp:recs[i].cp,
+          direccion:recs[i].direccion,fecha_registro:recs[i].fecha_registro
+        })
+      });
+      ok++;
+    }catch(e){err++;}
+  }
+  btn.textContent='☁️ Subir mis clientas a la nube';
+  btn.disabled=false;
+  if(err===0){
+    toast('✅ '+ok+' clientas subidas a la nube');
+    btn.style.display='none';
+    document.getElementById('sdot').className='sdot ok';
+  } else {
+    toast('⚠️ '+ok+' subidas, '+err+' fallaron');
+  }
+}
+
+async function loadSupa(){
+  try{
+    var res=await fetch(S+'/rest/v1/clientas?select=*&order=nombre',{headers:{apikey:K,'Authorization':'Bearer '+K}});
+    var data=await res.json();
+    if(data&&data.length){
+      recs=data.map(function(r){return Object.assign({},r,{etiquetas:r.etiquetas?JSON.parse(r.etiquetas):[]});});
+      sv('mk_clients',recs);
+      document.getElementById('sync-btn').style.display='none';
+    } else if(recs.length){
+      // Hay clientas local pero Supabase está vacío — mostrar botón de sync
+      document.getElementById('sync-btn').style.display='block';
+    }
+    document.getElementById('sdot').className='sdot ok';
+  }catch(e){
+    document.getElementById('sdot').className='sdot off';
+  }
+}
 
 /* ── PRODUCTOS desde Supabase ── */
 async function loadProductos(){
