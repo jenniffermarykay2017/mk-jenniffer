@@ -2,1008 +2,710 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>JI · Mis Clientas</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Mis Clientas · Jenniffer MK</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --ink:#0e0609;--deep:#18080f;--surface:rgba(255,255,255,.05);--surface2:rgba(255,255,255,.09);
-  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
-  --rose:#c4536a;--rose-dim:rgba(196,83,106,.14);--gold:#c8964a;--gold-light:#e8b870;
-  --gold-dim:rgba(200,150,74,.12);--cream:#f8f0ea;
-  --text:rgba(255,255,255,.88);--text-mid:rgba(255,255,255,.54);--text-dim:rgba(255,255,255,.3);
-  --ok:#5db87a;--warn:#e0a050;--hot:#e05050;--cool:#5090d0;--pause:#7878a0;
+  --ink:#100a0e;--deep:#1a0f16;
+  --s:rgba(255,240,235,.04);--s2:rgba(255,240,235,.08);
+  --b:rgba(255,220,200,.08);--b2:rgba(255,220,200,.14);
+  --rose:#c9617a;--rdim:rgba(201,97,122,.14);
+  --gold:#c8964a;--gl:#e8b870;--gdim:rgba(200,150,74,.12);
+  --cream:#f8f0ea;
+  --tx:rgba(255,255,255,.88);--txm:rgba(255,255,255,.54);--txd:rgba(255,255,255,.3);
+  --ok:#5db87a;--warn:#e0a050;--hot:#e05050;--cool:#5090d0;--pause:#7878a0
 }
-html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:var(--ink);color:var(--text);}
+html,body{height:100%;overflow:hidden;font-family:'Jost',sans-serif;background:var(--ink);color:var(--tx)}
 .amb{position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 60% 40% at 15% 10%,rgba(196,83,106,.07) 0%,transparent 60%),
-             radial-gradient(ellipse 50% 40% at 85% 85%,rgba(200,150,74,.05) 0%,transparent 55%);}
-.app{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;overflow:hidden;}
-.topbar{flex-shrink:0;background:rgba(14,6,9,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
-.topbar-main{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;}
-.page-title{font-family:"Cormorant Garamond",serif;font-size:1.12rem;font-style:italic;color:var(--cream);flex:1;}
-.btn-add{background:var(--rose);color:white;border:none;border-radius:20px;padding:8px 16px;
-  font-family:"Jost",sans-serif;font-size:.76rem;font-weight:500;cursor:pointer;transition:background .22s;white-space:nowrap;}
-.btn-add:hover{background:#a83d52;}
-.tabs{display:flex;border-bottom:1px solid var(--border);}
-.tab{flex:1;padding:9px 4px;font-size:.65rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--text-dim);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all .22s;
-  background:none;border-top:none;border-left:none;border-right:none;font-family:"Jost",sans-serif;}
-.tab.active{color:var(--rose);border-bottom-color:var(--rose);}
-.search-row{padding:10px 16px 6px;position:relative;}
-.search-inp{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:28px;
-  padding:10px 16px 10px 38px;color:var(--text);font-family:"Jost",sans-serif;font-size:.86rem;outline:none;transition:border-color .22s;}
-.search-inp::placeholder{color:var(--text-dim);}
-.search-inp:focus{border-color:rgba(196,83,106,.4);background:rgba(196,83,106,.05);}
-.search-ico{position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:.8rem;opacity:.32;}
-.chips{display:flex;gap:7px;padding:0 16px 8px;overflow-x:auto;scrollbar-width:none;}
-.chips::-webkit-scrollbar{display:none;}
-.chip{flex-shrink:0;background:var(--surface);border:1px solid var(--border);border-radius:18px;
-  padding:5px 12px;font-size:.67rem;font-weight:500;cursor:pointer;color:var(--text-dim);transition:all .22s;}
-.chip.on{background:var(--rose-dim);border-color:var(--rose);color:var(--cream);}
-.chip:hover{border-color:var(--border2);color:var(--text);}
-.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 16px 90px;-webkit-overflow-scrolling:touch;}
-.scroll::-webkit-scrollbar{display:none;}
-.slabel{font-size:.52rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);
-  padding:12px 0 8px;display:flex;align-items:center;gap:8px;}
-.slabel::after{content:"";flex:1;height:1px;background:rgba(200,150,74,.15);}
-.clist{display:flex;flex-direction:column;gap:8px;}
-.ccard{background:var(--surface);border:1px solid var(--border);border-radius:15px;
-  padding:13px 13px 13px 16px;cursor:pointer;transition:all .25s;
-  display:flex;align-items:center;gap:11px;position:relative;overflow:hidden;}
-.ccard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:var(--cc,var(--rose));border-radius:3px 0 0 3px;}
-.ccard:hover{background:var(--surface2);transform:translateX(2px);border-color:var(--border2);}
-.ccard.paused{opacity:.55;}
-.avatar{width:42px;height:42px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-family:"Cormorant Garamond",serif;font-size:1rem;font-weight:500;color:var(--cream);
-  background:var(--av,linear-gradient(135deg,#5c1a2a,#2d0f1a));position:relative;}
-.bday-ring{position:absolute;inset:-2px;border-radius:50%;
-  border:2px solid var(--gold);animation:ringPulse 2s ease infinite;}
-@keyframes ringPulse{0%,100%{opacity:.45}50%{opacity:1}}
-.cbody{flex:1;min-width:0;}
-.cname{font-size:.88rem;font-weight:600;color:var(--cream);margin-bottom:3px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cmeta{font-size:.68rem;color:var(--text-dim);margin-bottom:5px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ctags{display:flex;gap:5px;flex-wrap:wrap;}
-.tag{font-size:.58rem;font-weight:600;letter-spacing:.5px;padding:2px 8px;border-radius:8px;text-transform:uppercase;}
-.t-vip{background:rgba(200,150,74,.18);color:var(--gold-light);border:1px solid rgba(200,150,74,.25);}
-.t-freq{background:rgba(196,83,106,.18);color:#f0a0b0;border:1px solid rgba(196,83,106,.25);}
-.t-nueva{background:rgba(93,184,122,.14);color:#90e8a8;border:1px solid rgba(93,184,122,.2);}
-.t-prosp{background:rgba(80,144,208,.14);color:#a0c8f8;border:1px solid rgba(80,144,208,.2);}
-.t-inact{background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid var(--border);}
-.t-cons{background:rgba(200,150,74,.2);color:var(--gold-light);border:1px solid rgba(200,150,74,.3);}
-.t-pause{background:rgba(120,120,160,.15);color:var(--pause);border:1px solid rgba(120,120,160,.2);}
-.wa-mini{background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2);color:#5de870;
-  border-radius:16px;padding:4px 10px;font-size:.64rem;font-weight:600;cursor:pointer;text-decoration:none;flex-shrink:0;}
-.empty{text-align:center;padding:48px 20px;}
-.empty-ico{font-size:2.4rem;margin-bottom:12px;opacity:.35;}
-.empty-txt{font-size:.8rem;color:var(--text-dim);line-height:1.7;max-width:240px;margin:0 auto;}
-.moverlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
-  display:none;align-items:flex-end;justify-content:center;}
-.moverlay.open{display:flex;}
-.modal{background:var(--deep);border:1px solid var(--border2);border-radius:24px 24px 0 0;
-  width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .32s cubic-bezier(.4,0,.2,1);}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.mhandle{width:36px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:14px auto 0;}
-.mhead{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--border);}
-.mtitle{font-family:"Cormorant Garamond",serif;font-size:1.05rem;font-style:italic;color:var(--cream);}
-.mclose{background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;padding:4px;}
-.mbody{padding:18px 20px;}
-.mfoot{padding:14px 20px 24px;border-top:1px solid var(--border);display:flex;gap:9px;}
-.fsec{font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);
-  margin:18px 0 12px;display:flex;align-items:center;gap:8px;}
-.fsec::after{content:"";flex:1;height:1px;background:rgba(200,150,74,.18);}
-.frow2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.frow1{margin-bottom:10px;}
-.flabel{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:5px;}
-.finput{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;
-  padding:11px 13px;color:var(--text);font-family:"Jost",sans-serif;font-size:.86rem;outline:none;transition:border-color .22s;}
-.finput::placeholder{color:rgba(255,255,255,.2);}
-.finput:focus{border-color:rgba(196,83,106,.5);background:rgba(196,83,106,.05);}
-.fselect{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;
-  padding:11px 13px;color:var(--text);font-family:"Jost",sans-serif;font-size:.86rem;outline:none;-webkit-appearance:none;cursor:pointer;}
-.fselect option{background:var(--deep);}
-.ftextarea{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;
-  padding:11px 13px;color:var(--text);font-family:"Jost",sans-serif;font-size:.86rem;
-  outline:none;resize:none;min-height:90px;line-height:1.6;}
-.ftextarea::placeholder{color:rgba(255,255,255,.2);}
-.ftextarea:focus{border-color:rgba(196,83,106,.5);}
-.chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
-.copt{background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  padding:6px 13px;font-size:.7rem;cursor:pointer;color:var(--text-dim);transition:all .22s;}
-.copt.sel{background:var(--rose-dim);border-color:var(--rose);color:var(--cream);}
-.copt:hover{border-color:var(--border2);color:var(--text);}
-.temp-row{display:flex;gap:8px;margin-bottom:10px;}
-.topt{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:10px 8px;font-size:.72rem;text-align:center;cursor:pointer;transition:all .22s;color:var(--text-dim);}
-.topt.sel-hot{background:rgba(224,80,80,.15);border-color:var(--hot);color:#f09090;}
-.topt.sel-warm{background:rgba(224,160,80,.15);border-color:var(--warn);color:#f0c080;}
-.topt.sel-cold{background:rgba(80,144,208,.15);border-color:var(--cool);color:#a0c8f8;}
-.btn-save{flex:2;background:var(--rose);color:white;border:none;border-radius:11px;
-  padding:13px;font-family:"Jost",sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:background .22s;}
-.btn-save:hover{background:#a83d52;}
-.btn-del{flex:1;background:rgba(200,80,80,.1);color:#f08080;border:1px solid rgba(200,80,80,.22);
-  border-radius:11px;padding:13px;font-family:"Jost",sans-serif;font-size:.85rem;cursor:pointer;transition:all .22s;}
-.btn-can{flex:1;background:var(--surface);color:var(--text-dim);border:1px solid var(--border);
-  border-radius:11px;padding:13px;font-family:"Jost",sans-serif;font-size:.85rem;cursor:pointer;transition:all .22s;}
-.cg-card{background:linear-gradient(135deg,rgba(200,150,74,.12),rgba(196,83,106,.07));
-  border:1px solid rgba(200,150,74,.22);border-radius:14px;padding:16px 18px;margin:16px 20px 0;}
-.cg-label{font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
-.cg-days{font-family:"Cormorant Garamond",serif;font-size:1.6rem;color:var(--cream);line-height:1;}
-.cg-days-sub{font-size:.64rem;color:var(--text-dim);margin-top:2px;}
-.cg-bar-wrap{background:rgba(255,255,255,.06);border-radius:4px;height:5px;overflow:hidden;margin:10px 0;}
-.cg-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--rose),var(--gold));transition:width .8s;}
-.cg-info{font-size:.72rem;color:var(--text-dim);line-height:1.6;margin-bottom:10px;}
-.cg-earn{background:rgba(93,184,122,.1);border:1px solid rgba(93,184,122,.18);border-radius:10px;padding:10px 14px;margin-bottom:10px;}
-.cg-earn-title{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--ok);margin-bottom:5px;}
-.cg-earn-text{font-size:.78rem;color:rgba(255,255,255,.75);line-height:1.5;}
-.cg-status{font-size:.68rem;font-weight:600;padding:4px 10px;border-radius:10px;}
-.cg-ok{background:rgba(93,184,122,.15);color:#90e8a8;border:1px solid rgba(93,184,122,.2);}
-.cg-warn{background:rgba(224,160,80,.15);color:#f0c080;border:1px solid rgba(224,160,80,.22);}
-.cg-hot{background:rgba(224,80,80,.15);color:#f09090;border:1px solid rgba(224,80,80,.22);}
-.cg-done{background:rgba(200,150,74,.2);color:var(--gold-light);border:1px solid rgba(200,150,74,.3);}
-.cg-exp{background:rgba(120,120,160,.15);color:var(--pause);border:1px solid rgba(120,120,160,.2);}
-.cg-wa{width:100%;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;
-  border-radius:10px;padding:11px;font-family:"Jost",sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;}
-.pause-row{display:flex;align-items:center;justify-content:space-between;
-  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin:12px 20px 0;}
-.toggle{width:42px;height:24px;background:rgba(255,255,255,.12);border-radius:12px;
-  position:relative;cursor:pointer;transition:background .25s;flex-shrink:0;}
-.toggle.on{background:rgba(120,120,160,.5);}
-.toggle::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;
-  background:white;top:3px;left:3px;transition:transform .25s;}
-.toggle.on::after{transform:translateX(18px);}
-.prof-hero{text-align:center;padding:22px 20px 16px;border-bottom:1px solid var(--border);}
-.prof-av{width:68px;height:68px;border-radius:50%;margin:0 auto 12px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:"Cormorant Garamond",serif;font-size:1.5rem;font-weight:500;color:var(--cream);
-  box-shadow:0 6px 24px rgba(0,0,0,.5),0 0 0 5px rgba(255,255,255,.05);}
-.prof-name{font-family:"Cormorant Garamond",serif;font-size:1.25rem;font-style:italic;color:var(--cream);margin-bottom:8px;}
-.prof-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
-.pdet{display:flex;align-items:flex-start;gap:12px;padding:11px 20px;
-  border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem;}
-.pdet:last-child{border-bottom:none;}
-.pdet-icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0;margin-top:1px;}
-.pdet-label{font-size:.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;}
-.pdet-val{color:var(--cream);font-size:.84rem;line-height:1.5;}
-.pdet-note{font-style:italic;color:var(--text-mid);white-space:pre-wrap;}
-.toast{position:fixed;bottom:20px;left:50%;z-index:500;transform:translateX(-50%) translateY(16px);
-  background:rgba(14,6,9,.97);border:1px solid rgba(196,83,106,.3);border-radius:28px;
-  padding:10px 20px;font-size:.8rem;color:var(--cream);opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.loader{position:fixed;inset:0;z-index:500;background:var(--ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
-.lring{width:36px;height:36px;border-radius:50%;border:2px solid rgba(196,83,106,.2);
-  border-top-color:var(--rose);animation:spin 1s linear infinite;}
+  background:radial-gradient(ellipse 60% 40% at 15% 10%,rgba(201,97,122,.06) 0,transparent 60%),
+             radial-gradient(ellipse 50% 40% at 85% 85%,rgba(200,150,74,.04) 0,transparent 55%)}
+.app{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOPBAR */
+.topbar{flex-shrink:0;background:rgba(16,10,14,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--b);padding:13px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--cream)}
+.brand span{font-size:.5rem;letter-spacing:4px;font-style:normal;text-transform:uppercase;color:var(--gold);display:block;margin-top:1px}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:sp 2s ease infinite}
+.sdot.ok{background:var(--ok);animation:none}.sdot.off{background:var(--txd);animation:none}
+@keyframes sp{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* TABS */
+.tabs{flex-shrink:0;display:flex;border-bottom:1px solid var(--b);background:rgba(16,10,14,.7)}
+.tab{flex:1;padding:11px 4px;font-size:.63rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--txd);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all .22s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Jost',sans-serif}
+.tab.on{color:var(--rose);border-bottom-color:var(--rose)}
+
+/* CONTENT */
+.content{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.panel{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:12px 16px 90px;display:none}
+.panel.active{display:block}
+.panel::-webkit-scrollbar{display:none}
+
+/* PNL BANNER */
+.pnl-banner{background:linear-gradient(135deg,rgba(200,150,74,.08),rgba(201,97,122,.05));border:1px solid rgba(200,150,74,.15);border-radius:13px;padding:13px 16px;margin-bottom:10px;text-align:center}
+.pnl-tag{font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;opacity:.7}
+.pnl-frase{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.95rem;color:var(--cream);line-height:1.6;opacity:.9}
+
+/* FESTIVOS */
+.fest-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:10px}
+.fest-row::-webkit-scrollbar{display:none}
+.fest-chip{flex-shrink:0;background:var(--s);border:1px solid var(--b);border-radius:11px;padding:8px 12px;min-width:105px}
+.fest-chip.soon{border-color:rgba(201,97,122,.3)}
+.fest-chip.today{border-color:rgba(200,150,74,.4)}
+
+/* SEARCH */
+.srow{position:relative;margin-bottom:8px}
+.sinp{width:100%;background:var(--s);border:1px solid var(--b);border-radius:26px;padding:10px 16px 10px 36px;color:var(--tx);font-family:'Jost',sans-serif;font-size:.85rem;outline:none;transition:border-color .22s}
+.sinp:focus{border-color:rgba(201,97,122,.4)}
+.sico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:.78rem;opacity:.3}
+
+/* FILTER CHIPS */
+.chips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;margin-bottom:4px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;background:var(--s);border:1px solid var(--b);border-radius:17px;padding:5px 11px;font-size:.66rem;font-weight:500;cursor:pointer;color:var(--txd);transition:all .22s}
+.chip.on{background:var(--rdim);border-color:var(--rose);color:var(--cream)}
+
+/* BDAY BANNER */
+.bday-banner{background:linear-gradient(135deg,rgba(200,150,74,.1),rgba(201,97,122,.07));border:1px solid rgba(200,150,74,.2);border-radius:13px;padding:12px 14px;margin-bottom:10px}
+.b-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem;cursor:pointer}
+.b-item:last-child{border-bottom:none}
+
+/* CLIENT CARDS */
+.ccard{background:var(--s);border:1px solid var(--b);border-radius:14px;padding:12px 13px 12px 15px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;margin-bottom:8px}
+.ccard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc,var(--rose));border-radius:3px 0 0 3px}
+.ccard:hover{background:var(--s2);transform:translateX(2px)}
+.ccard.paused{opacity:.55}
+.av{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:500;color:var(--cream);position:relative}
+.bdr{position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--gold);animation:rp 2s ease infinite}
+@keyframes rp{0%,100%{opacity:.45}50%{opacity:1}}
+.tag{font-size:.57rem;font-weight:600;letter-spacing:.5px;padding:2px 7px;border-radius:7px;text-transform:uppercase}
+.tv{background:rgba(200,150,74,.18);color:var(--gl);border:1px solid rgba(200,150,74,.25)}
+.tf{background:rgba(201,97,122,.18);color:#f0a0b0;border:1px solid rgba(201,97,122,.25)}
+.tn{background:rgba(93,184,122,.14);color:#90e8a8;border:1px solid rgba(93,184,122,.2)}
+.tp{background:rgba(80,144,208,.14);color:#a0c8f8;border:1px solid rgba(80,144,208,.2)}
+.tc{background:rgba(200,150,74,.2);color:var(--gl);border:1px solid rgba(200,150,74,.3)}
+.tpa{background:rgba(120,120,160,.15);color:var(--pause);border:1px solid rgba(120,120,160,.2)}
+.wam{background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2);color:#5de870;border-radius:14px;padding:4px 9px;font-size:.62rem;font-weight:600;cursor:pointer;text-decoration:none;flex-shrink:0}
+
+/* SECTION LABEL */
+.slbl{font-size:.54rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);padding:12px 0 8px;display:flex;align-items:center;gap:8px}
+.slbl::after{content:"";flex:1;height:1px;background:rgba(200,150,74,.15)}
+
+/* ADD BUTTON */
+.btn-add{width:100%;background:var(--rose);color:white;border:none;border-radius:12px;padding:12px;font-family:'Jost',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:all .25s;margin-bottom:12px}
+.btn-add:hover{background:#a83d52}
+
+/* CG CARD */
+.cg-card{background:linear-gradient(135deg,var(--gdim),rgba(201,97,122,.07));border:1px solid rgba(200,150,74,.22);border-radius:13px;padding:14px 16px;margin:12px 18px 0}
+.cg-earn{background:rgba(93,184,122,.1);border:1px solid rgba(93,184,122,.18);border-radius:9px;padding:9px 12px;margin-bottom:9px}
+.cg-wa{width:100%;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;border-radius:9px;padding:10px;font-family:'Jost',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer}
+.tgl{width:40px;height:22px;background:rgba(255,255,255,.12);border-radius:11px;position:relative;cursor:pointer;transition:background .25s;flex-shrink:0}
+.tgl.on{background:rgba(120,120,160,.5)}
+.tgl::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .25s}
+.tgl.on::after{transform:translateX(18px)}
+.pdet{display:flex;align-items:flex-start;gap:11px;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.05)}
+.pdet:last-child{border-bottom:none}
+
+/* MODALS */
+.mov{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center}
+.mov.open{display:flex}
+.modal{background:var(--deep);border:1px solid var(--b2);border-radius:22px 22px 0 0;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;animation:su .32s cubic-bezier(.4,0,.2,1)}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mh{width:34px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:12px auto 0}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid var(--b)}
+.mtitle{font-family:'Cormorant Garamond',serif;font-size:1rem;font-style:italic;color:var(--cream)}
+.mclose{background:none;border:none;color:var(--txd);font-size:.95rem;cursor:pointer;padding:4px}
+.mbody{padding:16px 18px 20px}
+.mfoot{padding:12px 18px 24px;border-top:1px solid var(--b);display:flex;gap:8px}
+
+/* FORM */
+.finp{width:100%;background:var(--s);border:1px solid var(--b2);border-radius:9px;padding:10px 12px;color:var(--tx);font-family:'Jost',sans-serif;font-size:.85rem;outline:none;transition:border-color .22s;margin-bottom:9px}
+.finp::placeholder{color:rgba(255,255,255,.2)}
+.finp:focus{border-color:rgba(201,97,122,.5);background:rgba(201,97,122,.05)}
+.fsel{width:100%;background:var(--s);border:1px solid var(--b2);border-radius:9px;padding:10px 12px;color:var(--tx);font-family:'Jost',sans-serif;font-size:.85rem;outline:none;-webkit-appearance:none;cursor:pointer;margin-bottom:9px}
+.fsel option{background:var(--deep)}
+.fta{width:100%;background:var(--s);border:1px solid var(--b2);border-radius:9px;padding:10px 12px;color:var(--tx);font-family:'Jost',sans-serif;font-size:.85rem;outline:none;resize:none;min-height:80px;line-height:1.6;margin-bottom:9px}
+.fta::placeholder{color:rgba(255,255,255,.2)}
+.fsec{font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:14px 0 9px;display:flex;align-items:center;gap:7px}
+.fsec::after{content:"";flex:1;height:1px;background:rgba(200,150,74,.18)}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.copt{background:var(--s);border:1px solid var(--b);border-radius:15px;padding:5px 12px;font-size:.68rem;cursor:pointer;color:var(--txd);transition:all .22s;display:inline-block;margin:0 5px 5px 0}
+.copt.sel{background:var(--rdim);border-color:var(--rose);color:var(--cream)}
+.to{flex:1;background:var(--s);border:1px solid var(--b);border-radius:10px;padding:9px 6px;font-size:.7rem;text-align:center;cursor:pointer;color:var(--txd)}
+.to.sh{background:rgba(224,80,80,.15);border-color:var(--hot);color:#f09090}
+.to.sw{background:rgba(224,160,80,.15);border-color:var(--warn);color:#f0c080}
+.to.sc{background:rgba(80,144,208,.15);border-color:var(--cool);color:#a0c8f8}
+.btn-del{flex:1;background:rgba(200,80,80,.1);color:#f08080;border:1px solid rgba(200,80,80,.22);border-radius:10px;padding:12px;font-family:'Jost',sans-serif;font-size:.84rem;cursor:pointer}
+.btn-can{flex:1;background:var(--s);color:var(--txd);border:1px solid var(--b);border-radius:10px;padding:12px;font-family:'Jost',sans-serif;font-size:.84rem;cursor:pointer}
+.btn-save{flex:2;background:var(--rose);color:white;border:none;border-radius:10px;padding:12px;font-family:'Jost',sans-serif;font-size:.87rem;font-weight:500;cursor:pointer}
+.ibc-link{display:block;background:var(--gdim);border:1px solid rgba(200,150,74,.22);color:var(--gl);border-radius:10px;padding:11px;font-family:'Jost',sans-serif;font-size:.8rem;font-weight:600;text-align:center;text-decoration:none;margin-bottom:8px}
+.wa-link{display:block;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;border-radius:10px;padding:11px;font-family:'Jost',sans-serif;font-size:.84rem;font-weight:600;text-align:center;text-decoration:none;margin-bottom:8px}
+
+/* TOAST */
+.toast{position:fixed;bottom:85px;left:50%;z-index:300;transform:translateX(-50%) translateY(14px);background:rgba(16,10,14,.97);border:1px solid rgba(201,97,122,.3);border-radius:26px;padding:9px 18px;font-size:.78rem;color:var(--cream);opacity:0;transition:all .26s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.loader{position:fixed;inset:0;z-index:500;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.lring{width:34px;height:34px;border-radius:50%;border:2px solid rgba(201,97,122,.2);border-top-color:var(--rose);animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ltxt{font-family:"Cormorant Garamond",serif;font-size:.95rem;font-style:italic;color:var(--text-dim);}
-
-/* MUSIC PLAYER */
-.music-btn {
-  position:fixed; bottom:80px; right:16px; z-index:100;
-  width:42px; height:42px; border-radius:50%;
-  background:rgba(200,150,74,.15); border:1px solid rgba(200,150,74,.3);
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; transition:all .3s ease; font-size:1.1rem;
-  backdrop-filter:blur(8px);
-}
-.music-btn:hover { background:rgba(200,150,74,.25); transform:scale(1.08); }
-.music-btn.playing { background:rgba(200,150,74,.2); border-color:var(--gold);
-  box-shadow:0 0 16px rgba(200,150,74,.25); animation:musicPulse 2s ease infinite; }
-@keyframes musicPulse { 0%,100%{box-shadow:0 0 8px rgba(200,150,74,.2)} 50%{box-shadow:0 0 20px rgba(200,150,74,.4)} }
-
-.music-panel {
-  position:fixed; bottom:132px; right:16px; z-index:100;
-  background:rgba(18,8,15,.96); border:1px solid rgba(200,150,74,.2);
-  border-radius:16px; padding:14px 16px; width:200px;
-  display:none; backdrop-filter:blur(16px);
-  animation:fadeUp .25s ease;
-}
-.music-panel.show { display:block; }
-.music-panel-title { font-size:.56rem; letter-spacing:3px; text-transform:uppercase;
-  color:var(--gold); margin-bottom:12px; }
-.freq-opt { display:flex; align-items:center; gap:10px; padding:8px 10px;
-  border-radius:10px; cursor:pointer; transition:all .22s; margin-bottom:4px; }
-.freq-opt:hover { background:rgba(200,150,74,.08); }
-.freq-opt.active { background:rgba(200,150,74,.12); border:1px solid rgba(200,150,74,.2); }
-.freq-icon { font-size:.9rem; width:20px; text-align:center; }
-.freq-name { font-size:.75rem; color:var(--cream); font-weight:500; }
-.freq-desc { font-size:.6rem; color:var(--text-dim); margin-top:1px; }
-.vol-row { display:flex; align-items:center; gap:8px; margin-top:10px;
-  padding-top:10px; border-top:1px solid rgba(255,255,255,.06); }
-.vol-label { font-size:.6rem; color:var(--text-dim); }
-.vol-slider { flex:1; accent-color:var(--gold); cursor:pointer; }
-
-.loader.gone{opacity:0!important;pointer-events:none;display:none!important;}
+.loader.gone{opacity:0;pointer-events:none;display:none}
 </style>
 </head>
 <body>
 <div class="amb"></div>
-<div class="loader" id="loader"><div class="lring"></div><div class="ltxt">Cargando...</div></div>
+<div class="loader" id="loader"><div class="lring"></div><div style="font-family:'Cormorant Garamond',serif;font-size:.9rem;font-style:italic;color:var(--txd)">Cargando tus clientas...</div></div>
 <div class="toast" id="toast"></div>
-<div class="app" id="app" style="opacity:0;transition:opacity .35s ease;">
+<div class="app" id="app" style="opacity:0;transition:opacity .3s ease">
+
   <div class="topbar">
-    <div class="topbar-main">
-      <div class="page-title">Mis Clientas</div>
-      <button class="btn-add" id="btn-add" onclick="openAddModal()">+ Nueva</button>
+    <div class="brand">Jenniffer Ivelisse<span>Mary Kay · Puerto Rico</span></div>
+    <div style="display:flex;align-items:center;gap:9px">
+      <span id="ptitle" style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--txd)">Mis Clientas</span>
+      <div class="sdot" id="sdot"></div>
     </div>
-    <div class="tabs">
-      <button class="tab active" id="tab-clientas" onclick="switchTab('clientas')">👥 Clientas</button>
-      <button class="tab" id="tab-consultoras" onclick="switchTab('consultoras')">⭐ Equipo</button>
-    </div>
-    <div class="search-row">
-      <span class="search-ico">🔍</span>
-      <input class="search-inp" id="search-inp" type="text" placeholder="Buscar por nombre..." oninput="renderAll()">
-    </div>
-    <div class="chips" id="filter-chips"></div>
   </div>
-  <div class="scroll" id="scroll-area">
-  <!-- TODAY BANNER -->
-  <div id="today-banner" style="display:none;background:linear-gradient(135deg,rgba(224,160,80,.12),rgba(224,80,80,.08));border:1px solid rgba(224,160,80,.22);border-radius:14px;padding:14px 16px;margin:10px 0 4px;"></div>
-  <!-- BDAY BANNER -->
-  <div id="bday-banner" style="display:none;background:linear-gradient(135deg,rgba(200,150,74,.12),rgba(196,83,106,.08));border:1px solid rgba(200,150,74,.22);border-radius:14px;padding:14px 16px;margin:4px 0;"></div>
-</div>
-</div>
 
-<!-- MODAL FORM -->
-<div class="moverlay" id="modal-form" onclick="if(event.target===this)closeM('modal-form')">
-  <div class="modal">
-    <div class="mhandle"></div>
-    <div class="mhead">
-      <div class="mtitle" id="form-title">Nueva clienta</div>
-      <button class="mclose" onclick="closeM('modal-form')">✕</button>
+  <div class="tabs">
+    <button class="tab on" id="tc" onclick="switchTab('c')">&#128101; Clientas</button>
+    <button class="tab" id="te" onclick="switchTab('e')">&#11088; Colmena</button>
+  </div>
+
+  <div class="content">
+    <!-- PANEL CLIENTAS -->
+    <div class="panel active" id="panel-c">
+      <!-- PNL MERECIMIENTO -->
+      <div class="pnl-banner">
+        <div class="pnl-tag">Mary Kay</div>
+        <div class="pnl-frase" id="pnl-frase"></div>
+      </div>
+      <!-- CUMPLEANOS + FESTIVOS -->
+      <div id="bday-banner"></div>
+      <div class="fest-row" id="fest-row"></div>
+      <!-- SEARCH -->
+      <div class="srow"><span class="sico">&#128269;</span><input class="sinp" id="csearch" placeholder="Buscar por nombre..." oninput="renderC()"></div>
+      <div class="chips" id="chips-c"></div>
+      <div id="list-c"></div>
     </div>
+
+    <!-- PANEL COLMENA -->
+    <div class="panel" id="panel-e">
+      <div class="slbl" style="padding-top:0">Tu Equipo</div>
+      <div class="srow"><span class="sico">&#128269;</span><input class="sinp" id="esearch" placeholder="Buscar consultora..." oninput="renderE()"></div>
+      <div class="chips" id="chips-e"></div>
+      <div id="list-e"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="mov" id="pm" onclick="if(event.target===this)cm('pm')">
+  <div class="modal"><div class="mh"></div><div id="pc"></div></div>
+</div>
+
+<!-- FORM MODAL -->
+<div class="mov" id="fm" onclick="if(event.target===this)cm('fm')">
+  <div class="modal"><div class="mh"></div>
+    <div class="mhead"><div class="mtitle" id="ftitle">Nueva clienta</div><button class="mclose" onclick="cm('fm')">&#10005;</button></div>
     <div class="mbody">
-      <input type="hidden" id="f-id">
-      <input type="hidden" id="f-mode">
-      <div class="fsec">Información personal</div>
-      <div class="frow2">
-        <div><label class="flabel">Nombre *</label><input class="finput" id="f-nombre" placeholder="Nombre"></div>
-        <div><label class="flabel">Apellido</label><input class="finput" id="f-apellido" placeholder="Apellido"></div>
+      <input type="hidden" id="fid"><input type="hidden" id="fmode">
+      <div class="fsec">Informacion personal</div>
+      <div class="frow2" style="gap:9px;margin-bottom:0">
+        <div><label style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:4px">Nombre *</label><input class="finp" id="fnom" placeholder="Nombre"></div>
+        <div><label style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:4px">Apellido</label><input class="finp" id="fape" placeholder="Apellido"></div>
       </div>
-      <div class="frow2">
-        <div><label class="flabel">Teléfono / WA</label><input class="finput" id="f-tel" type="tel" placeholder="787-XXX-XXXX"></div>
-        <div><label class="flabel">Cumpleaños</label><input class="finput" id="f-bday" type="text" placeholder="Ej: 15 de marzo o 3/15"></div>
+      <div class="frow2" style="gap:9px;margin-bottom:0">
+        <div><label style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:4px">Telefono/WA</label><input class="finp" id="ftel" type="tel" placeholder="787-XXX-XXXX"></div>
+        <div><label style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:4px">Cumpleanos</label><input class="finp" id="fbday" type="text" placeholder="Ej: 15 de marzo o 3/15"></div>
       </div>
-      <div class="frow1"><label class="flabel">Email</label><input class="finput" id="f-email" type="email" placeholder="correo@email.com"></div>
-      <div class="frow2">
-        <div><label class="flabel">Ciudad / Municipio</label><input class="finput" id="f-ciudad" placeholder="ej: San Juan"></div>
-        <div><label class="flabel">Código Postal</label><input class="finput" id="f-cp" placeholder="ej: 00926"></div>
-      </div>
-      <div class="frow1"><label class="flabel">📍 Dirección de entrega</label>
-        <input class="finput" id="f-direccion" placeholder="ej: Urb. Las Flores, Calle Rosa #12, Apt 3B"></div>
-      <div class="frow2">
-        <div><label class="flabel">Género</label>
-          <select class="fselect" id="f-genero">
-            <option value="">— Opcional —</option>
-            <option>Dama</option><option>Caballero</option><option>Prefiero no decir</option>
-          </select>
-        </div>
-      </div>
+      <input class="finp" id="femail" type="email" placeholder="Correo electronico">
+      <div class="frow2" style="gap:9px;margin-bottom:0"><input class="finp" id="fciudad" placeholder="Ciudad/Municipio"><input class="finp" id="fcp" placeholder="Codigo Postal"></div>
+      <input class="finp" id="fdir" placeholder="Direccion de entrega">
+      <input class="finp" id="fconocimos" placeholder="Como nos conocimos (ej: Zoom 28 mayo, feria, referida de Maria...)">
 
-      <div id="sec-clienta">
-        <div class="fsec">Perfil de clienta</div>
-        <div class="frow2">
-          <div><label class="flabel">Tono de piel</label>
-            <select class="fselect" id="f-piel">
-              <option value="">— Selecciona —</option>
-              <option>Clara/Fair</option><option>Media/Medium</option><option>Oscura/Deep</option>
-            </select>
-          </div>
-          <div><label class="flabel">Tipo de piel</label>
-            <select class="fselect" id="f-tipo-piel">
-              <option value="">— Selecciona —</option>
-              <option>Normal</option><option>Seca</option><option>Grasa</option><option>Mixta</option><option>Sensible</option>
-            </select>
-          </div>
+      <div id="fsec-c">
+        <div class="fsec">Perfil</div>
+        <div class="frow2" style="gap:9px;margin-bottom:0">
+          <select class="fsel" id="fpiel"><option value="">Tono de piel</option><option>Clara/Fair</option><option>Media/Medium</option><option>Oscura/Deep</option></select>
+          <select class="fsel" id="ftipo"><option value="">Tipo de piel</option><option>Normal</option><option>Seca</option><option>Grasa</option><option>Mixta</option><option>Sensible</option></select>
         </div>
-        <div class="frow1"><label class="flabel">Productos favoritos</label>
-          <input class="finput" id="f-prods" placeholder="ej: TimeWise, CC Cream..."></div>
-
+        <input class="finp" id="fprods" placeholder="Productos favoritos">
         <div class="fsec">Temperatura</div>
-        <div class="temp-row">
-          <div class="topt" data-val="hot" onclick="selTemp(this)">🔥<br><span style="font-size:.6rem">Lista ya</span></div>
-          <div class="topt" data-val="warm" onclick="selTemp(this)">🌡️<br><span style="font-size:.6rem">Interesada</span></div>
-          <div class="topt" data-val="cold" onclick="selTemp(this)">❄️<br><span style="font-size:.6rem">Fría</span></div>
+        <div style="display:flex;gap:7px;margin-bottom:9px">
+          <div class="to" data-v="hot" onclick="selt(this)">&#128293;<br><span style="font-size:.6rem">Lista</span></div>
+          <div class="to" data-v="warm" onclick="selt(this)">&#127777;&#65039;<br><span style="font-size:.6rem">Interesada</span></div>
+          <div class="to" data-v="cold" onclick="selt(this)">&#10052;&#65039;<br><span style="font-size:.6rem">Fria</span></div>
         </div>
-
         <div class="fsec">Estado</div>
-        <div class="chip-row" id="est-sel">
-          <div class="copt" data-val="VIP" onclick="selOne(this,'est-sel')">⭐ VIP</div>
-          <div class="copt" data-val="Frecuente" onclick="selOne(this,'est-sel')">💗 Frecuente</div>
-          <div class="copt" data-val="Nueva" onclick="selOne(this,'est-sel')">🌸 Nueva</div>
-          <div class="copt" data-val="Prospecto" onclick="selOne(this,'est-sel')">💎 Prospecto</div>
-          <div class="copt" data-val="Inactiva" onclick="selOne(this,'est-sel')">💤 Inactiva</div>
+        <div id="est-sel" style="margin-bottom:9px">
+          <span class="copt" data-v="VIP" onclick="sel1(this,'est-sel')">&#11088; VIP</span>
+          <span class="copt" data-v="Frecuente" onclick="sel1(this,'est-sel')">&#128151; Frecuente</span>
+          <span class="copt" data-v="Nueva" onclick="sel1(this,'est-sel')">&#127800; Nueva</span>
+          <span class="copt" data-v="Prospecto" onclick="sel1(this,'est-sel')">&#128142; Prospecto</span>
+          <span class="copt" data-v="Inactiva" onclick="sel1(this,'est-sel')">&#128164; Inactiva</span>
         </div>
-
-        <div class="fsec">Prefiere contacto</div>
-        <div class="chip-row" id="cont-sel">
-          <div class="copt" data-val="WhatsApp" onclick="selOne(this,'cont-sel')">💬 WhatsApp</div>
-          <div class="copt" data-val="Llamada" onclick="selOne(this,'cont-sel')">📞 Llamada</div>
-          <div class="copt" data-val="Email" onclick="selOne(this,'cont-sel')">✉️ Email</div>
-          <div class="copt" data-val="Mañana" onclick="selOne(this,'cont-sel')">☀️ Mañana</div>
-          <div class="copt" data-val="Tarde" onclick="selOne(this,'cont-sel')">🌤 Tarde</div>
-          <div class="copt" data-val="Noche" onclick="selOne(this,'cont-sel')">🌙 Noche</div>
+        <div class="fsec">Contacto preferido</div>
+        <div id="cont-sel" style="margin-bottom:9px">
+          <span class="copt" data-v="WhatsApp" onclick="sel1(this,'cont-sel')">&#128172; WA</span>
+          <span class="copt" data-v="Llamada" onclick="sel1(this,'cont-sel')">&#128222; Llamada</span>
+          <span class="copt" data-v="Manana" onclick="sel1(this,'cont-sel')">&#9728;&#65039; Manana</span>
+          <span class="copt" data-v="Tarde" onclick="sel1(this,'cont-sel')">&#127804; Tarde</span>
+          <span class="copt" data-v="Noche" onclick="sel1(this,'cont-sel')">&#127769; Noche</span>
         </div>
-
-        <div class="fsec">Etiquetas · Profesión</div>
-        <div class="chip-row" id="etiq-sel">
-          <div class="copt" data-val="Secretaria" onclick="selMulti(this)">Secretaria</div>
-          <div class="copt" data-val="Enfermera" onclick="selMulti(this)">Enfermera</div>
-          <div class="copt" data-val="Maestra" onclick="selMulti(this)">Maestra</div>
-          <div class="copt" data-val="Médico" onclick="selMulti(this)">Médico</div>
-          <div class="copt" data-val="Farmacéutica" onclick="selMulti(this)">Farmacéutica</div>
-          <div class="copt" data-val="Abogada" onclick="selMulti(this)">Abogada</div>
-          <div class="copt" data-val="Radioaficionada" onclick="selMulti(this)">Radioaficionada</div>
-          <div class="copt" data-val="Fotógrafa" onclick="selMulti(this)">Fotógrafa</div>
-          <div class="copt" data-val="Chef" onclick="selMulti(this)">Chef</div>
-          <div class="copt" data-val="Contable" onclick="selMulti(this)">Contable</div>
-          <div class="copt" data-val="Estilista" onclick="selMulti(this)">Estilista</div>
-          <div class="copt" data-val="Periodista" onclick="selMulti(this)">Periodista</div>
-          <div class="copt" data-val="Psicóloga" onclick="selMulti(this)">Psicóloga</div>
-          <div class="copt" data-val="Militar" onclick="selMulti(this)">Militar</div>
-          <div class="copt" data-val="Madre" onclick="selMulti(this)">Madre</div>
+        <div class="fsec">Profesion / Etiquetas</div>
+        <div id="etiq-sel" style="margin-bottom:9px">
+          <span class="copt" data-v="Secretaria" onclick="selm(this)">Secretaria</span>
+          <span class="copt" data-v="Enfermera" onclick="selm(this)">Enfermera</span>
+          <span class="copt" data-v="Maestra" onclick="selm(this)">Maestra</span>
+          <span class="copt" data-v="Medico" onclick="selm(this)">Medico</span>
+          <span class="copt" data-v="Radioaficionada" onclick="selm(this)">Radioaficionada</span>
+          <span class="copt" data-v="Fotografa" onclick="selm(this)">Fotografa</span>
+          <span class="copt" data-v="Chef" onclick="selm(this)">Chef</span>
+          <span class="copt" data-v="Madre" onclick="selm(this)">Madre</span>
+          <span class="copt" data-v="Abogada" onclick="selm(this)">Abogada</span>
+          <span class="copt" data-v="Psicologa" onclick="selm(this)">Psicologa</span>
         </div>
-        <div class="frow1" style="margin-top:6px;">
-          <label class="flabel">Otra profesión (se añade como etiqueta)</label>
-          <input class="finput" id="f-etiq-custom" placeholder="ej: Bombera, Pastora, Atleta...">
-        </div>
-
-        <div class="fsec">¿Cómo llegó?</div>
-        <div class="chip-row" id="fuente-sel">
-          <div class="copt" data-val="Facebook" onclick="selOne(this,'fuente-sel')">Facebook</div>
-          <div class="copt" data-val="TikTok" onclick="selOne(this,'fuente-sel')">TikTok</div>
-          <div class="copt" data-val="Referido" onclick="selOne(this,'fuente-sel')">Referido</div>
-          <div class="copt" data-val="Quiz piel" onclick="selOne(this,'fuente-sel')">Quiz piel</div>
-          <div class="copt" data-val="Quiz labiales" onclick="selOne(this,'fuente-sel')">Quiz labiales</div>
-          <div class="copt" data-val="WhatsApp" onclick="selOne(this,'fuente-sel')">WhatsApp</div>
-          <div class="copt" data-val="Evento" onclick="selOne(this,'fuente-sel')">Evento</div>
-          <div class="copt" data-val="Zoom" onclick="selOne(this,'fuente-sel')">Zoom</div>
+        <input class="finp" id="fetiq" placeholder="Otra profesion (se anade automaticamente)">
+        <div class="fsec">Como llego?</div>
+        <div id="fuente-sel" style="margin-bottom:9px">
+          <span class="copt" data-v="Facebook" onclick="sel1(this,'fuente-sel')">Facebook</span>
+          <span class="copt" data-v="TikTok" onclick="sel1(this,'fuente-sel')">TikTok</span>
+          <span class="copt" data-v="Referido" onclick="sel1(this,'fuente-sel')">Referido</span>
+          <span class="copt" data-v="Quiz piel" onclick="sel1(this,'fuente-sel')">Quiz piel</span>
+          <span class="copt" data-v="WhatsApp" onclick="sel1(this,'fuente-sel')">WhatsApp</span>
+          <span class="copt" data-v="Zoom" onclick="sel1(this,'fuente-sel')">Zoom</span>
         </div>
       </div>
 
-      <div id="sec-consultora" style="display:none;">
+      <div id="fsec-e" style="display:none">
         <div class="fsec">Datos de consultora</div>
-        <div class="frow2">
-          <div><label class="flabel">Número consultora</label><input class="finput" id="f-numcons" placeholder="ej: MK-12345"></div>
-          <div><label class="flabel">Fecha de ingreso</label><input class="finput" id="f-ingreso" type="date"></div>
+        <div class="frow2" style="gap:9px;margin-bottom:0">
+          <input class="finp" id="fnumcons" placeholder="Numero consultora">
+          <input class="finp" id="fingreso" type="date">
         </div>
-        <div class="frow1"><label class="flabel">Pedido inicial realizado ($)</label>
-          <input class="finput" id="f-pedido" type="number" placeholder="0" min="0" step="10">
-        </div>
-        <div style="background:var(--gold-dim);border:1px solid rgba(200,150,74,.2);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
-          <div style="font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Comienzo Grandioso</div>
-          <div style="font-size:.76rem;color:rgba(255,255,255,.65);line-height:1.6;">Necesita $600+ en los primeros 3 meses para calificar.<br>Cuando califica, tú ganas <strong style="color:var(--gold-light);">$50 en efectivo</strong> y hasta <strong style="color:var(--gold-light);">$220 en productos</strong>.</div>
+        <input class="finp" id="fpedido" type="number" placeholder="Pedido inicial ($)" min="0" step="10">
+        <div style="background:var(--gdim);border:1px solid rgba(200,150,74,.2);border-radius:9px;padding:11px 13px;margin-bottom:9px">
+          <div style="font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Comienzo Grandioso</div>
+          <div style="font-size:.74rem;color:var(--txm);line-height:1.6">$600+ en 3 meses &#10140; tu ganas <strong style="color:var(--gl)">$50 efectivo</strong> + hasta <strong style="color:var(--gl)">$220 en productos</strong></div>
         </div>
       </div>
 
-      <div class="frow1"><label class="flabel">&#129309; ¿Cómo nos conocimos?</label><input class="finput" id="f-conocimos" placeholder="Ej: Zoom del 28 mayo, feria, referida de María..."></div>
-      <div class="fsec">Quién es ella · Notas privadas</div>
-      <div style="background:linear-gradient(135deg,rgba(200,150,74,.08),rgba(196,83,106,.05));border:1px solid rgba(200,150,74,.2);border-radius:11px;padding:12px 14px;margin-bottom:12px">
+      <!-- REGISTRO MK -->
+      <div style="background:linear-gradient(135deg,rgba(200,150,74,.08),rgba(201,97,122,.05));border:1px solid rgba(200,150,74,.2);border-radius:11px;padding:12px 14px;margin-bottom:12px">
         <div style="font-size:.7rem;font-weight:600;color:var(--gold);margin-bottom:5px">&#10024; Registro en Mary Kay</div>
-        <div style="font-size:.74rem;color:rgba(255,255,255,.55);margin-bottom:9px;line-height:1.6">Si la clienta quiere recibir promociones directamente de la compañía:</div>
+        <div style="font-size:.74rem;color:rgba(255,255,255,.55);margin-bottom:9px;line-height:1.6">Si la clienta quiere recibir promociones directamente de la compania:</div>
         <a href="https://www.marykay.com/jenniffer/es/login?rurl=%2Fjenniffer%2Fes%2Fhome" target="_blank" style="display:inline-block;padding:8px 16px;background:linear-gradient(135deg,#c8964a,#a07030);color:white;border-radius:9px;font-size:.72rem;font-weight:600;text-decoration:none">Inscribirse en Mary Kay &#10140;</a>
-        <div style="font-size:.62rem;color:rgba(255,255,255,.3);margin-top:6px">Solo si ella quiere — es opcional</div>
+        <div style="font-size:.62rem;color:rgba(255,255,255,.3);margin-top:6px">Solo si ella quiere - es opcional</div>
       </div>
-      <textarea class="ftextarea" id="f-notas" placeholder="Su historia, lo que la motiva, si está en pausa y cuándo puede volver...&#10;&#10;Este espacio es solo tuyo."></textarea>
+
+      <div class="fsec">Notas privadas</div>
+      <textarea class="fta" id="fnotas" placeholder="Su historia, lo que la motiva, notas privadas..."></textarea>
     </div>
     <div class="mfoot">
-      <button class="btn-del" id="btn-del" onclick="deleteRec()" style="display:none">🗑</button>
-      <button class="btn-can" onclick="closeM('modal-form')">Cancelar</button>
-      <button class="btn-save" onclick="saveRec()">💾 Guardar</button>
+      <button class="btn-del" id="fdel" style="display:none" onclick="delRec()">&#128465;</button>
+      <button class="btn-can" onclick="cm('fm')">Cancelar</button>
+      <button class="btn-save" onclick="saveRec()">&#128190; Guardar</button>
     </div>
   </div>
-</div>
-
-<!-- MODAL PROFILE -->
-<div class="moverlay" id="modal-prof" onclick="if(event.target===this)closeM('modal-prof')">
-  <div class="modal"><div class="mhandle"></div><div id="prof-content"></div></div>
 </div>
 
 <script>
-var SUPA_URL='https://wkqovrklcrrxawmnefwm.supabase.co';
-var SUPA_KEY='sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
-var IBC_URL='https://www.marykay.com/jenniffer/es/ibcprofile';
-var records=[];
-var currentTab='clientas';
-var activeFilter='all';
-var editingId=null;
+var S='https://wkqovrklcrrxawmnefwm.supabase.co',K='sb_publishable_PnRY0ksBVv-yru9o6zhFHA_YakOfptG';
+var IBC='https://www.marykay.com/jenniffer/es/login?rurl=%2Fjenniffer%2Fes%2Fhome';
+var recs=[],eid=null,ctab='c',afc='all',afe='all';
+
+/* PNL MESSAGES */
+var PNL_FRASES=[
+  'Tu piel cuenta su historia. Merece ser escuchada.',
+  'Las mujeres que se cuidan no lo hacen por vanidad — lo hacen porque saben que se lo merecen.',
+  'Mirarte al espejo y sentirte bien no es un lujo. Es lo minimo que mereces.',
+  'Cada mujer lleva un letrero invisible que dice: hazme sentir importante.',
+  'Cuidarte es quererte. Y tu te lo mereces todos los dias.',
+  'Tu piel refleja como te tratas. Dejala contar una historia hermosa.',
+  'No es vanidad. Es respeto propio. Y tu lo mereces hoy.',
+  'La mujer que se cuida no espera permiso — sabe que se lo merece.'
+];
+
+/* FESTIVOS */
+var FEST=[
+  {m:1,d:1,n:'Ano Nuevo',i:'&#127882;'},
+  {m:1,d:6,n:'Dia de Reyes',i:'&#128081;'},
+  {m:2,d:14,n:'San Valentin',i:'&#128149;'},
+  {m:3,d:8,n:'Dia de la Mujer',i:'&#127800;'},
+  {m:3,d:22,n:'Abolicion PR',i:'&#127477;&#127479;'},
+  {m:5,d:12,n:'Dia Enfermera',i:'&#127973;'},
+  {m:7,d:4,n:'Independencia EE.UU.',i:'&#127482;&#127480;'},
+  {m:7,d:25,n:'Constitucion PR',i:'&#127477;&#127479;'},
+  {m:10,d:15,n:'Dia del Maestro',i:'&#128218;'},
+  {m:10,d:31,n:'Halloween',i:'&#127875;'},
+  {m:12,d:24,n:'Nochebuena',i:'&#127775;'},
+  {m:12,d:25,n:'Navidad',i:'&#127876;'},
+  {mv:5,wn:2,wd:0,n:'Dia de las Madres',i:'&#128144;'}
+];
+
+function getFest(days){
+  var t=new Date();t.setHours(0,0,0,0);var res=[];
+  FEST.forEach(function(f){
+    var tgt;
+    if(f.m&&f.d){tgt=new Date(t.getFullYear(),f.m-1,f.d);if(tgt<t)tgt=new Date(t.getFullYear()+1,f.m-1,f.d);}
+    else if(f.mv){for(var y=t.getFullYear();y<=t.getFullYear()+1;y++){var fi=new Date(y,f.mv-1,1),df=(f.wd-fi.getDay()+7)%7,nth=new Date(y,f.mv-1,1+df+(f.wn-1)*7);if(nth>=t){tgt=nth;break;}}}
+    if(tgt){var dl=Math.round((tgt-t)/864e5);if(dl<=30)res.push(Object.assign({},f,{date:tgt,dl:dl}));}
+  });
+  return res.sort(function(a,b){return a.dl-b.dl;});
+}
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
-function toast(msg,dur){
-  dur=dur||2500;
-  var t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},dur);
-}
-function saveLocal(){localStorage.setItem('mk_clients',JSON.stringify(records));}
-function loadLocal(){try{var d=localStorage.getItem('mk_clients');if(d)records=JSON.parse(d);}catch(e){}}
-function fullName(r){return ((r.nombre||'')+' '+(r.apellido||'')).trim();}
-function initials(r){return ((r.nombre||'?')[0]+((r.apellido||'')[0]||'')).toUpperCase();}
-function tempIcon(t){return t==='hot'?'🔥':t==='warm'?'🌡️':'❄️';}
-function daysBetween(a,b){return Math.round((b-a)/(1000*60*60*24));}
+function toast(m,d){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},d||2500);}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function ld(k,d){try{var x=localStorage.getItem(k);return x?JSON.parse(x):d;}catch(e){return d;}}
+function cm(id){document.getElementById(id).classList.remove('open');}
+function fn(r){return((r.nombre||'')+' '+(r.apellido||'')).trim();}
+function ini(r){return((r.nombre||'?')[0]+((r.apellido||'')[0]||'')).toUpperCase();}
+function ti(t){return t==='hot'?'&#128293;':t==='warm'?'&#127777;':'&#10052;';}
+function db(a,b){return Math.round((b-a)/864e5);}
 
-function switchTab(tab){
-  currentTab=tab;activeFilter='all';
-  document.getElementById('tab-clientas').classList.toggle('active',tab==='clientas');
-  document.getElementById('tab-consultoras').classList.toggle('active',tab==='consultoras');
-  document.getElementById('btn-add').textContent=tab==='clientas'?'+ Nueva':'+ Consultora';
-  renderFilters();renderAll();
-}
-
-function renderFilters(){
-  var el=document.getElementById('filter-chips');
-  var opts=currentTab==='clientas'
-    ?[['all','Todas'],['VIP','⭐ VIP'],['Frecuente','💗 Frecuente'],['Nueva','🌸 Nueva'],['Prospecto','💎 Prospecto'],['Inactiva','💤 Inactiva'],['hot','🔥 Listas'],['hoy','📅 Hoy'],['ayer','📅 Ayer'],['semana','📅 Esta semana']]
-    :[['all','Todas'],['activa','⭐ Activas'],['pausa','😴 En pausa'],['calificada','🎉 Calificadas']];
-  el.innerHTML=opts.map(function(f){
-    return '<div class="chip'+(activeFilter===f[0]?' on':'')+'" onclick="setFilter(\'' + f[0] + '\')">'+f[1]+'</div>';
-  }).join('');
-}
-function setFilter(f){activeFilter=f;renderFilters();renderAll();}
-function matchesDateFilter(r,f){
+/* DATE FILTER */
+function matchDate(r,f){
   var today=new Date().toISOString().split('T')[0];
-  var ayer=new Date();ayer.setDate(ayer.getDate()-1);var ayerS=ayer.toISOString().split('T')[0];
-  var semana=new Date();semana.setDate(semana.getDate()-7);var semanaS=semana.toISOString().split('T')[0];
+  var ay=new Date();ay.setDate(ay.getDate()-1);var ayS=ay.toISOString().split('T')[0];
+  var sw=new Date();sw.setDate(sw.getDate()-7);var swS=sw.toISOString().split('T')[0];
   var fr=r.fecha_registro||'';
   if(f==='hoy')return fr===today;
-  if(f==='ayer')return fr===ayerS;
-  if(f==='semana')return fr>=semanaS&&fr<=today;
+  if(f==='ayer')return fr===ayS;
+  if(f==='semana')return fr>=swS&&fr<=today;
   return true;
 }
 
+/* SWITCH TABS */
+function switchTab(t){
+  ctab=t;
+  document.getElementById('tc').classList.toggle('on',t==='c');
+  document.getElementById('te').classList.toggle('on',t==='e');
+  document.getElementById('panel-c').classList.toggle('active',t==='c');
+  document.getElementById('panel-e').classList.toggle('active',t==='e');
+  document.getElementById('ptitle').textContent=t==='c'?'Mis Clientas':'Mi Colmena';
+  if(t==='c'){renderC();renderBday();renderFestivos();renderPNL();}
+  else{renderE();}
+}
+
+/* HOME RENDERING */
+function renderPNL(){
+  var h=new Date().getHours(),idx=Math.floor((h+new Date().getDay()*3)%PNL_FRASES.length);
+  var el=document.getElementById('pnl-frase');
+  if(el)el.textContent=PNL_FRASES[idx];
+}
+
+function renderBday(){
+  var today=new Date(),m=today.getMonth()+1,d=today.getDate();
+  var bdays=recs.filter(function(r){
+    if(!r.cumpleanos||r.tipo==='consultora')return false;
+    if(r.cumpleanos.includes('-')){var p=r.cumpleanos.split('-');return parseInt(p[1])===m;}
+    return false;
+  }).map(function(r){
+    var day=parseInt((r.cumpleanos.split('-')[2])||0);
+    return{name:fn(r),day:day,isToday:day===d,tel:r.telefono||''};
+  }).sort(function(a,b){return a.day-b.day;});
+  var el=document.getElementById('bday-banner');
+  if(!bdays.length){el.innerHTML='';return;}
+  var h='<div class="bday-banner"><div style="font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">&#127874; Cumpleanos este mes</div>';
+  h+=bdays.slice(0,3).map(function(x){
+    var oc=x.tel?'onclick="window.open(\'https://wa.me/'+x.tel.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent('&#127874; Feliz cumpleanos, '+x.name+'! &#127800; Que tu dia sea muy especial. Con carino, Jenniffer - Mary Kay')+'\',\'_blank\')"':'';
+    return '<div class="b-item" '+oc+'><span style="font-size:.82rem;font-weight:500;color:var(--cream)">'+x.name+'</span><span style="font-size:.68rem;color:'+(x.isToday?'var(--gold)':'var(--txd)')+';">'+(x.isToday?'&#127874; Hoy!':'Dia '+x.day)+'</span></div>';
+  }).join('');
+  if(bdays.length>3)h+='<div style="font-size:.66rem;color:var(--txd);padding-top:4px">+ '+(bdays.length-3)+' mas...</div>';
+  el.innerHTML=h+'</div>';
+}
+
+function renderFestivos(){
+  var fest=getFest(30);
+  var el=document.getElementById('fest-row');
+  if(!fest.length){el.innerHTML='';return;}
+  el.innerHTML=fest.slice(0,5).map(function(f){
+    var dl=f.dl,dlbl=dl===0?'HOY':dl===1?'MANANA':'En '+dl+' dias';
+    var cls=dl===0?' today':dl<=3?' soon':'';
+    return '<div class="fest-chip'+cls+'"><div style="font-size:.52rem;letter-spacing:2px;text-transform:uppercase;color:'+(dl===0?'var(--gold)':dl<=3?'var(--rose)':'var(--txd)')+';margin-bottom:3px">'+dlbl+'</div><div style="font-size:.8rem;color:var(--cream)">'+f.i+' '+f.n+'</div></div>';
+  }).join('');
+}
+
+/* CHIPS */
+function renderChipsC(){
+  var opts=[['all','Todas'],['VIP','&#11088; VIP'],['Frecuente','&#128151; Frecuente'],['Nueva','&#127800; Nueva'],['Prospecto','&#128142; Prospecto'],['Inactiva','&#128164; Inactiva'],['hot','&#128293; Listas'],['hoy','&#128197; Hoy'],['ayer','&#128197; Ayer'],['semana','&#128197; Semana']];
+  document.getElementById('chips-c').innerHTML=opts.map(function(o){
+    return '<div class="chip'+(afc===o[0]?' on':'')+'" data-f="'+o[0]+'" onclick="sfC(this.dataset.f)">'+o[1]+'</div>';
+  }).join('');
+}
+
+function renderChipsE(){
+  var opts=[['all','Todas'],['activa','&#11088; Activas'],['pausa','&#128564; Pausa'],['calificada','&#127881; Calificadas'],['hoy','&#128197; Hoy'],['ayer','&#128197; Ayer'],['semana','&#128197; Semana']];
+  document.getElementById('chips-e').innerHTML=opts.map(function(o){
+    return '<div class="chip'+(afe===o[0]?' on':'')+'" data-f="'+o[0]+'" onclick="sfE(this.dataset.f)">'+o[1]+'</div>';
+  }).join('');
+}
+
+function sfC(f){afc=f;renderChipsC();renderC();}
+function sfE(f){afe=f;renderChipsE();renderE();}
+
+/* RENDER CLIENTAS */
+function renderC(){
+  var q=(document.getElementById('csearch').value||'').toLowerCase();
+  var list=recs.filter(function(r){
+    if(r.tipo==='consultora')return false;
+    if(q&&!fn(r).toLowerCase().includes(q))return false;
+    if(afc==='all')return true;
+    if(afc==='hot')return r.temperatura==='hot';
+    if(['hoy','ayer','semana'].indexOf(afc)>=0)return matchDate(r,afc);
+    return r.estado===afc;
+  });
+  var add='<button class="btn-add" onclick="openAdd(\'c\')">+ Nueva clienta</button>';
+  if(!list.length){document.getElementById('list-c').innerHTML=add+'<div style="text-align:center;padding:32px 20px"><div style="font-size:2rem;opacity:.3;margin-bottom:8px">&#128101;</div><div style="font-size:.8rem;color:var(--txd)">'+(q?'Sin resultados':'Toca + para agregar')+'</div></div>';return;}
+  var now=new Date(),bd=list.filter(function(r){if(!r.cumpleanos||!r.cumpleanos.includes('-'))return false;var p=r.cumpleanos.split('-');return parseInt(p[1])===now.getMonth()+1&&parseInt(p[2])===now.getDate();}),rest=list.filter(function(r){return !bd.find(function(b){return b.id===r.id;});});
+  var h=add;
+  if(bd.length)h+='<div class="slbl">&#127874; Cumpleanos hoy</div>'+bd.map(cCard).join('');
+  if(rest.length)h+='<div class="slbl">Clientas - '+rest.length+'</div>'+rest.map(cCard).join('');
+  document.getElementById('list-c').innerHTML=h;
+}
+
+function cCard(r){
+  var cols={VIP:'var(--gold)',Frecuente:'var(--rose)',Nueva:'var(--ok)',Prospecto:'var(--cool)',Inactiva:'var(--pause)'};
+  var cc=cols[r.estado]||'var(--rose)';
+  var tC={VIP:'tv',Frecuente:'tf',Nueva:'tn',Prospecto:'tp',Inactiva:'tpa'}[r.estado]||'tn';
+  var now=new Date();
+  var isBday=r.cumpleanos&&r.cumpleanos.includes('-')?(function(){var p=r.cumpleanos.split('-');return parseInt(p[1])===now.getMonth()+1&&parseInt(p[2])===now.getDate();}()):false;
+  var et=(r.etiquetas||[]).slice(0,2).map(function(e){return '<span class="tag tp">'+e+'</span>';}).join('');
+  var wa=r.telefono?'<a class="wam" href="https://wa.me/'+r.telefono.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent('Hola '+fn(r)+' &#127800;')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'';
+  return '<div class="ccard" data-id="'+r.id+'" style="--cc:'+cc+'" onclick="openProf(this.dataset.id)"><div class="av" style="background:linear-gradient(135deg,'+cc+','+cc+'88)">'+(isBday?'<div class="bdr"></div>':'')+ini(r)+'</div><div style="flex:1;min-width:0"><div style="font-size:.87rem;font-weight:600;color:var(--cream);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+fn(r)+'</div><div style="font-size:.66rem;color:var(--txd);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.telefono||'')+(r.ciudad?' - '+r.ciudad:'')+'</div><div style="display:flex;gap:4px;flex-wrap:wrap"><span class="tag '+tC+'">'+(r.estado||'Nueva')+'</span>'+et+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0"><span style="font-size:.86rem">'+ti(r.temperatura)+'</span>'+wa+'</div></div>';
+}
+
+/* RENDER COLMENA */
 function calcCG(r){
   if(!r.ingreso)return null;
-  var ingreso=new Date(r.ingreso+'T12:00:00');
-  var deadline=new Date(ingreso);
-  deadline.setMonth(deadline.getMonth()+3);
-  var today=new Date();today.setHours(0,0,0,0);
-  var daysLeft=daysBetween(today,deadline);
-  var pedido=parseFloat(r.pedido)||0;
-  var needed=Math.max(0,600-pedido);
-  var pct=Math.min(100,(pedido/600)*100);
-  return {daysLeft:daysLeft,deadline:deadline,pedido:pedido,needed:needed,pct:pct,qualified:pedido>=600,expired:daysLeft<0};
+  var ing=new Date(r.ingreso+'T12:00:00'),dl=new Date(ing);dl.setMonth(dl.getMonth()+3);
+  var t=new Date();t.setHours(0,0,0,0);var dL=db(t,dl),ped=parseFloat(r.pedido)||0;
+  return{dL:dL,ped:ped,needed:Math.max(0,600-ped),pct:Math.min(100,(ped/600)*100),qualified:ped>=600,expired:dL<0};
 }
 
-function renderAll(){
-  var q=(document.getElementById('search-inp').value||'').toLowerCase();
-  var area=document.getElementById('scroll-area');
-  var list=records.filter(function(r){
-    var isc=r.tipo==='consultora';
-    if(currentTab==='clientas'&&isc)return false;
-    if(currentTab==='consultoras'&&!isc)return false;
-    if(q&&!fullName(r).toLowerCase().includes(q))return false;
-    if(activeFilter==='all')return true;
-    if(currentTab==='clientas'){
-      if(activeFilter==='hot')return r.temperatura==='hot';
-      return r.estado===activeFilter;
-    }else{
-      if(activeFilter==='pausa')return !!r.pausa;
-      if(activeFilter==='activa')return !r.pausa&&!r.calificada;
-      if(activeFilter==='calificada')return !!r.calificada;
-      return true;
-    }
+function renderE(){
+  var q=(document.getElementById('esearch').value||'').toLowerCase();
+  var list=recs.filter(function(r){
+    if(r.tipo!=='consultora')return false;
+    if(q&&!fn(r).toLowerCase().includes(q))return false;
+    if(afe==='all')return true;
+    if(afe==='pausa')return !!r.pausa;
+    if(afe==='activa')return !r.pausa&&!r.calificada;
+    if(afe==='calificada')return !!r.calificada;
+    if(['hoy','ayer','semana'].indexOf(afe)>=0)return matchDate(r,afe);
+    return true;
   });
-  if(!list.length){
-    area.innerHTML='<div class="empty"><div class="empty-ico">'+(currentTab==='clientas'?'👥':'⭐')+'</div><div class="empty-txt">'+(q?'Sin resultados para "'+q+'"':'Toca + para agregar tu primera '+(currentTab==='clientas'?'clienta':'consultora')+'.')+'</div></div>';
-    return;
-  }
-  var html='';
-  if(currentTab==='consultoras'){
-    var activas=list.filter(function(r){return !r.pausa&&!r.calificada;});
-    var calis=list.filter(function(r){return !!r.calificada;});
-    var pausas=list.filter(function(r){return !!r.pausa;});
-    if(activas.length)html+='<div class="slabel">En camino · '+activas.length+'</div><div class="clist">'+activas.map(consCard).join('')+'</div>';
-    if(calis.length)html+='<div class="slabel">🎉 Calificadas Comienzo Grandioso</div><div class="clist">'+calis.map(consCard).join('')+'</div>';
-    if(pausas.length)html+='<div class="slabel">😴 En pausa</div><div class="clist">'+pausas.map(consCard).join('')+'</div>';
-  }else{
-    var today=new Date();
-    var bdays=list.filter(function(r){
-      if(!r.cumpleanos)return false;
-      var p=r.cumpleanos.split('-');
-      return parseInt(p[1])===today.getMonth()+1&&parseInt(p[2])===today.getDate();
-    });
-    var rest=list.filter(function(r){return !bdays.find(function(b){return b.id===r.id;});});
-    if(bdays.length)html+='<div class="slabel">🎂 Cumpleaños hoy</div><div class="clist">'+bdays.map(clientCard).join('')+'</div>';
-    if(rest.length)html+='<div class="slabel">Clientas · '+rest.length+'</div><div class="clist">'+rest.map(clientCard).join('')+'</div>';
-  }
-  area.innerHTML=html;
+  var add='<button class="btn-add" onclick="openAdd(\'e\')">+ Nueva consultora</button>';
+  if(!list.length){document.getElementById('list-e').innerHTML=add+'<div style="text-align:center;padding:32px 20px"><div style="font-size:2rem;opacity:.3;margin-bottom:8px">&#11088;</div><div style="font-size:.8rem;color:var(--txd)">'+(q?'Sin resultados':'Toca + para agregar')+'</div></div>';return;}
+  var ac=list.filter(function(r){return !r.pausa&&!r.calificada;}),ca=list.filter(function(r){return !!r.calificada;}),pa=list.filter(function(r){return !!r.pausa;});
+  var h=add;
+  if(ac.length)h+='<div class="slbl">En camino - '+ac.length+'</div>'+ac.map(eCard).join('');
+  if(ca.length)h+='<div class="slbl">&#127881; Calificadas</div>'+ca.map(eCard).join('');
+  if(pa.length)h+='<div class="slbl">&#128564; Pausa</div>'+pa.map(eCard).join('');
+  document.getElementById('list-e').innerHTML=h;
 }
 
-function clientCard(r){
-  var colors={VIP:'var(--gold)',Frecuente:'var(--rose)',Nueva:'var(--ok)',Prospecto:'var(--cool)',Inactiva:'var(--pause)'};
-  var cc=colors[r.estado]||'var(--rose)';
-  var tClass={VIP:'t-vip',Frecuente:'t-freq',Nueva:'t-nueva',Prospecto:'t-prosp',Inactiva:'t-inact'}[r.estado]||'t-nueva';
-  var today=new Date();
-  var isBday=r.cumpleanos?(function(){var p=r.cumpleanos.split('-');return parseInt(p[1])===today.getMonth()+1&&parseInt(p[2])===today.getDate();}()):false;
-  var etags=(r.etiquetas||[]).slice(0,2).map(function(e){return '<span class="tag t-prosp">'+e+'</span>';}).join('');
-  var wa=r.telefono?'<a class="wa-mini" href="https://wa.me/'+r.telefono.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'';
-  return '<div class="ccard" data-id="'+r.id+'" style="--cc:'+cc+'" onclick="openProf(this.dataset.id)"><div class="avatar" style="background:linear-gradient(135deg,'+cc+','+cc+'88)">'+(isBday?'<div class="bday-ring"></div>':'')+initials(r)+'</div><div class="cbody"><div class="cname">'+fullName(r)+'</div><div class="cmeta">'+(r.telefono||'')+(r.ciudad?' · '+r.ciudad:'')+'</div><div class="ctags"><span class="tag '+tClass+'">'+(r.estado||'Nueva')+'</span>'+etags+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;"><span style="font-size:.9rem;">'+tempIcon(r.temperatura)+'</span>'+wa+'</div></div>';
-}
-
-function consCard(r){
-  var cg=calcCG(r);
+function eCard(r){
   var cc=r.calificada?'var(--gold)':r.pausa?'var(--pause)':'var(--rose)';
-  var cgBadge='';
-  if(cg&&!r.calificada&&!r.pausa){
-    if(cg.expired)cgBadge='<span style="font-size:.6rem;color:var(--text-dim);">Venció</span>';
-    else if(cg.daysLeft<=7)cgBadge='<span style="font-size:.6rem;color:#f09090;">'+cg.daysLeft+'d ⚠️</span>';
-    else cgBadge='<span style="font-size:.6rem;color:var(--text-dim);">'+cg.daysLeft+'d</span>';
-  }
-  var wa=r.telefono?'<a class="wa-mini" href="https://wa.me/'+r.telefono.replace(/\D/g,'')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'';
-  var badge=r.calificada?'<span class="tag t-vip">🎉 Calificada</span>':r.pausa?'<span class="tag t-pause">😴 Pausa</span>':'<span class="tag t-cons">⭐ Consultora</span>';
-  return '<div class="ccard'+(r.pausa?' paused':'')+'" data-id="'+r.id+'" style="--cc:'+cc+'" onclick="openProf(this.dataset.id)"><div class="avatar" style="background:linear-gradient(135deg,'+cc+','+cc+'88)">'+initials(r)+'</div><div class="cbody"><div class="cname">'+fullName(r)+'</div><div class="cmeta">'+(r.numcons?'#'+r.numcons+' · ':'')+( r.ingreso?'Ingresó '+new Date(r.ingreso+'T12:00:00').toLocaleDateString('es-PR',{month:'short',year:'numeric'}):'')+'</div><div class="ctags">'+badge+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">'+cgBadge+wa+'</div></div>';
+  var cg=calcCG(r);var cgB='';
+  if(cg&&!r.calificada&&!r.pausa){if(cg.expired)cgB='<span style="font-size:.58rem;color:var(--txd)">Vencio</span>';else if(cg.dL<=7)cgB='<span style="font-size:.58rem;color:#f09090">'+cg.dL+'d &#9888;</span>';else cgB='<span style="font-size:.58rem;color:var(--txd)">'+cg.dL+'d</span>';}
+  var wa=r.telefono?'<a class="wam" href="https://wa.me/'+r.telefono.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent('Hola '+fn(r)+' &#127800;')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'';
+  var badge=r.calificada?'<span class="tag tv">&#127881; Calificada</span>':r.pausa?'<span class="tag tpa">&#128564; Pausa</span>':'<span class="tag tc">&#11088; Consultora</span>';
+  return '<div class="ccard'+(r.pausa?' paused':'')+'" data-id="'+r.id+'" style="--cc:'+cc+'" onclick="openProf(this.dataset.id)"><div class="av" style="background:linear-gradient(135deg,'+cc+','+cc+'88)">'+ini(r)+'</div><div style="flex:1;min-width:0"><div style="font-size:.87rem;font-weight:600;color:var(--cream);margin-bottom:2px">'+fn(r)+'</div><div style="font-size:.66rem;color:var(--txd);margin-bottom:4px">'+(r.numcons?'#'+r.numcons+' - ':'')+(r.ingreso?new Date(r.ingreso+'T12:00:00').toLocaleDateString('es-PR',{month:'short',year:'numeric'}):'')+'</div><div style="display:flex;gap:4px">'+badge+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">'+cgB+wa+'</div></div>';
 }
 
+/* PROFILE */
 function openProf(id){
-  var r=records.find(function(x){return x.id===id;});
-  if(!r)return;
-  var iscons=r.tipo==='consultora';
-  var cc=iscons?'var(--gold)':{VIP:'var(--gold)',Frecuente:'var(--rose)',Nueva:'var(--ok)',Prospecto:'var(--cool)',Inactiva:'var(--pause)'}[r.estado]||'var(--rose)';
-  var av='linear-gradient(135deg,'+cc+','+cc+'88)';
-  var html='<div class="mhead" style="border:none;"><div class="mtitle">Perfil</div><div style="display:flex;gap:8px;"><button style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:6px 14px;color:var(--text-mid);font-family:Jost,sans-serif;font-size:.72rem;cursor:pointer;" onclick="editFromProf(this.dataset.id)" data-id="'+id+'">✏️ Editar</button><button class="mclose" onclick="closeProf()">✕</button></div></div>';
-  html+='<div class="prof-hero"><div class="prof-av" style="background:'+av+'">'+initials(r)+'</div><div class="prof-name">'+fullName(r)+'</div><div class="prof-tags">';
-  if(iscons){
-    html+='<span class="tag '+(r.calificada?'t-vip':r.pausa?'t-pause':'t-cons')+'">'+(r.calificada?'🎉 Calificada':r.pausa?'😴 En pausa':'⭐ Consultora')+'</span>';
-  }else{
-    var tc={VIP:'t-vip',Frecuente:'t-freq',Nueva:'t-nueva',Prospecto:'t-prosp',Inactiva:'t-inact'}[r.estado]||'t-nueva';
-    html+='<span class="tag '+tc+'">'+(r.estado||'Nueva')+'</span>';
-    if(r.temperatura)html+='<span style="font-size:1rem;margin-left:4px;">'+tempIcon(r.temperatura)+'</span>';
-  }
-  html+='</div></div>';
-
-  // COMIENZO GRANDIOSO
-  if(iscons){
-    var cg=calcCG(r);
-    if(cg&&!r.pausa){
-      var sc,sl;
-      if(r.calificada){sc='cg-done';sl='🎉 ¡Calificó!';}
-      else if(cg.expired){sc='cg-exp';sl='Venció';}
-      else if(cg.daysLeft<=7){sc='cg-hot';sl='⚠️ '+cg.daysLeft+'d';}
-      else if(cg.daysLeft<=14){sc='cg-warn';sl=cg.daysLeft+'d restantes';}
-      else{sc='cg-ok';sl=cg.daysLeft+'d restantes';}
-      html+='<div class="cg-card">';
-      html+='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">';
-      html+='<div><div class="cg-label">Comienzo Grandioso</div>';
-      html+='<div class="cg-days">'+(r.calificada?'🎉':cg.expired?'—':cg.daysLeft)+'</div>';
-      html+='<div class="cg-days-sub">'+(r.calificada?'¡Calificó!':cg.expired?'Venció':'días para calificar')+'</div></div>';
-      html+='<span class="cg-status '+sc+'">'+sl+'</span></div>';
-      html+='<div class="cg-bar-wrap"><div class="cg-bar" style="width:'+cg.pct+'%"></div></div>';
-      html+='<div class="cg-info">';
-      if(r.calificada)html+='¡Lo logró! Sigue apoyándola. 🌸';
-      else if(cg.expired)html+='El plazo venció. Motívala a seguir adelante.';
-      else html+='Pedido: <strong style="color:var(--cream)">$'+cg.pedido.toFixed(0)+'</strong> de $600.'+(cg.needed>0?' Le faltan <strong style="color:var(--warn)">$'+cg.needed.toFixed(0)+'</strong>.':'');
-      html+='</div>';
-      html+='<div class="cg-earn"><div class="cg-earn-title">💵 Lo que tú ganas cuando ella califique</div>';
-      if(r.calificada)html+='<div class="cg-earn-text">Ya ganaste tu gratificación de $50. ¡Felicidades! 🎉</div>';
-      else html+='<div class="cg-earn-text">• <strong>$50 en efectivo</strong> por desarrollo de equipo<br>• Hasta <strong>$220 en paquetes de productos</strong><br>• Sin límite de reclutas</div>';
-      html+='</div>';
-      if(r.telefono&&!r.calificada&&!cg.expired){
-        html+='<button class="cg-wa" data-tel="'+r.telefono+'" data-name="'+fullName(r)+'" data-days="'+cg.daysLeft+'" data-needed="'+cg.needed+'" onclick="waConsultora(this.dataset.tel,this.dataset.name,this.dataset.days,this.dataset.needed)">💬 Escribirle ahora</button>';
-      }
-      html+='</div>';
-    }
-    // PAUSE TOGGLE
-    html+='<div class="pause-row"><div><div style="font-size:.8rem;color:var(--text-mid);">Modo pausa</div><div style="font-size:.66rem;color:var(--text-dim);margin-top:2px;">Respeta su espacio · Sin avisos</div></div>';
-    html+='<div class="toggle'+(r.pausa?' on':'')+'" onclick="togglePausa(this.dataset.id)" data-id="'+r.id+'"></div></div>';
-  }
-
-  // DETAILS
+  var r=recs.find(function(x){return x.id===id;});if(!r)return;
+  var isc=r.tipo==='consultora';
+  var cc=isc?'var(--gold)':{VIP:'var(--gold)',Frecuente:'var(--rose)',Nueva:'var(--ok)',Prospecto:'var(--cool)',Inactiva:'var(--pause)'}[r.estado]||'var(--rose)';
+  var h='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid var(--b)"><div style="font-family:Cormorant Garamond,serif;font-size:1rem;font-style:italic;color:var(--cream)">Perfil</div><div style="display:flex;gap:7px"><button style="background:var(--s);border:1px solid var(--b2);border-radius:14px;padding:5px 12px;color:var(--txm);font-family:Jost,sans-serif;font-size:.7rem;cursor:pointer" data-eid="'+id+'" onclick="efp(this.dataset.eid)">&#9998; Editar</button><button style="background:none;border:none;color:var(--txd);font-size:.95rem;cursor:pointer" onclick="cm(\'pm\')">&#10005;</button></div></div>';
+  h+='<div style="text-align:center;padding:20px 18px 14px;border-bottom:1px solid var(--b)"><div style="width:62px;height:62px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--cream);background:linear-gradient(135deg,'+cc+','+cc+'88);box-shadow:0 6px 22px rgba(0,0,0,.5)">'+ini(r)+'</div><div style="font-family:Cormorant Garamond,serif;font-size:1.15rem;font-style:italic;color:var(--cream);margin-bottom:7px">'+fn(r)+'</div><div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">';
+  if(isc)h+='<span class="tag '+(r.calificada?'tv':r.pausa?'tpa':'tc')+'">'+(r.calificada?'&#127881; Calificada':r.pausa?'&#128564; Pausa':'&#11088; Consultora')+'</span>';
+  else{var tC={VIP:'tv',Frecuente:'tf',Nueva:'tn',Prospecto:'tp',Inactiva:'tpa'}[r.estado]||'tn';h+='<span class="tag '+tC+'">'+(r.estado||'Nueva')+'</span>';if(r.temperatura)h+='<span style="font-size:.88rem;margin-left:3px">'+ti(r.temperatura)+'</span>';}
+  h+='</div></div>';
+  if(isc&&!r.pausa){var cg=calcCG(r);if(cg){h+='<div class="cg-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px"><div><div style="font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:4px">Comienzo Grandioso</div><div style="font-family:Cormorant Garamond,serif;font-size:1.5rem;color:var(--cream);line-height:1">'+(r.calificada?'&#127881;':cg.expired?'—':cg.dL)+'</div><div style="font-size:.6rem;color:var(--txd);margin-top:1px">'+(r.calificada?'Califico!':cg.expired?'Vencio':'dias para calificar')+'</div></div><span style="font-size:.63rem;font-weight:600;padding:3px 9px;border-radius:9px;background:rgba(93,184,122,.15);color:#90e8a8;border:1px solid rgba(93,184,122,.2)">'+(r.calificada?'&#127881;':cg.expired?'Vencio':cg.dL+'d')+'</span></div><div style="background:rgba(255,255,255,.06);border-radius:3px;height:4px;overflow:hidden;margin-bottom:8px"><div style="height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rose),var(--gold));width:'+cg.pct+'%"></div></div><div style="font-size:.7rem;color:var(--txd);line-height:1.5;margin-bottom:8px">'+(r.calificada?'Lo logro! Sigue apoyandola.':cg.expired?'El plazo vencio.':'Pedido: <strong style=color:var(--cream)>$'+cg.ped.toFixed(0)+'</strong> de $600.'+(cg.needed>0?' Le faltan <strong style=color:var(--warn)>$'+cg.needed.toFixed(0)+'</strong>':''))+'</div><div class="cg-earn"><div style="font-size:.55rem;letter-spacing:2px;text-transform:uppercase;color:var(--ok);margin-bottom:4px">Lo que tu ganas</div><div style="font-size:.74rem;color:rgba(255,255,255,.72);line-height:1.5">'+(r.calificada?'Ya ganaste $50. Felicidades!':'- <strong>$50 en efectivo</strong><br>- Hasta <strong>$220 en productos</strong>')+'</div></div>'+(r.telefono&&!r.calificada&&!cg.expired?'<button class="cg-wa" data-t="'+r.telefono+'" data-n="'+fn(r)+'" data-d="'+cg.dL+'" data-nd="'+cg.needed+'" onclick="waC(this.dataset.t,this.dataset.n,this.dataset.d,this.dataset.nd)">&#128172; Escribirle ahora</button>':'')+'</div>';}}
+  if(isc){h+='<div style="display:flex;align-items:center;justify-content:space-between;background:var(--s);border:1px solid var(--b);border-radius:11px;padding:11px 15px;margin:10px 18px 0"><div><div style="font-size:.8rem;color:var(--txm)">Modo pausa</div><div style="font-size:.62rem;color:var(--txd);margin-top:1px">Respeta su espacio - sin avisos</div></div><div class="tgl'+(r.pausa?' on':'')+'" data-id="'+r.id+'" onclick="tPause(this.dataset.id)"></div></div>';}
   var dets=[];
-  if(r.telefono)dets.push({i:'📱',l:'Teléfono',v:r.telefono});
-  if(r.email)dets.push({i:'✉️',l:'Email',v:r.email});
-  if(r.cumpleanos)dets.push({i:'🎂',l:'Cumpleaños',v:new Date(r.cumpleanos+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long'})});
-  if(r.ciudad)dets.push({i:'📍',l:'Ciudad / Municipio',v:r.ciudad+(r.cp?' · '+r.cp:'')});
-  if(!iscons){
-    if(r.piel)dets.push({i:'🌸',l:'Tono de piel',v:r.piel});
-    if(r.tipo_piel)dets.push({i:'💧',l:'Tipo de piel',v:r.tipo_piel});
-    if(r.productos_fav)dets.push({i:'💄',l:'Productos favoritos',v:r.productos_fav});
-    if(r.fuente)dets.push({i:'📡',l:'Llegó por',v:r.fuente});
-    if(r.contacto_pref)dets.push({i:'💬',l:'Prefiere contacto',v:r.contacto_pref});
-  var callTime=getBestCallTime(r);
-  if(callTime)dets.push({i:'🕐',l:'Mejor hora para llamar',v:callTime});
-    if(r.etiquetas&&r.etiquetas.length)dets.push({i:'🏷️',l:'Profesión/Etiquetas',v:r.etiquetas.join(' · ')});
-  }else{
-    if(r.numcons)dets.push({i:'🆔',l:'Número consultora',v:'#'+r.numcons});
-    if(r.ingreso)dets.push({i:'📅',l:'Fecha ingreso',v:new Date(r.ingreso+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'})});
+  if(r.telefono)dets.push(['&#128241;',r.telefono]);
+  if(r.email)dets.push(['&#9993;',r.email]);
+  if(r.cumpleanos)dets.push(['&#127874;',r.cumpleanos]);
+  if(r.conocimos)dets.push(['&#129309;','Nos conocimos: '+r.conocimos]);
+  if(r.ciudad)dets.push(['&#128205;',r.ciudad+(r.cp?' - '+r.cp:'')]);
+  if(r.direccion)dets.push(['&#127968;',r.direccion]);
+  if(!isc){if(r.piel)dets.push(['&#127800;',r.piel]);if(r.tipo_piel)dets.push(['&#128167;',r.tipo_piel]);if(r.productos_fav)dets.push(['&#128132;',r.productos_fav]);if(r.etiquetas&&r.etiquetas.length)dets.push(['&#127991;',r.etiquetas.join(' - ')]);if(r.fuente)dets.push(['&#128279;','Llego por: '+r.fuente]);}
+  else{if(r.numcons)dets.push(['&#128219;','#'+r.numcons]);if(r.ingreso)dets.push(['&#128197;',new Date(r.ingreso+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'})]);}
+  if(r.notas)dets.push(['&#128221;',r.notas,true]);
+  dets.forEach(function(d){h+='<div class="pdet"><span style="font-size:.93rem;width:20px;text-align:center;flex-shrink:0;margin-top:1px">'+d[0]+'</span><div style="color:var(--cream);font-size:.82rem;line-height:1.5'+(d[2]?';font-style:italic;color:var(--txm);white-space:pre-wrap':'')+'">'+d[1]+'</div></div>';});
+  h+='<div style="padding:12px 18px 24px;display:flex;flex-direction:column;gap:8px">';
+  if(r.telefono)h+='<a href="https://wa.me/'+r.telefono.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent('Hola '+fn(r)+' &#127800; Soy Jenniffer, tu consultora Mary Kay.')+'" target="_blank" class="wa-link">&#128172; WhatsApp</a>';
+  h+='<a href="'+IBC+'" target="_blank" class="ibc-link">&#10024; Invitar a registrarse en Mary Kay</a></div>';
+  document.getElementById('pc').innerHTML=h;
+  document.getElementById('pm').classList.add('open');
+}
+
+function waC(t,n,dl,nd){var nl=String.fromCharCode(10);var m='Hola '+n+nl+nl+'Estaba pensando en ti. ';if(parseFloat(nd)>0)m+='Con $'+parseFloat(nd).toFixed(0)+' mas calificas para el Comienzo Grandioso. ';if(parseFloat(dl)<=7&&parseFloat(dl)>0)m+='Solo quedan '+dl+' dias. ';m+=nl+nl+'Como te esta yendo? Aqui estoy para apoyarte.'+nl+nl+'Jenniffer - Mary Kay';window.open('https://wa.me/'+t.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(m),'_blank');}
+function tPause(id){var r=recs.find(function(x){return x.id===id;});if(!r)return;r.pausa=!r.pausa;sv('mk_clients',recs);syncRec(r);if(ctab==='e')renderE();cm('pm');toast(r.pausa?'&#128564; En pausa':'&#10003; Activa de nuevo');}
+function efp(id){cm('pm');setTimeout(function(){openEdit(id);},200);}
+
+/* FORM */
+function openAdd(t){
+  eid=null;
+  document.getElementById('ftitle').textContent=t==='c'?'Nueva clienta':'Nueva consultora';
+  document.getElementById('fmode').value=t;
+  document.getElementById('fsec-c').style.display=t==='c'?'block':'none';
+  document.getElementById('fsec-e').style.display=t==='e'?'block':'none';
+  document.getElementById('fdel').style.display='none';
+  clrF();document.getElementById('fm').classList.add('open');
+}
+
+function openEdit(id){
+  var r=recs.find(function(x){return x.id===id;});if(!r)return;
+  eid=id;var isc=r.tipo==='consultora';
+  document.getElementById('ftitle').textContent='Editar '+(isc?'consultora':'clienta');
+  document.getElementById('fid').value=id;document.getElementById('fmode').value=isc?'e':'c';
+  document.getElementById('fsec-c').style.display=isc?'none':'block';
+  document.getElementById('fsec-e').style.display=isc?'block':'none';
+  document.getElementById('fdel').style.display='flex';
+  clrF();
+  ['fnom|nombre','fape|apellido','ftel|telefono','fbday|cumpleanos','femail|email','fciudad|ciudad','fcp|cp','fdir|direccion','fconocimos|conocimos','fnotas|notas'].forEach(function(p){var s=p.split('|');var e=document.getElementById(s[0]);if(e)e.value=r[s[1]]||'';});
+  if(!isc){
+    document.getElementById('fpiel').value=r.piel||'';document.getElementById('ftipo').value=r.tipo_piel||'';document.getElementById('fprods').value=r.productos_fav||'';
+    if(r.temperatura)document.querySelectorAll('.to').forEach(function(t){if(t.dataset.v===r.temperatura)selt(t);});
+    if(r.estado)document.querySelectorAll('#est-sel .copt').forEach(function(c){if(c.dataset.v===r.estado)c.classList.add('sel');});
+    if(r.contacto_pref)document.querySelectorAll('#cont-sel .copt').forEach(function(c){if(c.dataset.v===r.contacto_pref)c.classList.add('sel');});
+    if(r.fuente)document.querySelectorAll('#fuente-sel .copt').forEach(function(c){if(c.dataset.v===r.fuente)c.classList.add('sel');});
+    if(r.etiquetas)document.querySelectorAll('#etiq-sel .copt').forEach(function(c){if(r.etiquetas.includes(c.dataset.v))c.classList.add('sel');});
+  } else {
+    document.getElementById('fnumcons').value=r.numcons||'';document.getElementById('fingreso').value=r.ingreso||'';document.getElementById('fpedido').value=r.pedido||'';
   }
-  if(r.conocimos)dets.push({i:'🤝',l:'Nos conocimos',v:r.conocimos});
-  if(r.notas)dets.push({i:'📝',l:'Notas',v:r.notas,note:true});
-  // Products & samples section
-  var prodSection = '';
-  if(!iscons){
-    prodSection = '<div style="margin:0 20px 8px;">'
-      + '<div style="font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:14px 0 10px;display:flex;align-items:center;gap:8px;">Productos que usa<span style="flex:1;height:1px;background:rgba(200,150,74,.15);display:block;"></span></div>'
-      + '<textarea id="prod-usa-'+r.id+'" placeholder="ej: TimeWise Miracle Set, CC Cream Beige 1..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;color:var(--text);font-family:Jost,sans-serif;font-size:.82rem;outline:none;resize:none;min-height:64px;line-height:1.6;">'+(r.productos_usa||r.productos_fav||'')+'</textarea>'
-      + '<div style="font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin:14px 0 10px;display:flex;align-items:center;gap:8px;">Muestras dadas<span style="flex:1;height:1px;background:rgba(200,150,74,.15);display:block;"></span></div>'
-      + '<textarea id="muestras-'+r.id+'" placeholder="ej: Muestra TimeWise 3D 12/mar, Fragancia Illuminea 15/mar..." style="width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 13px;color:var(--text);font-family:Jost,sans-serif;font-size:.82rem;outline:none;resize:none;min-height:64px;line-height:1.6;">'+(r.muestras||'')+'</textarea>'
-      + '<button data-sid="'+r.id+'" onclick="saveProdsAndSamples(this.dataset.sid)" style="width:100%;background:var(--rose);color:white;border:none;border-radius:10px;padding:11px;font-family:Jost,sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;margin-top:8px;">💾 Guardar productos y muestras</button>'
-      + '</div>';
-  }
-  dets.forEach(function(d){
-    html+='<div class="pdet"><span class="pdet-icon">'+d.i+'</span><div><div class="pdet-label">'+d.l+'</div><div class="pdet-val'+(d.note?' pdet-note':'')+'" >'+d.v+'</div></div></div>';
-  });
-
-  // ACTION BUTTONS
-  html += prodSection;
-  // Maps button if address exists
-  if(r.direccion){
-    var mapsQuery=encodeURIComponent((r.direccion||'')+', '+(r.ciudad||'')+', Puerto Rico '+(r.cp||''));
-    html+='<div style="padding:8px 20px 0;">'
-      +'<a href="https://www.google.com/maps/search/?api=1&query='+mapsQuery+'" target="_blank" '
-      +'style="display:flex;align-items:center;gap:10px;background:rgba(66,133,244,.1);border:1px solid rgba(66,133,244,.25);'
-      +'color:#7ab3f8;border-radius:11px;padding:12px 16px;text-decoration:none;font-family:Jost,sans-serif;font-size:.82rem;font-weight:500;">'
-      +'<span style="font-size:1rem;">📍</span>'
-      +'<div><div style="font-weight:600;margin-bottom:1px;">Ver en Google Maps</div>'
-      +'<div style="font-size:.68rem;opacity:.7;">'+r.direccion+(r.ciudad?', '+r.ciudad:'')+'</div></div>'
-      +'<span style="margin-left:auto;font-size:.8rem;opacity:.6;">→</span>'
-      +'</a></div>';
-  }
-  html+='<div style="padding:12px 20px 28px;display:flex;flex-direction:column;gap:9px;">';
-  if(r.telefono)html+='<a href="https://wa.me/'+r.telefono.replace(/\D/g,'')+'" target="_blank" style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;border-radius:11px;padding:12px;font-family:Jost,sans-serif;font-size:.84rem;font-weight:600;text-align:center;text-decoration:none;display:block;">💬 WhatsApp</a>';
-  html+='<a href="'+IBC_URL+'" target="_blank" style="background:var(--gold-dim);border:1px solid rgba(200,150,74,.22);color:var(--gold-light);border-radius:11px;padding:12px;font-family:Jost,sans-serif;font-size:.8rem;font-weight:600;text-align:center;text-decoration:none;display:block;">✨ Invitar a registrarse en Mary Kay</a>';
-  html+='</div>';
-
-  document.getElementById('prof-content').innerHTML=html;
-  document.getElementById('modal-prof').classList.add('open');
+  document.getElementById('fm').classList.add('open');
 }
 
-function waConsultora(tel,name,daysLeft,needed){
-  var nl=String.fromCharCode(10);
-  var msg='Hola '+name+' '+String.fromCharCode(127800)+nl+nl+'Estaba pensando en ti. ';
-  if(parseFloat(needed)>0)msg+='Con $'+parseFloat(needed).toFixed(0)+' mas en tu pedido calificas para el Comienzo Grandioso. ';
-  if(parseFloat(daysLeft)<=7&&parseFloat(daysLeft)>0)msg+='Solo quedan '+daysLeft+' dias. Tu puedes! ';
-  msg+=nl+nl+'Como te esta yendo? Aqui estoy para apoyarte. '+nl+nl+'Jenniffer - Mary Kay';
-  window.open('https://wa.me/'+tel.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(msg),'_blank');
-}
-
-function togglePausa(id){
-  var r=records.find(function(x){return x.id===id;});if(!r)return;
-  r.pausa=!r.pausa;
-  saveLocal();syncRec(r);renderAll();closeM('modal-prof');
-  toast(r.pausa?'😴 En pausa — sin avisos':'✅ Activa de nuevo');
-}
-
-function editFromProf(id){closeM('modal-prof');setTimeout(function(){openEditModal(id);},200);}
-
-function openAddModal(){
-  editingId=null;
-  document.getElementById('form-title').textContent=currentTab==='clientas'?'Nueva clienta':'Nueva consultora';
-  document.getElementById('f-mode').value=currentTab;
-  document.getElementById('sec-clienta').style.display=currentTab==='clientas'?'block':'none';
-  document.getElementById('sec-consultora').style.display=currentTab==='consultoras'?'block':'none';
-  document.getElementById('btn-del').style.display='none';
-  clearForm();
-  document.getElementById('modal-form').classList.add('open');
-}
-
-function openEditModal(id){
-  var r=records.find(function(x){return x.id===id;});if(!r)return;
-  editingId=id;
-  var iscons=r.tipo==='consultora';
-  document.getElementById('form-title').textContent='Editar '+(iscons?'consultora':'clienta');
-  document.getElementById('f-id').value=id;
-  document.getElementById('f-mode').value=iscons?'consultoras':'clientas';
-  document.getElementById('sec-clienta').style.display=iscons?'none':'block';
-  document.getElementById('sec-consultora').style.display=iscons?'block':'none';
-  document.getElementById('btn-del').style.display='flex';
-  clearForm();
-  document.getElementById('f-nombre').value=r.nombre||'';
-  document.getElementById('f-apellido').value=r.apellido||'';
-  document.getElementById('f-tel').value=r.telefono||'';
-  document.getElementById('f-bday').value=r.cumpleanos||'';
-  document.getElementById('f-email').value=r.email||'';
-  document.getElementById('f-ciudad').value=r.ciudad||'';
-  var cpEl=document.getElementById('f-cp');if(cpEl)cpEl.value=r.cp||'';
-  var dirEl=document.getElementById('f-direccion');if(dirEl)dirEl.value=r.direccion||'';
-  document.getElementById('f-genero').value=r.genero||'';
-  document.getElementById('f-notas').value=r.notas||'';
-    var fc=document.getElementById('f-conocimos');if(fc)fc.value=r.conocimos||'';
-  if(!iscons){
-    document.getElementById('f-piel').value=r.piel||'';
-    document.getElementById('f-tipo-piel').value=r.tipo_piel||'';
-    document.getElementById('f-prods').value=r.productos_fav||'';
-    if(r.temperatura){document.querySelectorAll('.topt').forEach(function(t){if(t.dataset.val===r.temperatura)selTemp(t);});}
-    if(r.estado){document.querySelectorAll('#est-sel .copt').forEach(function(c){if(c.dataset.val===r.estado)c.classList.add('sel');});}
-    if(r.contacto_pref){document.querySelectorAll('#cont-sel .copt').forEach(function(c){if(c.dataset.val===r.contacto_pref)c.classList.add('sel');});}
-    if(r.fuente){document.querySelectorAll('#fuente-sel .copt').forEach(function(c){if(c.dataset.val===r.fuente)c.classList.add('sel');});}
-    if(r.etiquetas){document.querySelectorAll('#etiq-sel .copt').forEach(function(c){if(r.etiquetas.includes(c.dataset.val))c.classList.add('sel');});}
-  }else{
-    document.getElementById('f-numcons').value=r.numcons||'';
-    document.getElementById('f-ingreso').value=r.ingreso||'';
-    document.getElementById('f-pedido').value=r.pedido||'';
-  }
-  document.getElementById('modal-form').classList.add('open');
-}
-
-function clearForm(){
-  ['f-nombre','f-apellido','f-tel','f-bday','f-email','f-ciudad','f-cp','f-direccion','f-notas',
-   'f-piel','f-tipo-piel','f-prods','f-etiq-custom','f-numcons','f-ingreso','f-pedido'].forEach(function(id){
-    var el=document.getElementById(id);if(el)el.value='';
-  });
-  document.getElementById('f-genero').value='';
-  document.querySelectorAll('.topt').forEach(function(t){t.className='topt';});
+function clrF(){
+  ['fnom','fape','ftel','fbday','femail','fciudad','fcp','fdir','fconocimos','fnotas','fpiel','ftipo','fprods','fetiq','fnumcons','fingreso','fpedido'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.querySelectorAll('.to').forEach(function(t){t.className='to';});
   document.querySelectorAll('.copt').forEach(function(c){c.classList.remove('sel');});
 }
-function selTemp(el){
-  document.querySelectorAll('.topt').forEach(function(t){t.className='topt';});
-  el.classList.add('sel-'+el.dataset.val);
-}
-function selOne(el,group){
-  document.querySelectorAll('#'+group+' .copt').forEach(function(c){c.classList.remove('sel');});
-  el.classList.add('sel');
-}
-function selMulti(el){el.classList.toggle('sel');}
+
+function selt(el){document.querySelectorAll('.to').forEach(function(t){t.className='to';});el.classList.add('s'+el.dataset.v[0]);}
+function sel1(el,g){document.querySelectorAll('#'+g+' .copt').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
+function selm(el){el.classList.toggle('sel');}
 
 function saveRec(){
-  var nombre=document.getElementById('f-nombre').value.trim();
-  if(!nombre){toast('Escribe el nombre 🌸');return;}
-  var iscons=document.getElementById('f-mode').value==='consultoras';
-  var id=editingId||uid();
-  var r={id:id,nombre:nombre,tipo:iscons?'consultora':'clienta',
-    apellido:document.getElementById('f-apellido').value.trim(),
-    telefono:document.getElementById('f-tel').value.trim(),
-    cumpleanos:document.getElementById('f-bday').value,
-    email:document.getElementById('f-email').value.trim(),
-    ciudad:document.getElementById('f-ciudad').value.trim(),
-    cp:(document.getElementById('f-cp')||{value:''}).value.trim(),
-    direccion:(document.getElementById('f-direccion')||{value:''}).value.trim(),
-    genero:document.getElementById('f-genero').value,
-    conocimos:document.getElementById('f-conocimos')?document.getElementById('f-conocimos').value.trim():'',
-    notas:document.getElementById('f-notas').value.trim(),
+  var nom=document.getElementById('fnom').value.trim();if(!nom){toast('Escribe el nombre &#127800;');return;}
+  var isc=document.getElementById('fmode').value==='e';var id=eid||uid();
+  var r={id:id,nombre:nom,tipo:isc?'consultora':'clienta',
+    apellido:document.getElementById('fape').value.trim(),
+    telefono:document.getElementById('ftel').value.trim(),
+    cumpleanos:document.getElementById('fbday').value.trim(),
+    email:document.getElementById('femail').value.trim(),
+    ciudad:document.getElementById('fciudad').value.trim(),
+    cp:document.getElementById('fcp').value.trim(),
+    direccion:document.getElementById('fdir').value.trim(),
+    conocimos:document.getElementById('fconocimos').value.trim(),
+    notas:document.getElementById('fnotas').value.trim(),
     fecha_registro:new Date().toISOString().split('T')[0]};
-  if(!iscons){
-    r.piel=document.getElementById('f-piel').value;
-    r.tipo_piel=document.getElementById('f-tipo-piel').value;
-    r.productos_fav=document.getElementById('f-prods').value.trim();
-    var ts=document.querySelector('.topt[class*="sel-"]');
-    r.temperatura=ts?ts.dataset.val:'';
-    var es=document.querySelector('#est-sel .copt.sel');
-    r.estado=es?es.dataset.val:'Nueva';
-    var cs=document.querySelector('#cont-sel .copt.sel');
-    r.contacto_pref=cs?cs.dataset.val:'';
-    var fs=document.querySelector('#fuente-sel .copt.sel');
-    r.fuente=fs?fs.dataset.val:'';
-    var etqs=[].slice.call(document.querySelectorAll('#etiq-sel .copt.sel')).map(function(c){return c.dataset.val;});
-    var custom=document.getElementById('f-etiq-custom').value.trim();
-    if(custom)etqs.push(custom);
-    r.etiquetas=etqs;
-  }else{
-    r.numcons=document.getElementById('f-numcons').value.trim();
-    r.ingreso=document.getElementById('f-ingreso').value;
-    r.pedido=parseFloat(document.getElementById('f-pedido').value)||0;
-    r.calificada=r.pedido>=600;
-    r.pausa=editingId?((records.find(function(x){return x.id===editingId;})||{}).pausa||false):false;
+  if(!isc){
+    r.piel=document.getElementById('fpiel').value;r.tipo_piel=document.getElementById('ftipo').value;r.productos_fav=document.getElementById('fprods').value.trim();
+    var ts=document.querySelector('.to[class*=" s"]');r.temperatura=ts?ts.dataset.v:'';
+    var es=document.querySelector('#est-sel .copt.sel');r.estado=es?es.dataset.v:'Nueva';
+    var cs=document.querySelector('#cont-sel .copt.sel');r.contacto_pref=cs?cs.dataset.v:'';
+    var fs=document.querySelector('#fuente-sel .copt.sel');r.fuente=fs?fs.dataset.v:'';
+    var etqs=[].slice.call(document.querySelectorAll('#etiq-sel .copt.sel')).map(function(c){return c.dataset.v;});
+    var cu=document.getElementById('fetiq').value.trim();if(cu)etqs.push(cu);r.etiquetas=etqs;
+  } else {
+    r.numcons=document.getElementById('fnumcons').value.trim();r.ingreso=document.getElementById('fingreso').value;
+    r.pedido=parseFloat(document.getElementById('fpedido').value)||0;r.calificada=r.pedido>=600;
+    r.pausa=eid?((recs.find(function(x){return x.id===eid;})||{}).pausa||false):false;
   }
-  if(editingId){var idx=records.findIndex(function(x){return x.id===editingId;});if(idx>=0)records[idx]=r;}
-  else{records.push(r);}
-  saveLocal();syncRec(r);renderAll();closeM('modal-form');
-  toast('✅ '+nombre+' guardada');
+  if(eid){var ix=recs.findIndex(function(x){return x.id===eid;});if(ix>=0)recs[ix]=r;}else recs.push(r);
+  sv('mk_clients',recs);syncRec(r);
+  if(ctab==='c')renderC();else renderE();
+  renderBday();cm('fm');toast('&#10003; '+nom+' guardada');
 }
 
-function deleteRec(){
-  if(!editingId||!confirm('¿Eliminar este registro?'))return;
-  records=records.filter(function(x){return x.id!==editingId;});
-  saveLocal();
-  try{fetch(SUPA_URL+'/rest/v1/clientas?id=eq.'+editingId,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});}catch(e){}
-  renderAll();closeM('modal-form');toast('🗑 Eliminado');
+function delRec(){
+  if(!eid||!confirm('Eliminar?'))return;
+  recs=recs.filter(function(x){return x.id!==eid;});sv('mk_clients',recs);
+  try{fetch(S+'/rest/v1/clientas?id=eq.'+eid,{method:'DELETE',headers:{apikey:K,'Authorization':'Bearer '+K}});}catch(e){}
+  if(ctab==='c')renderC();else renderE();cm('fm');toast('&#128465; Eliminado');
 }
 
-function closeM(id){document.getElementById(id).classList.remove('open');}
-function closeProf(){document.getElementById('modal-prof').classList.remove('open');}
-
+/* SUPABASE */
 async function syncRec(r){
   try{
-    await fetch(SUPA_URL+'/rest/v1/clientas?on_conflict=id',{
+    await fetch(S+'/rest/v1/clientas?on_conflict=id',{
       method:'POST',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
+      headers:{apikey:K,'Authorization':'Bearer '+K,'Content-Type':'application/json','Prefer':'return=representation'},
       body:JSON.stringify({id:r.id,nombre:r.nombre,apellido:r.apellido,telefono:r.telefono,
-        cumpleanos:r.cumpleanos,email:r.email,ciudad:r.ciudad,genero:r.genero,notas:r.notas,
-        tipo:r.tipo,estado:r.estado,temperatura:r.temperatura,piel:r.piel,tipo_piel:r.tipo_piel,
+        cumpleanos:r.cumpleanos,email:r.email,ciudad:r.ciudad,notas:r.notas,tipo:r.tipo,
+        estado:r.estado,temperatura:r.temperatura,piel:r.piel,tipo_piel:r.tipo_piel,
         productos_fav:r.productos_fav,fuente:r.fuente,contacto_pref:r.contacto_pref,
         etiquetas:r.etiquetas?JSON.stringify(r.etiquetas):null,
-        numcons:r.numcons,ingreso:r.ingreso,pedido:r.pedido,calificada:r.calificada,pausa:r.pausa,
-        fecha_registro:r.fecha_registro,conocimos:r.conocimos||null})
+        numcons:r.numcons,ingreso:r.ingreso,pedido:r.pedido,calificada:r.calificada,
+        pausa:r.pausa,cp:r.cp,direccion:r.direccion,
+        conocimos:r.conocimos||null,fecha_registro:r.fecha_registro})
     });
   }catch(e){console.log('Offline');}
 }
 
 async function loadSupa(){
   try{
-    var res=await fetch(SUPA_URL+'/rest/v1/clientas?select=*&order=nombre',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    var res=await fetch(S+'/rest/v1/clientas?select=*&order=nombre',{headers:{apikey:K,'Authorization':'Bearer '+K}});
     var data=await res.json();
     if(data&&data.length){
-      records=data.map(function(r){return Object.assign({},r,{etiquetas:r.etiquetas?JSON.parse(r.etiquetas):[]});});
-      saveLocal();
+      recs=data.map(function(r){return Object.assign({},r,{etiquetas:r.etiquetas?JSON.parse(r.etiquetas):[]});});
+      sv('mk_clients',recs);
     }
-  }catch(e){console.log('Offline');}
+    document.getElementById('sdot').className='sdot ok';
+  }catch(e){document.getElementById('sdot').className='sdot off';}
 }
 
-
-function getBestCallTime(r){
-  var etqs=r.etiquetas||[];
-  var pref=r.contacto_pref||'';
-  var isMom=etqs.includes('Madre');
-  var timeStr='';
-  if(pref==='Mañana') timeStr='☀️ Mañana · 10am-12pm';
-  else if(pref==='Tarde') timeStr='🌤 Tarde · 2pm-4pm';
-  else if(pref==='Noche') timeStr='🌙 Noche · después 7pm';
-  else if(isMom) timeStr='👶 10am-12pm (niños en escuela) · o después 3pm';
-  else timeStr='📊 Martes-Jueves · 10am-11am (mayor tasa de respuesta)';
-  return timeStr;
+/* MUSICA — latidos imperceptibles */
+var _AC=null,_started=false;
+function startHeart(){
+  if(_started)return;_started=true;
+  try{
+    _AC=new(window.AudioContext||window.webkitAudioContext)();
+    var mg=_AC.createGain();mg.gain.setValueAtTime(0,_AC.currentTime);mg.gain.linearRampToValueAtTime(1,_AC.currentTime+3);mg.connect(_AC.destination);
+    function beat(t){
+      function pulse(st,dur,freq){
+        var o=_AC.createOscillator(),e=_AC.createGain(),f=_AC.createBiquadFilter();
+        f.type='lowpass';f.frequency.value=80;f.Q.value=8;o.type='sine';o.frequency.value=freq||52;
+        e.gain.setValueAtTime(0,st);e.gain.linearRampToValueAtTime(0.022,st+0.02);e.gain.exponentialRampToValueAtTime(0.0001,st+dur);
+        o.connect(f);f.connect(e);e.connect(mg);o.start(st);o.stop(st+dur+0.05);
+      }
+      pulse(t,0.12,58);pulse(t+0.13,0.09,46);
+    }
+    function loop(){
+      var now=_AC.currentTime,iv=60/62;
+      for(var i=0;i<8;i++)beat(now+i*iv);
+      setTimeout(loop,(8*iv-0.3)*1000);
+    }
+    loop();
+  }catch(e){}
 }
+document.addEventListener('click',startHeart,{once:true});
+document.addEventListener('touchstart',startHeart,{once:true});
 
-
-function saveProdsAndSamples(id){
-  var r=records.find(function(x){return x.id===id;});if(!r)return;
-  var usaEl=document.getElementById('prod-usa-'+id);
-  var muEl=document.getElementById('muestras-'+id);
-  if(usaEl) r.productos_usa=usaEl.value;
-  if(muEl) r.muestras=muEl.value;
-  saveLocal();syncRec(r);
-  toast('✅ Guardado');
-}
-
-function renderTodayBanner(){
-  var today=new Date().toISOString().split('T')[0];
-  var tom=new Date();tom.setDate(tom.getDate()+1);
-  var tomStr=tom.toISOString().split('T')[0];
-  var fups=[];
-  try{fups=JSON.parse(localStorage.getItem('mk_followups')||'[]');}catch(e){}
-  var overdue=fups.filter(function(f){return !f.done&&f.due<today;});
-  var todayF=fups.filter(function(f){return !f.done&&f.due===today;});
-  var tomF=fups.filter(function(f){return !f.done&&f.due===tomStr;});
-  var banner=document.getElementById('today-banner');
-  if(!banner)return;
-  var all=[].concat(overdue,todayF,tomF);
-  if(!all.length){banner.style.display='none';return;}
-  banner.style.display='block';
-  var html='<div style="font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--warn);margin-bottom:10px;">⏰ Pendientes hoy · '+all.length+'</div>';
-  html+=all.slice(0,3).map(function(f){
-    var isOv=f.due<today;
-    var badge=isOv?'<span style="font-size:.6rem;background:rgba(224,80,80,.2);color:#f09090;padding:2px 8px;border-radius:8px;">Vencido</span>':'<span style="font-size:.6rem;background:rgba(224,160,80,.18);color:#f0c080;padding:2px 8px;border-radius:8px;">Hoy</span>';
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);">'
-      +'<div><div style="font-size:.82rem;color:var(--cream);font-weight:500;">'+f.clientName+'</div>'
-      +'<div style="font-size:.68rem;color:var(--text-dim);">'+(f.label||'Seguimiento')+'</div></div>'
-      +badge+'</div>';
-  }).join('');
-  if(all.length>3)html+='<div style="font-size:.68rem;color:var(--text-dim);margin-top:6px;">+ '+(all.length-3)+' más...</div>';
-  banner.innerHTML=html;
-}
-
-function renderBdayBannerCRM(){
-  var today=new Date();
-  var thisMonth=today.getMonth()+1;
-  var todayDay=today.getDate();
-  var bdays=records.filter(function(r){
-    if(!r.cumpleanos)return false;
-    var p=r.cumpleanos.split('-');
-    return parseInt(p[1])===thisMonth;
-  }).map(function(r){
-    var day=parseInt((r.cumpleanos.split('-')[2])||0);
-    return {name:((r.nombre||'')+' '+(r.apellido||'')).trim(),day:day,isToday:day===todayDay};
-  }).sort(function(a,b){return a.day-b.day;});
-  var banner=document.getElementById('bday-banner');
-  if(!banner||!bdays.length){if(banner)banner.style.display='none';return;}
-  banner.style.display='block';
-  var html='<div style="font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">🎂 Cumpleaños este mes · '+bdays.length+'</div>';
-  html+=bdays.slice(0,3).map(function(b){
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);">'
-      +'<div style="font-size:.82rem;color:var(--cream);">'+b.name+'</div>'
-      +'<span style="font-size:.68rem;color:'+(b.isToday?'var(--gold)':'var(--text-dim)')+';">'+(b.isToday?'🎂 Hoy':'Día '+b.day)+'</span>'
-      +'</div>';
-  }).join('');
-  if(bdays.length>3)html+='<div style="font-size:.68rem;color:var(--text-dim);margin-top:6px;">+ '+(bdays.length-3)+' más...</div>';
-  banner.innerHTML=html;
-}
-
+/* INIT */
 function init(){
-  // Step 1: Load local data immediately — no waiting
-  loadLocal();
-  renderFilters();
-  renderAll();
-  renderTodayBanner();
-  renderBdayBannerCRM();
-  // Step 2: Show app — always, no matter what
-  var app = document.getElementById('app');
-  var loader = document.getElementById('loader');
-  if(app) app.style.opacity = '1';
-  if(loader) loader.className = 'loader gone';
-  // Step 3: Try Supabase quietly in background
+  recs=ld('mk_clients',[]);
+  renderChipsC();renderChipsE();
+  renderC();renderBday();renderFestivos();renderPNL();
+  document.getElementById('app').style.opacity='1';
+  document.getElementById('loader').className='loader gone';
   if(navigator.onLine){
     setTimeout(function(){
       loadSupa().then(function(){
-        renderAll();
-        renderTodayBanner();
-        renderBdayBannerCRM();
-      }).catch(function(e){
-        console.log('Supabase offline:', e);
-      });
-    }, 500);
+        renderC();renderE();renderBday();renderFestivos();
+      }).catch(function(){});
+    },400);
   }
 }
-window.addEventListener('online',function(){loadSupa().then(function(){renderAll();renderTodayBanner();renderBdayBannerCRM();});});
+window.addEventListener('online',function(){loadSupa().then(function(){renderC();renderE();renderBday();});});
 init();
 </script>
-
-<!-- MUSIC PLAYER -->
-<button class="music-btn" id="music-btn" onclick="toggleMusicPanel()" title="Música de enfoque">
-  🎵
-</button>
-
-<div class="music-panel" id="music-panel">
-  <div class="music-panel-title">Música de enfoque</div>
-
-  <div class="freq-opt active" id="freq-432" onclick="playFreq('432')">
-    <span class="freq-icon">🌊</span>
-    <div>
-      <div class="freq-name">432 Hz</div>
-      <div class="freq-desc">Calma · Equilibrio</div>
-    </div>
-  </div>
-
-  <div class="freq-opt" id="freq-528" onclick="playFreq('528')">
-    <span class="freq-icon">✨</span>
-    <div>
-      <div class="freq-name">528 Hz</div>
-      <div class="freq-desc">Claridad · Transformación</div>
-    </div>
-  </div>
-
-  <div class="freq-opt" id="freq-40" onclick="playFreq('40')">
-    <span class="freq-icon">🧠</span>
-    <div>
-      <div class="freq-name">40 Hz Gamma</div>
-      <div class="freq-desc">Enfoque · Productividad</div>
-    </div>
-  </div>
-
-  <div class="freq-opt" id="freq-lofi" onclick="playFreq('lofi')">
-    <span class="freq-icon">🎹</span>
-    <div>
-      <div class="freq-name">Lo-Fi Chill</div>
-      <div class="freq-desc">Tranquila · Sin letras</div>
-    </div>
-  </div>
-
-  <div style="padding-top:10px;border-top:1px solid rgba(255,255,255,.06);margin-top:8px;">
-    <div style="font-size:.62rem;color:var(--text-dim);text-align:center;line-height:1.5;">Abre en YouTube · Controla<br>el volumen desde ahí 🎵</div>
-  </div>
-</div>
-
-<script>
-// MUSIC PLAYER - opens YouTube in new tab
-var FREQS = {
-  '432': { url:'https://www.youtube.com/watch?v=74YBuLHAGZ0', label:'432 Hz' },
-  '528': { url:'https://www.youtube.com/watch?v=LMEmSPVEtCY', label:'528 Hz' },
-  '40':  { url:'https://www.youtube.com/watch?v=F5Kb0ZwULbM', label:'40 Hz Gamma' },
-  'lofi':{ url:'https://www.youtube.com/watch?v=jfKfPfyJRdk', label:'Lo-Fi Chill' },
-};
-
-function toggleMusicPanel(){
-  var panel = document.getElementById('music-panel');
-  panel.classList.toggle('show');
-}
-
-function playFreq(freq){
-  var f = FREQS[freq];
-  if(!f) return;
-  // Update active state
-  ['432','528','40','lofi'].forEach(function(k){
-    var el = document.getElementById('freq-'+k);
-    if(el) el.classList.toggle('active', k===freq);
-  });
-  var btn = document.getElementById('music-btn');
-  btn.classList.add('playing');
-  window.open(f.url, '_blank');
-  toast('🎵 Abriendo ' + f.label + ' en YouTube...', 2500);
-  document.getElementById('music-panel').classList.remove('show');
-}
-</script>
-
 </body>
 </html>
