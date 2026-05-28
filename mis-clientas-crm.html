@@ -267,7 +267,7 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
       </div>
       <div class="frow2">
         <div><label class="flabel">Teléfono / WA</label><input class="finput" id="f-tel" type="tel" placeholder="787-XXX-XXXX"></div>
-        <div><label class="flabel">Cumpleaños</label><input class="finput" id="f-bday" type="date"></div>
+        <div><label class="flabel">Cumpleaños</label><input class="finput" id="f-bday" type="text" placeholder="Ej: 15 de marzo o 3/15"></div>
       </div>
       <div class="frow1"><label class="flabel">Email</label><input class="finput" id="f-email" type="email" placeholder="correo@email.com"></div>
       <div class="frow2">
@@ -381,7 +381,14 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
         </div>
       </div>
 
+      <div class="frow1"><label class="flabel">&#129309; ¿Cómo nos conocimos?</label><input class="finput" id="f-conocimos" placeholder="Ej: Zoom del 28 mayo, feria, referida de María..."></div>
       <div class="fsec">Quién es ella · Notas privadas</div>
+      <div style="background:linear-gradient(135deg,rgba(200,150,74,.08),rgba(196,83,106,.05));border:1px solid rgba(200,150,74,.2);border-radius:11px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:.7rem;font-weight:600;color:var(--gold);margin-bottom:5px">&#10024; Registro en Mary Kay</div>
+        <div style="font-size:.74rem;color:rgba(255,255,255,.55);margin-bottom:9px;line-height:1.6">Si la clienta quiere recibir promociones directamente de la compañía:</div>
+        <a href="https://www.marykay.com/jenniffer/es/login?rurl=%2Fjenniffer%2Fes%2Fhome" target="_blank" style="display:inline-block;padding:8px 16px;background:linear-gradient(135deg,#c8964a,#a07030);color:white;border-radius:9px;font-size:.72rem;font-weight:600;text-decoration:none">Inscribirse en Mary Kay &#10140;</a>
+        <div style="font-size:.62rem;color:rgba(255,255,255,.3);margin-top:6px">Solo si ella quiere — es opcional</div>
+      </div>
       <textarea class="ftextarea" id="f-notas" placeholder="Su historia, lo que la motiva, si está en pausa y cuándo puede volver...&#10;&#10;Este espacio es solo tuyo."></textarea>
     </div>
     <div class="mfoot">
@@ -431,13 +438,23 @@ function switchTab(tab){
 function renderFilters(){
   var el=document.getElementById('filter-chips');
   var opts=currentTab==='clientas'
-    ?[['all','Todas'],['VIP','⭐ VIP'],['Frecuente','💗 Frecuente'],['Nueva','🌸 Nueva'],['Prospecto','💎 Prospecto'],['Inactiva','💤 Inactiva'],['hot','🔥 Listas']]
+    ?[['all','Todas'],['VIP','⭐ VIP'],['Frecuente','💗 Frecuente'],['Nueva','🌸 Nueva'],['Prospecto','💎 Prospecto'],['Inactiva','💤 Inactiva'],['hot','🔥 Listas'],['hoy','📅 Hoy'],['ayer','📅 Ayer'],['semana','📅 Esta semana']]
     :[['all','Todas'],['activa','⭐ Activas'],['pausa','😴 En pausa'],['calificada','🎉 Calificadas']];
   el.innerHTML=opts.map(function(f){
     return '<div class="chip'+(activeFilter===f[0]?' on':'')+'" onclick="setFilter(\'' + f[0] + '\')">'+f[1]+'</div>';
   }).join('');
 }
 function setFilter(f){activeFilter=f;renderFilters();renderAll();}
+function matchesDateFilter(r,f){
+  var today=new Date().toISOString().split('T')[0];
+  var ayer=new Date();ayer.setDate(ayer.getDate()-1);var ayerS=ayer.toISOString().split('T')[0];
+  var semana=new Date();semana.setDate(semana.getDate()-7);var semanaS=semana.toISOString().split('T')[0];
+  var fr=r.fecha_registro||'';
+  if(f==='hoy')return fr===today;
+  if(f==='ayer')return fr===ayerS;
+  if(f==='semana')return fr>=semanaS&&fr<=today;
+  return true;
+}
 
 function calcCG(r){
   if(!r.ingreso)return null;
@@ -594,6 +611,7 @@ function openProf(id){
     if(r.numcons)dets.push({i:'🆔',l:'Número consultora',v:'#'+r.numcons});
     if(r.ingreso)dets.push({i:'📅',l:'Fecha ingreso',v:new Date(r.ingreso+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'long',year:'numeric'})});
   }
+  if(r.conocimos)dets.push({i:'🤝',l:'Nos conocimos',v:r.conocimos});
   if(r.notas)dets.push({i:'📝',l:'Notas',v:r.notas,note:true});
   // Products & samples section
   var prodSection = '';
@@ -684,6 +702,7 @@ function openEditModal(id){
   var dirEl=document.getElementById('f-direccion');if(dirEl)dirEl.value=r.direccion||'';
   document.getElementById('f-genero').value=r.genero||'';
   document.getElementById('f-notas').value=r.notas||'';
+    var fc=document.getElementById('f-conocimos');if(fc)fc.value=r.conocimos||'';
   if(!iscons){
     document.getElementById('f-piel').value=r.piel||'';
     document.getElementById('f-tipo-piel').value=r.tipo_piel||'';
@@ -734,6 +753,7 @@ function saveRec(){
     cp:(document.getElementById('f-cp')||{value:''}).value.trim(),
     direccion:(document.getElementById('f-direccion')||{value:''}).value.trim(),
     genero:document.getElementById('f-genero').value,
+    conocimos:document.getElementById('f-conocimos')?document.getElementById('f-conocimos').value.trim():'',
     notas:document.getElementById('f-notas').value.trim(),
     fecha_registro:new Date().toISOString().split('T')[0]};
   if(!iscons){
@@ -787,7 +807,7 @@ async function syncRec(r){
         productos_fav:r.productos_fav,fuente:r.fuente,contacto_pref:r.contacto_pref,
         etiquetas:r.etiquetas?JSON.stringify(r.etiquetas):null,
         numcons:r.numcons,ingreso:r.ingreso,pedido:r.pedido,calificada:r.calificada,pausa:r.pausa,
-        fecha_registro:r.fecha_registro})
+        fecha_registro:r.fecha_registro,conocimos:r.conocimos||null})
     });
   }catch(e){console.log('Offline');}
 }
