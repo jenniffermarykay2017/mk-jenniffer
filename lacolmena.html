@@ -224,9 +224,11 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
   <div class="slbl" style="margin-top:14px">Acceso rápido</div>
   <div class="qa-grid">
     <button class="qa" onclick="nav('clientas')"><span style="font-size:1.3rem">👥</span><div style="font-size:.78rem;font-weight:500;color:var(--cream)">Clientas</div><div id="qa-c" style="font-size:.62rem;color:var(--txd)">CRM</div></button>
-    <button class="qa" onclick="nav('ventas')"><span style="font-size:1.3rem">💰</span><div style="font-size:.78rem;font-weight:500;color:var(--cream)">Nueva venta</div><div style="font-size:.62rem;color:var(--txd)">Cesta · Recibo</div></button>
+    <button class="qa" onclick="nav('seguimiento')"><span style="font-size:1.3rem">📋</span><div style="font-size:.78rem;font-weight:500;color:var(--cream)">Seguimientos</div><div id="qa-s" style="font-size:.62rem;color:var(--txd)">Pendientes</div></button>
     <button class="qa" onclick="nav('inventario')"><span style="font-size:1.3rem">📦</span><div style="font-size:.78rem;font-weight:500;color:var(--cream)">Inventario</div><div id="qa-i" style="font-size:.62rem;color:var(--txd)">Stock</div></button>
     <button class="qa" onclick="nav('resucita')"><span style="font-size:1.3rem">💫</span><div style="font-size:.78rem;font-weight:500;color:var(--cream)">Resucita</div><div style="font-size:.62rem;color:var(--txd)">Mensajes PNL</div></button>
+    <button class="qa" onclick="nav('perfumes')"><span style="font-size:1.3rem">🌸</span><div style="font-size:.78rem;font-weight:500;color:var(--cream)">Fragancias</div><div style="font-size:.62rem;color:var(--txd)">Damas · Caballeros</div></button>
+    <button class="qa" onclick="nav('ajustes')"><span style="font-size:1.3rem">⚙️</span><div style="font-size:.78rem;font-weight:500;color:var(--cream)">Ajustes</div><div style="font-size:.62rem;color:var(--txd)">QR de pago</div></button>
   </div>
 </div>
 
@@ -253,11 +255,24 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
 
 <!-- VENTAS -->
 <div class="page" id="pg-ventas">
-  <div class="slbl">Nueva venta</div>
-  <input class="finp" id="sc" placeholder="Nombre de la clienta (opcional)" list="cl"><datalist id="cl"></datalist>
-  <div class="slbl">Buscar producto</div>
-  <div class="srow"><span class="sico">🔍</span><input class="sinp" id="psearch" placeholder="Buscar..." oninput="filterP()"></div>
-  <div id="ppick" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;max-height:180px;overflow-y:auto"></div>
+  <div class="slbl">¿Para quién es la venta?</div>
+  <input class="finp" id="sc" placeholder="Escribe el nombre (registrada o nueva)" list="cl" autocomplete="off"><datalist id="cl"></datalist>
+  <div style="font-size:.66rem;color:var(--txd);margin:-4px 0 6px 2px">Puedes escribir cualquier nombre, aunque no esté guardada.</div>
+
+  <div class="slbl">Productos de mi inventario</div>
+  <div class="srow"><span class="sico">🔍</span><input class="sinp" id="psearch" placeholder="Buscar en mi inventario..." oninput="filterP()"></div>
+  <div id="ppick" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:170px;overflow-y:auto"></div>
+
+  <div style="background:var(--gdim);border:1px solid rgba(200,150,74,.2);border-radius:12px;padding:12px 14px;margin-bottom:12px">
+    <div style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">➕ Agregar producto a mano</div>
+    <input class="finp" id="freeName" placeholder="Nombre del producto" style="margin-bottom:7px">
+    <div style="display:flex;gap:7px;align-items:center">
+      <input class="finp" id="freePrice" type="number" inputmode="decimal" step="0.01" min="0" placeholder="Precio $" style="margin-bottom:0;flex:1">
+      <input class="finp" id="freeQty" type="number" inputmode="numeric" min="1" value="1" style="margin-bottom:0;width:64px;text-align:center">
+      <button onclick="addFree()" style="background:var(--rose);color:white;border:none;border-radius:9px;padding:11px 14px;font-family:Jost,sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap">Agregar</button>
+    </div>
+  </div>
+
   <div class="slbl">Carrito</div>
   <div id="cart-items"><div style="text-align:center;padding:20px;color:var(--txd);font-size:.82rem">Agrega productos arriba 👆</div></div>
   <div style="display:flex;align-items:center;gap:10px;margin:10px 0;background:var(--s);border:1px solid var(--b);border-radius:12px;padding:11px 14px">
@@ -372,14 +387,25 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
   </div>
 </div>
 
+<!-- SEGUIMIENTOS -->
+<div class="page" id="pg-seguimiento">
+  <div style="font-size:.78rem;color:var(--txm);line-height:1.6;margin-bottom:14px">Cada venta crea 3 recordatorios automáticos. También puedes agendar los tuyos.</div>
+  <div id="seg-list"></div>
+  <div class="slbl" style="margin-top:18px">Agendar un seguimiento</div>
+  <input class="finp" id="fupNom" placeholder="Nombre de la clienta" list="cl">
+  <input class="finp" id="fupLabel" placeholder="¿Para qué? (ej: llamar, entregar, ofrecer)">
+  <input class="finp" id="fupDue" type="date">
+  <button class="btn" onclick="addFupManual()">📌 Agendar seguimiento</button>
+</div>
+
 </div><!-- end pages -->
 
 <nav class="bnav">
   <button class="nb on" id="nb-home" onclick="nav('home')"><span class="ni">🏠</span><span class="nl">Inicio</span></button>
   <button class="nb" id="nb-clientas" onclick="nav('clientas')"><span class="ni">👥<span class="nbadge" id="nbc" style="display:none">0</span></span><span class="nl">Clientas</span></button>
   <button class="nb" id="nb-ventas" onclick="nav('ventas')"><span class="ni">💰</span><span class="nl">Ventas</span></button>
+  <button class="nb" id="nb-seguimiento" onclick="nav('seguimiento')"><span class="ni">📋</span><span class="nl">Seguir</span></button>
   <button class="nb" id="nb-resucita" onclick="nav('resucita')"><span class="ni">💫</span><span class="nl">Resucita</span></button>
-  <button class="nb" id="nb-ajustes" onclick="nav('ajustes')"><span class="ni">⚙️</span><span class="nl">Ajustes</span></button>
 </nav>
 </div>
 
@@ -535,6 +561,7 @@ var NL=String.fromCharCode(10);
 var QR_ATH=localStorage.getItem('mk_qr_ath')||'';
 var QR_TARJETA=localStorage.getItem('mk_qr_tarjeta')||'';
 var QR_PAYPAL=localStorage.getItem('mk_qr_paypal')||'';
+var QR_ZELLE=localStorage.getItem('mk_qr_zelle')||'';
 
 var SD=[
   {m:1,d:1,n:'Año Nuevo 🇵🇷',i:'🎊',t:[]},
@@ -673,13 +700,14 @@ function nav(name){
   document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on');});
   document.getElementById('pg-'+name).classList.add('active');
   var nb=document.getElementById('nb-'+name);if(nb)nb.classList.add('on');
-  var tt={home:'Inicio',clientas:'Mis Clientas',inventario:'Inventario',ventas:'Nueva Venta',resucita:'Resucita',perfumes:'Fragancias',ajustes:'Ajustes'};
+  var tt={home:'Inicio',clientas:'Mis Clientas',inventario:'Inventario',ventas:'Nueva Venta',resucita:'Resucita',perfumes:'Fragancias',ajustes:'Ajustes',seguimiento:'Seguimientos'};
   document.getElementById('ptitle').textContent=tt[name]||name;
   if(name==='clientas')renderC();
   if(name==='inventario')renderInv();
   if(name==='ventas')refreshCart();
   if(name==='perfumes')renderPerfs();
   if(name==='ajustes')renderQRprev();
+  if(name==='seguimiento')renderSeg();
 }
 
 function renderHome(){
@@ -692,6 +720,8 @@ function renderHome(){
   var nc=recs.length;document.getElementById('qa-c').textContent=nc>0?nc+' persona'+(nc>1?'s':''):'CRM';
   var lsArr=inv.filter(function(p){return(p.stock||0)<=(p.alert||2)&&p.stock!==undefined;});
   document.getElementById('qa-i').textContent=lsArr.length>0?'⚠️ '+lsArr.length+' bajo stock':inv.length+' productos';
+  var pendN=loadFups().filter(function(x){return !x.done&&x.due<=hoyISO();}).length;
+  var qs=document.getElementById('qa-s');if(qs)qs.textContent=pendN>0?pendN+' pendiente'+(pendN>1?'s':''):'Al día ✓';
 }
 function renderGoalUI(){
   var p=GT>0?Math.min(100,(GS/GT)*100):0;
@@ -708,7 +738,15 @@ function renderBanners(){
   var bdays=recs.filter(function(r){if(!r.cumpleanos)return false;var p=r.cumpleanos.split('-');return parseInt(p[1])===m;}).map(function(r){var day=parseInt((r.cumpleanos.split('-')[2])||0);return{name:fn(r),day:day,isToday:day===d,tel:r.telefono||''};}).sort(function(a,b){return a.day-b.day;});
   var eb=document.getElementById('b-bday');
   if(bdays.length){var hb='<div class="banner b-bday"><div style="font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">🎂 Cumpleaños este mes · '+bdays.length+'</div>';hb+=bdays.slice(0,4).map(function(x){return '<div class="b-item"><div><div style="font-size:.82rem;font-weight:500;color:var(--cream)">'+x.name+'</div><div style="font-size:.66rem;color:var(--txd)">Día '+x.day+'</div></div><span class="'+(x.isToday?'bg':'bdg bw')+'">'+(x.isToday?'🎂 ¡Hoy!':'Día '+x.day)+'</span></div>';}).join('');eb.innerHTML=hb+'</div>';}else{eb.innerHTML='';}
-  document.getElementById('b-today').innerHTML='';
+  var fups=loadFups().filter(function(x){return !x.done&&x.due<=hoyISO();}).sort(function(a,b){return a.due<b.due?-1:1;});
+  var bt=document.getElementById('b-today');
+  if(fups.length){
+    var hh='<div class="banner b-today"><div style="font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--warn);margin-bottom:8px">⏰ Seguimientos pendientes · '+fups.length+'</div>';
+    hh+=fups.slice(0,4).map(function(fp){var venc=fp.due<hoyISO();return '<div class="b-item"><div><div style="font-size:.82rem;font-weight:500;color:var(--cream)">'+fp.clientName+'</div><div style="font-size:.66rem;color:var(--txd)">'+fp.label+'</div></div><span class="bdg '+(venc?'bh':'bw')+'">'+(venc?'Vencido':'Hoy')+'</span></div>';}).join('');
+    if(fups.length>4)hh+='<div style="font-size:.66rem;color:var(--txd);padding-top:4px">+ '+(fups.length-4)+' más...</div>';
+    hh+='<button onclick="nav(\'seguimiento\')" style="width:100%;margin-top:8px;background:rgba(224,160,80,.12);border:1px solid rgba(224,160,80,.25);color:#f0c080;border-radius:9px;padding:8px;font-family:Jost,sans-serif;font-size:.74rem;font-weight:600;cursor:pointer">Ver todos →</button>';
+    bt.innerHTML=hh+'</div>';
+  } else { bt.innerHTML=''; }
 }
 function renderSD_home(){
   var days=getSD(45);var el=document.getElementById('sd-row');
@@ -827,8 +865,25 @@ function refreshCart(){
   var el=document.getElementById('cart-items'),tc=document.getElementById('totals');
   if(!cart.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--txd);font-size:.82rem">Agrega productos arriba 👆</div>';tc.style.display='none';return;}
   var sub=cart.reduce(function(s,c){return s+c.price*c.qty;},0);var tax=sub*(taxR/100);var total=sub+tax;
-  el.innerHTML=cart.map(function(c){return '<div class="ci"><div style="flex:1;font-size:.84rem;color:var(--cream)">'+c.name+'</div><div style="display:flex;align-items:center;gap:6px"><button class="qb" data-id="'+c.id+'" onclick="chQ(this.dataset.id,-1)">−</button><span style="font-size:.82rem;font-weight:600;color:var(--cream);min-width:18px;text-align:center">'+c.qty+'</span><button class="qb" data-id="'+c.id+'" onclick="chQ(this.dataset.id,1)">+</button></div><span style="font-size:.82rem;color:var(--gold);min-width:50px;text-align:right">$'+(c.price*c.qty).toFixed(2)+'</span><button style="background:none;border:none;color:var(--hot);cursor:pointer;font-size:.88rem;padding:2px" data-id="'+c.id+'" onclick="rmC(this.dataset.id)">✕</button></div>';}).join('');
+  el.innerHTML=cart.map(function(c){return '<div style="background:var(--s);border:1px solid var(--b);border-radius:12px;padding:11px 13px;margin-bottom:7px">'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="flex:1;font-size:.84rem;color:var(--cream);font-weight:500">'+c.name+'</div><button style="background:none;border:none;color:var(--hot);cursor:pointer;font-size:.88rem;padding:2px" data-id="'+c.id+'" onclick="rmC(this.dataset.id)">✕</button></div>'+
+    '<div style="display:flex;align-items:center;gap:8px">'+
+      '<div style="display:flex;align-items:center;gap:5px"><span style="font-size:.7rem;color:var(--txd)">$</span><input type="number" inputmode="decimal" step="0.01" min="0" value="'+c.price+'" data-id="'+c.id+'" oninput="editPrice(this.dataset.id,this.value)" style="width:74px;background:var(--deep);border:1px solid var(--b2);border-radius:8px;padding:7px 8px;color:var(--gold);font-family:Jost,sans-serif;font-size:.82rem;font-weight:600;text-align:right;outline:none"></div>'+
+      '<div style="display:flex;align-items:center;gap:6px;margin-left:auto"><button class="qb" data-id="'+c.id+'" onclick="chQ(this.dataset.id,-1)">−</button><span style="font-size:.82rem;font-weight:600;color:var(--cream);min-width:18px;text-align:center">'+c.qty+'</span><button class="qb" data-id="'+c.id+'" onclick="chQ(this.dataset.id,1)">+</button></div>'+
+      '<span style="font-size:.84rem;color:var(--cream);font-weight:600;min-width:56px;text-align:right">$'+(c.price*c.qty).toFixed(2)+'</span>'+
+    '</div></div>';}).join('');
   tc.style.display='block';tc.innerHTML='<div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--txm);padding:4px 0"><span>Subtotal</span><span>$'+sub.toFixed(2)+'</span></div><div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--txm);padding:4px 0"><span>IVU ('+taxR+'%)</span><span>$'+tax.toFixed(2)+'</span></div><div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:600;color:var(--cream);border-top:1px solid rgba(255,255,255,.08);margin-top:6px;padding-top:10px"><span>Total</span><span>$'+total.toFixed(2)+'</span></div>';
+}
+function editPrice(id,val){var c=cart.find(function(x){return x.id===id;});if(!c)return;var v=parseFloat(val);c.price=isNaN(v)?0:v;var sub=cart.reduce(function(s,cc){return s+cc.price*cc.qty;},0);var tax=sub*(taxR/100);var tc=document.getElementById('totals');if(tc)tc.innerHTML='<div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--txm);padding:4px 0"><span>Subtotal</span><span>$'+sub.toFixed(2)+'</span></div><div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--txm);padding:4px 0"><span>IVU ('+taxR+'%)</span><span>$'+tax.toFixed(2)+'</span></div><div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:600;color:var(--cream);border-top:1px solid rgba(255,255,255,.08);margin-top:6px;padding-top:10px"><span>Total</span><span>$'+(sub+tax).toFixed(2)+'</span></div>';}
+function addFree(){
+  var n=document.getElementById('freeName').value.trim();
+  var pr=parseFloat(document.getElementById('freePrice').value);
+  var q=parseInt(document.getElementById('freeQty').value)||1;
+  if(!n){toast('Escribe el nombre del producto');return;}
+  if(isNaN(pr)){toast('Escribe el precio');return;}
+  cart.push({id:uid(),name:n,price:pr,qty:Math.max(1,q),libre:true});
+  document.getElementById('freeName').value='';document.getElementById('freePrice').value='';document.getElementById('freeQty').value='1';
+  refreshCart();toast('✅ '+n+' agregado');
 }
 function chQ(id,d){var c=cart.find(function(x){return x.id===id;});if(!c)return;c.qty=Math.max(1,c.qty+d);refreshCart();filterP();}
 function rmC(id){cart=cart.filter(function(x){return x.id!==id;});refreshCart();filterP();}
@@ -841,6 +896,7 @@ function regSale(){
   var sub=cart.reduce(function(s,c){return s+c.price*c.qty;},0);var tax=sub*(taxR/100);var total=sub+tax;
   cart.forEach(function(ci){var p=inv.find(function(x){return x.id===ci.id;});if(p)p.stock=Math.max(0,(p.stock||0)-ci.qty);});sv('mk_inv',inv);
   GS+=total;localStorage.setItem('mk_gs',GS);
+  crearSeguimientosVenta(cn);
   showReceipt(cart.slice(),{sub:sub,tax:tax,total:total,taxR:taxR},cn,new Date());
   cart=[];refreshCart();filterP();renderGoalUI();renderBanners();toast('✅ Venta registrada 🌸');
 }
@@ -849,6 +905,7 @@ function qrBlock(){
   if(QR_ATH)qrs.push(['ATH Móvil',QR_ATH]);
   if(QR_TARJETA)qrs.push(['Tarjeta',QR_TARJETA]);
   if(QR_PAYPAL)qrs.push(['PayPal',QR_PAYPAL]);
+  if(QR_ZELLE)qrs.push(['Zelle',QR_ZELLE]);
   if(!qrs.length)return '';
   var h='<div style="display:flex;justify-content:space-around;margin-top:12px;padding-top:10px;border-top:1px dashed #ddd">';
   qrs.forEach(function(q){h+='<div style="text-align:center"><img src="'+q[1]+'" style="width:78px;height:78px;object-fit:contain;border-radius:6px;border:1px solid #eee;padding:2px"><p style="font-size:.6rem;color:#888;margin-top:3px">'+q[0]+'</p></div>';});
@@ -936,6 +993,7 @@ function openQRpicker(tipo){
       if(tipo==='ath'){QR_ATH=data;localStorage.setItem('mk_qr_ath',data);}
       if(tipo==='tarjeta'){QR_TARJETA=data;localStorage.setItem('mk_qr_tarjeta',data);}
       if(tipo==='paypal'){QR_PAYPAL=data;localStorage.setItem('mk_qr_paypal',data);}
+      if(tipo==='zelle'){QR_ZELLE=data;localStorage.setItem('mk_qr_zelle',data);}
       renderQRprev();toast('✅ QR guardado');
     };
     reader.readAsDataURL(file);
@@ -946,10 +1004,11 @@ function delQR(tipo){
   if(tipo==='ath'){QR_ATH='';localStorage.removeItem('mk_qr_ath');}
   if(tipo==='tarjeta'){QR_TARJETA='';localStorage.removeItem('mk_qr_tarjeta');}
   if(tipo==='paypal'){QR_PAYPAL='';localStorage.removeItem('mk_qr_paypal');}
+  if(tipo==='zelle'){QR_ZELLE='';localStorage.removeItem('mk_qr_zelle');}
   renderQRprev();toast('QR eliminado');
 }
 function renderQRprev(){
-  var rows=[['ath','ATH Móvil',QR_ATH],['tarjeta','Tarjeta',QR_TARJETA],['paypal','PayPal',QR_PAYPAL]];
+  var rows=[['ath','ATH Móvil',QR_ATH],['tarjeta','Tarjeta',QR_TARJETA],['paypal','PayPal',QR_PAYPAL],['zelle','Zelle',QR_ZELLE]];
   var h='';
   rows.forEach(function(r){
     h+='<div style="background:var(--s);border:1px solid var(--b);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px">';
@@ -964,6 +1023,85 @@ function renderQRprev(){
   document.getElementById('qr-list').innerHTML=h;
 }
 
+/* =================== SEGUIMIENTOS =================== */
+function fechaMas(dias){var d=new Date();d.setDate(d.getDate()+dias);return d.toISOString().split('T')[0];}
+function hoyISO(){return new Date().toISOString().split('T')[0];}
+function loadFups(){return ld('mk_f',[]);}
+function saveFups(a){sv('mk_f',a);}
+function telDe(nombre){var r=recs.find(function(x){return fn(x)===nombre;});return r?(r.telefono||''):'';}
+function crearSeguimientosVenta(cn){
+  if(!cn||cn==='Cliente')return;
+  var fups=loadFups();
+  [[2,'Llamada de cortesía (2 días)'],[14,'¿Cómo le fue? (2 semanas)'],[75,'Reposición / reorden (2.5 meses)']].forEach(function(x){
+    fups.push({id:uid(),clientName:cn,label:x[1],due:fechaMas(x[0]),done:false,auto:true});
+  });
+  saveFups(fups);
+}
+function addFupManual(){
+  var nom=document.getElementById('fupNom').value.trim();
+  var lab=document.getElementById('fupLabel').value.trim();
+  var due=document.getElementById('fupDue').value;
+  if(!nom){toast('Escribe el nombre 🌸');return;}
+  if(!due){toast('Elige una fecha');return;}
+  var fups=loadFups();
+  fups.push({id:uid(),clientName:nom,label:lab||'Seguimiento',due:due,done:false,auto:false});
+  saveFups(fups);
+  document.getElementById('fupNom').value='';document.getElementById('fupLabel').value='';document.getElementById('fupDue').value='';
+  renderSeg();renderHome();toast('✅ Seguimiento agendado');
+}
+function doneFup(id){
+  var fups=loadFups();var fp=fups.find(function(x){return x.id===id;});if(fp)fp.done=true;
+  saveFups(fups);renderSeg();renderHome();toast('✅ Hecho');
+}
+function delFup(id){
+  var fups=loadFups().filter(function(x){return x.id!==id;});
+  saveFups(fups);renderSeg();renderHome();toast('Eliminado');
+}
+function fechaCalendar(due){
+  // due = 'YYYY-MM-DD' -> formato YYYYMMDD para evento de día completo
+  var d=due.replace(/-/g,'');
+  var dt=new Date(due+'T12:00:00');dt.setDate(dt.getDate()+1);
+  var fin=dt.toISOString().split('T')[0].replace(/-/g,'');
+  return d+'/'+fin;
+}
+function calLink(fp){
+  var titulo='Mary Kay: '+fp.label+' — '+fp.clientName;
+  var tel=telDe(fp.clientName);
+  var detalles='Seguimiento de La Colmena.'+(tel?' WhatsApp: '+tel:'')+' | wa.me/'+(tel?tel.replace(/[^0-9]/g,''):'');
+  var fechas=fechaCalendar(fp.due);
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE'+
+    '&text='+encodeURIComponent(titulo)+
+    '&dates='+fechas+
+    '&details='+encodeURIComponent(detalles)+
+    '&reminders=POPUP,540';
+}
+function fupItem(fp,modo){
+  var hoy=hoyISO();var vencido=fp.due<hoy;var esHoy=fp.due===hoy;
+  var col=vencido?'#f09090':esHoy?'#f0c080':'var(--txd)';
+  var etq=vencido?'Vencido':esHoy?'Hoy':new Date(fp.due+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'short'});
+  var tel=telDe(fp.clientName);
+  var wa=tel?'<a class="wam" href="https://wa.me/'+tel.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent('Hola '+fp.clientName+' 🌸')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'';
+  var cal='<a href="'+calLink(fp)+'" target="_blank" onclick="event.stopPropagation()" style="background:rgba(80,144,208,.12);border:1px solid rgba(80,144,208,.25);color:#a0c8f8;border-radius:9px;padding:7px 9px;font-family:Jost,sans-serif;font-size:.7rem;font-weight:600;text-decoration:none;white-space:nowrap">📅</a>';
+  return '<div style="background:var(--s);border:1px solid var(--b);border-radius:12px;padding:12px 14px;margin-bottom:8px">'+
+    '<div style="display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div style="font-size:.85rem;font-weight:600;color:var(--cream)">'+fp.clientName+'</div>'+
+    '<div style="font-size:.68rem;color:var(--txm);margin-top:2px">'+fp.label+'</div>'+
+    '<div style="font-size:.62rem;color:'+col+';margin-top:3px;font-weight:600">'+(fp.auto?'⏰ ':'📌 ')+etq+'</div></div>'+
+    '<button data-id="'+fp.id+'" onclick="doneFup(this.dataset.id)" style="background:rgba(93,184,122,.12);border:1px solid rgba(93,184,122,.25);color:#90e8a8;border-radius:9px;padding:8px 11px;font-family:Jost,sans-serif;font-size:.72rem;font-weight:600;cursor:pointer">✓ Hecho</button>'+
+    '<button data-id="'+fp.id+'" onclick="delFup(this.dataset.id)" style="background:none;border:none;color:var(--hot);font-size:.85rem;cursor:pointer;padding:2px">✕</button></div>'+
+    '<div style="display:flex;gap:7px;margin-top:9px">'+wa+cal+'</div>'+
+    '</div>';
+}
+function renderSeg(){
+  var fups=loadFups().filter(function(x){return !x.done;});
+  var hoy=hoyISO();
+  var pend=fups.filter(function(x){return x.due<=hoy;}).sort(function(a,b){return a.due<b.due?-1:1;});
+  var prox=fups.filter(function(x){return x.due>hoy;}).sort(function(a,b){return a.due<b.due?-1:1;});
+  var el=document.getElementById('seg-list');var h='';
+  if(pend.length){h+='<div class="slbl">⏰ Pendientes ahora · '+pend.length+'</div>'+pend.map(function(fp){return fupItem(fp,'p');}).join('');}
+  if(prox.length){h+='<div class="slbl" style="margin-top:14px">Próximos · '+prox.length+'</div>'+prox.map(function(fp){return fupItem(fp,'x');}).join('');}
+  if(!pend.length&&!prox.length){h='<div style="text-align:center;padding:30px 20px;color:var(--txd)"><div style="font-size:2rem;opacity:.3;margin-bottom:8px">📋</div><div style="font-size:.82rem">No hay seguimientos pendientes.<br>Se crean solos cuando registras una venta,<br>o agéndalos abajo 👇</div></div>';}
+  el.innerHTML=h;
+}
 function cmpm(){cm('pm');}
 function init(){
   recs=ld('mk_clients',[]);
