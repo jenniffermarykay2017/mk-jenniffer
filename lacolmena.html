@@ -120,9 +120,9 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
 .modal{background:var(--deep);border:1px solid var(--b2);border-radius:22px 22px 0 0;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;animation:su .32s cubic-bezier(.4,0,.2,1)}
 @keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .mh{width:34px;height:4px;background:rgba(255,255,255,.14);border-radius:2px;margin:12px auto 0}
-.mhead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid var(--b)}
+.mhead{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--deep);z-index:5}
 .mtitle{font-family:"Cormorant Garamond",serif;font-size:1rem;font-style:italic;color:var(--cream)}
-.mclose{background:none;border:none;color:var(--txd);font-size:.95rem;cursor:pointer;padding:4px}
+.mclose{background:var(--s);border:1px solid var(--b2);border-radius:50%;color:var(--cream);font-size:1rem;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mbody{padding:16px 18px 20px}
 .mfoot{padding:12px 18px 24px;border-top:1px solid var(--b);display:flex;gap:8px}
 .btn{width:100%;background:var(--rose);color:white;border:none;border-radius:12px;padding:13px;font-family:"Jost",sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:all .25s}
@@ -198,10 +198,48 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
 
 <!-- HOME -->
 <div class="page active" id="pg-home">
-  <div style="margin-bottom:18px">
+  <div style="margin-bottom:14px">
     <div id="gtime" style="font-size:.56rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px"></div>
     <h1 id="gtext" style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.4rem,5vw,1.9rem);font-weight:300;line-height:1.25;color:var(--cream)"></h1>
   </div>
+
+  <!-- RELOJ + FECHA EN VIVO (hora de Puerto Rico) -->
+  <div style="background:linear-gradient(135deg,rgba(196,83,106,.1),rgba(200,150,74,.06));border:1px solid rgba(196,83,106,.18);border-radius:16px;padding:14px 18px;margin-bottom:12px;text-align:center">
+    <div id="liveClock" style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--cream);line-height:1;letter-spacing:1px">--:--</div>
+    <div id="liveDate" style="font-size:.68rem;letter-spacing:1px;color:var(--gold);margin-top:5px;text-transform:capitalize"></div>
+  </div>
+
+  <!-- MENSAJE MOTIVADOR PNL PARA JENNIFFER -->
+  <div style="background:linear-gradient(135deg,rgba(200,150,74,.1),rgba(196,83,106,.05));border:1px solid rgba(200,150,74,.22);border-radius:16px;padding:16px 18px;margin-bottom:12px;position:relative;overflow:hidden">
+    <div style="font-size:.5rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">✨ Para ti, Jenniffer</div>
+    <div id="motivMsg" style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--cream);line-height:1.5"></div>
+  </div>
+
+  <!-- CALENDARIO DEL MES -->
+  <div style="background:var(--s);border:1px solid var(--b);border-radius:16px;padding:14px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <button onclick="calMes(-1)" style="background:var(--s2);border:1px solid var(--b2);border-radius:50%;width:32px;height:32px;color:var(--cream);font-size:.9rem;cursor:pointer">‹</button>
+      <div id="calTitulo" style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--cream);text-transform:capitalize"></div>
+      <button onclick="calMes(1)" style="background:var(--s2);border:1px solid var(--b2);border-radius:50%;width:32px;height:32px;color:var(--cream);font-size:.9rem;cursor:pointer">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:5px">
+      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">D</div>
+      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">L</div>
+      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">M</div>
+      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">M</div>
+      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">J</div>
+      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">V</div>
+      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">S</div>
+    </div>
+    <div id="calDias" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+      <span style="font-size:.58rem;color:var(--txd)"><span style="color:var(--rose)">●</span> Cumpleaños</span>
+      <span style="font-size:.58rem;color:var(--txd)"><span style="color:var(--gold)">●</span> Fecha especial</span>
+      <span style="font-size:.58rem;color:var(--txd)"><span style="color:var(--cool)">●</span> Seguimiento</span>
+    </div>
+    <div id="calDetalle" style="margin-top:10px"></div>
+  </div>
+
   <div class="goal-card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
       <div>
@@ -809,7 +847,10 @@ function openProf(id){
   var r=recs.find(function(x){return x.id===id;});if(!r)return;
   var isc=r.tipo==='consultora';
   var cc=isc?'var(--gold)':{VIP:'var(--gold)',Frecuente:'var(--rose)',Nueva:'var(--ok)',Prospecto:'var(--cool)',Inactiva:'var(--pause)'}[r.estado]||'var(--rose)';
-  var h='<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid var(--b)"><div style="font-family:Cormorant Garamond,serif;font-size:1rem;font-style:italic;color:var(--cream)">Perfil</div><div style="display:flex;gap:7px"><button style="background:var(--s);border:1px solid var(--b2);border-radius:14px;padding:5px 12px;color:var(--txm);font-family:Jost,sans-serif;font-size:.7rem;cursor:pointer" data-eid="'+id+'" onclick="efp(this.dataset.eid)">✏️ Editar</button><button style="background:none;border:none;color:var(--txd);font-size:.95rem;cursor:pointer" onclick="cmpm()">✕</button></div></div>';
+  var h='<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 16px 12px;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--deep);z-index:5">'+
+    '<button onclick="cmpm()" style="display:flex;align-items:center;gap:5px;background:var(--s);border:1px solid var(--b2);border-radius:20px;padding:10px 16px;color:var(--cream);font-family:Jost,sans-serif;font-size:.82rem;font-weight:500;cursor:pointer">← Volver</button>'+
+    '<button data-eid="'+id+'" onclick="efp(this.dataset.eid)" style="display:flex;align-items:center;gap:5px;background:var(--rose);border:none;border-radius:20px;padding:10px 18px;color:white;font-family:Jost,sans-serif;font-size:.82rem;font-weight:600;cursor:pointer">✏️ Editar</button>'+
+    '</div>';
   h+='<div style="text-align:center;padding:20px 18px 14px;border-bottom:1px solid var(--b)"><div style="width:62px;height:62px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--cream);background:linear-gradient(135deg,'+cc+','+cc+'88);box-shadow:0 6px 22px rgba(0,0,0,.5)">'+ini(r)+'</div><div style="font-family:Cormorant Garamond,serif;font-size:1.15rem;font-style:italic;color:var(--cream);margin-bottom:7px">'+fn(r)+'</div><div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">';
   if(isc)h+='<span class="tag '+(r.calificada?'tv':r.pausa?'tpa':'tc')+'">'+(r.calificada?'🎉 Calificada':r.pausa?'😴 Pausa':'⭐ Consultora')+'</span>';
   else{var tC={VIP:'tv',Frecuente:'tf',Nueva:'tn',Prospecto:'tp',Inactiva:'tpa'}[r.estado]||'tn';h+='<span class="tag '+tC+'">'+(r.estado||'Nueva')+'</span>';if(r.temperatura)h+='<span style="font-size:.88rem;margin-left:3px">'+ti(r.temperatura)+'</span>';}
@@ -830,6 +871,7 @@ function openProf(id){
   if(r.notas)dets.push(['📝',r.notas,true]);
   dets.forEach(function(dd){h+='<div class="pdet"><span style="font-size:.93rem;width:20px;text-align:center;flex-shrink:0;margin-top:1px">'+dd[0]+'</span><div style="color:var(--cream);font-size:.82rem;line-height:1.5'+(dd[2]?';font-style:italic;color:var(--txm);white-space:pre-wrap':'')+'">'+dd[1]+'</div></div>';});
   h+='<div style="padding:12px 18px 24px;display:flex;flex-direction:column;gap:8px">';
+  h+='<button data-eid="'+r.id+'" onclick="efp(this.dataset.eid)" style="background:var(--rose);border:none;color:white;border-radius:10px;padding:13px;font-family:Jost,sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;display:block;width:100%">✏️ Editar / Añadir Mapa Humano</button>';
   if(r.telefono)h+='<a href="https://wa.me/'+r.telefono.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent('Hola '+fn(r)+' 🌸 Soy Jenniffer, tu consultora Mary Kay.')+'" target="_blank" style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;border-radius:10px;padding:11px;font-family:Jost,sans-serif;font-size:.84rem;font-weight:600;text-align:center;text-decoration:none;display:block">💬 WhatsApp</a>';
   h+='<a href="'+IBC+'" target="_blank" style="background:var(--gdim);border:1px solid rgba(200,150,74,.22);color:var(--gl);border-radius:10px;padding:11px;font-family:Jost,sans-serif;font-size:.8rem;font-weight:600;text-align:center;text-decoration:none;display:block">✨ Invitar a registrarse en Mary Kay</a></div>';
   document.getElementById('pc').innerHTML=h;
@@ -1115,15 +1157,119 @@ function renderSeg(){
   el.innerHTML=h;
 }
 function cmpm(){cm('pm');}
+/* =================== RELOJ + FECHA (Puerto Rico) =================== */
+function tickClock(){
+  var ahora=new Date();
+  try{
+    var hora=ahora.toLocaleTimeString('es-PR',{timeZone:'America/Puerto_Rico',hour:'2-digit',minute:'2-digit',hour12:true});
+    var fecha=ahora.toLocaleDateString('es-PR',{timeZone:'America/Puerto_Rico',weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    var c=document.getElementById('liveClock');var d=document.getElementById('liveDate');
+    if(c)c.textContent=hora;
+    if(d)d.textContent=fecha;
+  }catch(e){}
+}
+
+/* =================== MENSAJES MOTIVADORES PNL (para Jenniffer) =================== */
+var MOTIV=[
+  'Hoy tus manos construyen lo que tu mente ya decidió. Cada conversación te acerca a la mujer que ya estás siendo.',
+  'Dios no te dio este sueño para que lo cargues sola. Hoy Él abre las puertas — tú solo camina hacia ellas.',
+  'Mary Kay lo dijo: actúa como si fuera imposible fallar. Y tú ya sabes lo que vienes a hacer hoy.',
+  'La mujer que tú quieres ser el año que viene se construye con lo que decides hacer hoy. Empieza.',
+  'Cada "no" te acerca al "sí" que ya tiene tu nombre. Sigue, que vas llegando.',
+  'Tú no persigues clientas — tú atraes a las mujeres que necesitan exactamente lo que tú das.',
+  'Hoy alguien necesita sentirse importante. Y tú naciste para hacer sentir importante a la gente.',
+  'El éxito que buscas también te está buscando a ti. Hoy se encuentran.',
+  'No tienes que verlo todo el camino. Solo da el próximo paso — el resto se revela al caminar.',
+  'Tu disciplina de hoy es la libertad de tu familia mañana. Cada paso cuenta y tú lo sabes.',
+  'Mary Kay construyó un imperio una mujer a la vez. Tú estás haciendo lo mismo, hoy, con cada mensaje.',
+  'Lo que siembras con amor, florece con abundancia. Hoy siembras — confía en tu cosecha.',
+  'Eres más fuerte de lo que crees y estás más cerca de lo que imaginas. Sigue.',
+  'Dios pone el sueño en tu corazón y la fuerza en tus manos. Hoy usas las dos.',
+  'No naciste para encajar — naciste para brillar. Hoy deja que se note.',
+  'Cada mujer que tocas hoy recordará cómo la hiciste sentir. Ese es tu verdadero negocio.',
+  'La constancia vence al talento cuando el talento no es constante. Y tú apareces todos los días.',
+  'Tu "por qué" es más grande que cualquier "no". Recuérdalo hoy y avanza.',
+  'Hoy no compites con nadie. Solo eres un poco mejor que ayer — y eso ya es ganar.',
+  'La abundancia que pides ya está en camino. Tu trabajo de hoy es prepararte para recibirla.',
+  'Mary Kay decía: el fracaso es parte del proceso del éxito. Hoy todo suma a tu favor.',
+  'Tú decides el tono de tu día. Decídelo grande, decídelo con fe.',
+  'Las puertas se abren para quien toca. Hoy tú tocas — con confianza, con calma, con propósito.',
+  'No estás empezando de cero. Estás empezando desde la experiencia. Eso es poder.',
+  'Hoy tu energía es tu mejor herramienta de venta. Cuídala, protégela, compártela.',
+  'Dios bendice el trabajo de tus manos. Hoy trabaja sabiendo que no estás sola.',
+  'La mujer disciplinada y con fe es imparable. Hoy tú eres esa mujer.',
+  'Cada día que apareces, te conviertes en la consultora que tus metas necesitan. Aparece hoy.',
+  'Tu historia inspira más de lo que crees. Hoy alguien necesita verte brillar para creer en sí misma.',
+  'Lo que para otros es imposible, para ti es el próximo paso. Hoy lo das con seguridad.',
+  'Hoy honras tu sueño actuando. No mañana, no cuando sea perfecto — hoy. Y eso te hace grande.'
+];
+function renderMotiv(){
+  var ahora=new Date();
+  var dia=parseInt(ahora.toLocaleDateString('en-CA',{timeZone:'America/Puerto_Rico',day:'numeric'}),10)||1;
+  var idx=(dia-1)%MOTIV.length;
+  var el=document.getElementById('motivMsg');
+  if(el)el.textContent='"'+MOTIV[idx]+'"';
+}
+
+/* =================== CALENDARIO DEL MES =================== */
+var calOffset=0;
+function calMes(d){calOffset+=d;renderCalendario();}
+function renderCalendario(){
+  var hoy=new Date();
+  var base=new Date(hoy.getFullYear(),hoy.getMonth()+calOffset,1);
+  var anio=base.getFullYear(),mes=base.getMonth();
+  var tit=document.getElementById('calTitulo');
+  if(tit)tit.textContent=base.toLocaleDateString('es-PR',{month:'long',year:'numeric'});
+  var primerDia=new Date(anio,mes,1).getDay();
+  var diasEnMes=new Date(anio,mes+1,0).getDate();
+  var hoyD=hoy.getDate(),hoyM=hoy.getMonth(),hoyA=hoy.getFullYear();
+  // recopilar marcas
+  var fups=loadFups().filter(function(x){return !x.done;});
+  var cont=document.getElementById('calDias');
+  var h='';
+  for(var i=0;i<primerDia;i++){h+='<div></div>';}
+  for(var dd=1;dd<=diasEnMes;dd++){
+    var esHoy=(dd===hoyD&&mes===hoyM&&anio===hoyA);
+    var iso=anio+'-'+String(mes+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+    // cumpleaños
+    var hayBday=recs.some(function(r){if(!r.cumpleanos)return false;var p=r.cumpleanos.split('-');return parseInt(p[1])===mes+1&&parseInt(p[2])===dd;});
+    // fecha especial
+    var haySD=getSD(400).some(function(sd){return sd.date.getDate()===dd&&sd.date.getMonth()===mes&&sd.date.getFullYear()===anio;});
+    // seguimiento
+    var hayFup=fups.some(function(fp){return fp.due===iso;});
+    var dots='';
+    if(hayBday)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--rose);display:inline-block;margin:0 1px"></span>';
+    if(haySD)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--gold);display:inline-block;margin:0 1px"></span>';
+    if(hayFup)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--cool);display:inline-block;margin:0 1px"></span>';
+    h+='<div data-iso="'+iso+'" data-d="'+dd+'" onclick="calDia(this.dataset.iso,this.dataset.d)" style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;cursor:pointer;'+(esHoy?'background:var(--rose);color:white;font-weight:700':'color:var(--tx)')+';font-size:.78rem">'+dd+'<div style="height:5px;display:flex;align-items:center">'+dots+'</div></div>';
+  }
+  if(cont)cont.innerHTML=h;
+  var det=document.getElementById('calDetalle');if(det)det.innerHTML='';
+}
+function calDia(iso,dd){
+  var partes=iso.split('-');var mes=parseInt(partes[1]),dia=parseInt(partes[2]);
+  var items=[];
+  recs.forEach(function(r){if(r.cumpleanos){var p=r.cumpleanos.split('-');if(parseInt(p[1])===mes&&parseInt(p[2])===dia)items.push('🎂 Cumpleaños de '+fn(r));}});
+  getSD(400).forEach(function(sd){if(sd.date.getDate()===dia&&(sd.date.getMonth()+1)===mes)items.push(sd.i+' '+sd.n);});
+  loadFups().filter(function(x){return !x.done&&x.due===iso;}).forEach(function(fp){items.push('📋 '+fp.clientName+' — '+fp.label);});
+  var det=document.getElementById('calDetalle');
+  if(!det)return;
+  if(!items.length){det.innerHTML='<div style="text-align:center;font-size:.72rem;color:var(--txd);padding:8px">Día '+dd+': nada agendado</div>';return;}
+  det.innerHTML='<div style="background:var(--s2);border:1px solid var(--b);border-radius:11px;padding:11px 13px"><div style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Día '+dd+'</div>'+items.map(function(it){return '<div style="font-size:.76rem;color:var(--cream);padding:3px 0">'+it+'</div>';}).join('')+'</div>';
+}
+
 function init(){
   recs=ld('mk_clients',[]);
   inv=ld('mk_inv',[]);
   var fLocal=ld('mk_fragancias',[]);if(fLocal.length)FRAGANCIAS=fLocal;
   renderHome();upPP();renderChips();
+  tickClock();setInterval(tickClock,1000);
+  renderMotiv();
+  renderCalendario();
   document.getElementById('app').style.opacity='1';
   document.getElementById('loader').className='loader gone';
   if(navigator.onLine){
-    setTimeout(function(){loadSupa().then(function(){renderHome();upPP();}).catch(function(){});loadFragancias().catch(function(){});},400);
+    setTimeout(function(){loadSupa().then(function(){renderHome();upPP();renderCalendario();}).catch(function(){});loadFragancias().catch(function(){});},400);
   }
 }
 window.addEventListener('online',function(){loadSupa().then(function(){renderHome();renderC();}).catch(function(){});});
