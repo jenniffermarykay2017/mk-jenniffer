@@ -293,7 +293,13 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
     <div class="slbl" style="padding:0;margin:0;flex:1">Productos</div>
     <button class="btn-sm" onclick="openProd()">+ Añadir</button>
   </div>
+  <div id="inv-empty" style="display:none;background:var(--gdim);border:1px solid rgba(200,150,74,.25);border-radius:14px;padding:16px;margin-bottom:14px;text-align:center">
+    <div style="font-size:.84rem;color:var(--cream);margin-bottom:4px">¿Empezamos rápido?</div>
+    <div style="font-size:.72rem;color:var(--txm);line-height:1.5;margin-bottom:12px">Carga la lista de productos Mary Kay (skincare + fragancias) con 1 en existencia. Luego les pones precio y ajustas lo que quieras.</div>
+    <button onclick="cargarProductosMK()" style="background:var(--rose);color:white;border:none;border-radius:11px;padding:12px 18px;font-family:Jost,sans-serif;font-size:.82rem;font-weight:600;cursor:pointer">📦 Cargar productos Mary Kay</button>
+  </div>
   <div class="inv-grid" id="inv-grid"></div>
+  <button onclick="cargarProductosMK()" id="inv-recargar" style="display:none;width:100%;background:var(--s);border:1px solid var(--b2);border-radius:11px;padding:11px;color:var(--txm);font-family:Jost,sans-serif;font-size:.76rem;cursor:pointer;margin-top:6px">📦 Cargar productos Mary Kay que falten</button>
 </div>
 
 <!-- VENTAS -->
@@ -919,9 +925,74 @@ function saveRec(){
 }
 function delRec(){if(!eid||!confirm('¿Eliminar?'))return;recs=recs.filter(function(x){return x.id!==eid;});sv('mk_clients',recs);try{fetch(S+'/rest/v1/clientas?id=eq.'+eid,{method:'DELETE',headers:{apikey:K,'Authorization':'Bearer '+K}});}catch(e){}renderC();cm('fm');toast('🗑 Eliminado');}
 
+var MK_PRODUCTOS=[
+  // Sets de skincare
+  'TimeWise Miracle Set 3D (Normal/Seca)',
+  'TimeWise Miracle Set 3D (Mixta/Grasa)',
+  'TimeWise Repair Volu-Firm Set',
+  'Set de Microdermabrasión',
+  'Clear Proof Set (Acné)',
+  'Botanical Effects Set',
+  // Limpiadores y humectantes
+  'Limpiador TimeWise 3D (Normal/Seca)',
+  'Limpiador TimeWise 3D (Mixta/Grasa)',
+  'Humectante Día TimeWise 3D FPS 30',
+  'Humectante Noche TimeWise 3D',
+  'Suero C+E TimeWise',
+  'Crema de Ojos TimeWise Repair',
+  'Crema de Noche TimeWise Repair',
+  'Suero Lifting TimeWise Repair',
+  // Microdermabrasión y mascarillas
+  'Microdermabrasion Refine (Paso 1)',
+  'Microdermabrasion Pore Minimizer (Paso 2)',
+  'Mascarilla Charcoal',
+  'Mascarilla Moisture Renewing Gel',
+  // Clear Proof individuales
+  'Clear Proof Gel Limpiador',
+  'Clear Proof Tratamiento Localizado',
+  // Ojos y labios
+  'Desmaquillador de Ojos Sin Aceite',
+  'Satin Lips Set (Bálsamo + Exfoliante)',
+  'Satin Hands Set',
+  // Fragancias Damas
+  'Perfume Illuminea (Dama)',
+  'Perfume Belara (Dama)',
+  'Perfume Bella Belara (Dama)',
+  'Perfume Enchanted Wish (Dama)',
+  'Perfume Thinking of You (Dama)',
+  'Perfume Live Fearlessly (Dama)',
+  'Perfume Forever Diamonds (Dama)',
+  'Perfume Confidently You (Dama)',
+  // Fragancias Caballeros
+  'Cologne Domain (Caballero)',
+  'Cologne Cityscape (Caballero)',
+  'MK High Intensity (Caballero)',
+  'MK High Intensity Sport (Caballero)',
+  'Cologne True Optimism (Caballero)'
+];
+function cargarProductosMK(){
+  var existentes={};inv.forEach(function(p){existentes[p.nombre]=true;});
+  var nuevos=0;
+  MK_PRODUCTOS.forEach(function(nombre){
+    if(!existentes[nombre]){
+      var p={id:uid(),nombre:nombre,precio:0,stock:1,alert:2};
+      inv.push(p);syncInvItem(p);nuevos++;
+    }
+  });
+  sv('mk_inv',inv);renderInv();upPP();
+  toast(nuevos>0?('✅ '+nuevos+' productos añadidos'):'Ya estaban todos cargados');
+}
 function renderInv(){
   var g=document.getElementById('inv-grid');
-  if(!inv.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:28px;color:var(--txd);font-size:.82rem">Agrega productos para comenzar</div>';return;}
+  var empty=document.getElementById('inv-empty');var recargar=document.getElementById('inv-recargar');
+  if(!inv.length){
+    if(empty)empty.style.display='block';
+    if(recargar)recargar.style.display='none';
+    g.innerHTML='';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  if(recargar)recargar.style.display='block';
   g.innerHTML=inv.map(function(p){var s=parseInt(p.stock)||0,al=parseInt(p.alert)||2;var ok=s===0?'var(--hot)':s<=al?'var(--warn)':'var(--ok)';var sl=s===0?'⛔ Agotado':s<=al?'⚠️ '+s+' quedan':'✅ '+s;return '<div class="inv-card"><div style="font-size:.82rem;font-weight:500;color:var(--cream);margin-bottom:4px;line-height:1.3">'+p.nombre+'</div><div style="font-size:.72rem;color:var(--gold);margin-bottom:8px">$'+parseFloat(p.precio||0).toFixed(2)+'</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:.76rem;font-weight:600;color:'+ok+'">'+sl+'</span><div style="display:flex;gap:4px"><button class="qb" data-id="'+p.id+'" onclick="adjS(this.dataset.id,-1)">−</button><button class="qb" data-id="'+p.id+'" onclick="adjS(this.dataset.id,1)">+</button><button class="qb" data-id="'+p.id+'" onclick="openEP(this.dataset.id)" style="font-size:.66rem">✏️</button></div></div></div>';}).join('');}
 function adjS(id,d){var p=inv.find(function(x){return x.id===id;});if(!p)return;p.stock=Math.max(0,(p.stock||0)+d);sv('mk_inv',inv);syncInvItem(p);renderInv();}
 function openProd(){epid=null;document.getElementById('prtitle').textContent='Nuevo producto';['prid','prname','prprice','prstock'].forEach(function(id){document.getElementById(id).value='';});document.getElementById('pralert').value='2';document.getElementById('prdel').style.display='none';document.getElementById('prm').classList.add('open');}
