@@ -165,13 +165,7 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
 .loader.gone{opacity:0;pointer-events:none;display:none}
 .pinkey{aspect-ratio:1;background:var(--s);border:1px solid var(--b2);border-radius:50%;color:var(--cream);font-family:Jost,sans-serif;font-size:1.4rem;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
 .pinkey:active{background:var(--rose);transform:scale(.95)}
-.cal-wrap{display:flex;flex-direction:column;gap:12px}
-.cal-side{display:flex;flex-direction:column}
-@media(min-width:860px){
-  .cal-wrap{flex-direction:row;align-items:stretch}
-  .cal-wrap>div:first-child{flex:0 0 360px;max-width:360px}
-  .cal-side{flex:1;background:var(--s);border:1px solid var(--b);border-radius:16px;padding:16px;overflow-y:auto}
-}
+
 /* ===== PC + TABLET — NUEVO (Parte 1) ===== */
 @media(min-width:860px){
   .app{max-width:820px;margin-inline:auto;border-inline:1px solid var(--b)}
@@ -245,33 +239,10 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
     <div id="motivMsg" style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--cream);line-height:1.5"></div>
   </div>
 
-  <!-- CALENDARIO DEL MES -->
-  <div class="cal-wrap" style="margin-bottom:16px">
-   <div style="background:var(--s);border:1px solid var(--b);border-radius:16px;padding:14px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <button onclick="calMes(-1)" style="background:var(--s2);border:1px solid var(--b2);border-radius:50%;width:32px;height:32px;color:var(--cream);font-size:.9rem;cursor:pointer">‹</button>
-      <div id="calTitulo" style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--cream);text-transform:capitalize"></div>
-      <button onclick="calMes(1)" style="background:var(--s2);border:1px solid var(--b2);border-radius:50%;width:32px;height:32px;color:var(--cream);font-size:.9rem;cursor:pointer">›</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:5px">
-      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">D</div>
-      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">L</div>
-      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">M</div>
-      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">M</div>
-      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">J</div>
-      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">V</div>
-      <div style="text-align:center;font-size:.56rem;color:var(--txd);font-weight:600">S</div>
-    </div>
-    <div id="calDias" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
-    <div style="display:flex;gap:12px;justify-content:center;margin-top:10px;flex-wrap:wrap">
-      <span style="font-size:.58rem;color:var(--txd)"><span style="color:var(--rose)">●</span> Cumpleaños</span>
-      <span style="font-size:.58rem;color:var(--txd)"><span style="color:var(--gold)">●</span> Fecha especial</span>
-      <span style="font-size:.58rem;color:var(--txd)"><span style="color:var(--cool)">●</span> Seguimiento</span>
-    </div>
-   </div>
-   <div class="cal-side">
-    <div id="calDetalle"></div>
-   </div>
+  <!-- AGENDA (lista) -->
+  <div style="background:var(--s);border:1px solid var(--b);border-radius:16px;padding:16px 18px;margin-bottom:16px">
+    <div style="font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px">📅 Mi agenda</div>
+    <div id="agenda"></div>
   </div>
 
   <div class="goal-card">
@@ -515,7 +486,7 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
 <!-- FORM MODAL -->
 <div class="mov" id="fm" onclick="if(event.target===this)cm('fm')">
   <div class="modal"><div class="mh"></div>
-    <div class="mhead"><div class="mtitle" id="ftitle">Nueva clienta</div><button class="mclose" onclick="cm('fm')">✕</button></div>
+    <div class="mhead"><button onclick="cm('fm')" style="display:flex;align-items:center;gap:5px;background:var(--s);border:1px solid var(--b2);border-radius:20px;padding:9px 15px;color:var(--cream);font-family:Jost,sans-serif;font-size:.8rem;font-weight:500;cursor:pointer">← Volver</button><div class="mtitle" id="ftitle" style="flex:1;text-align:center">Nueva clienta</div><button class="mclose" onclick="cm('fm')">✕</button></div>
     <div class="mbody">
       <input type="hidden" id="fid"><input type="hidden" id="fmode">
       <div class="fsec">Información personal</div>
@@ -941,8 +912,10 @@ function saveRec(){
   var r={id:id,nombre:nom,tipo:isc?'consultora':'clienta',apellido:document.getElementById('fape').value.trim(),telefono:document.getElementById('ftel').value.trim(),cumpleanos:document.getElementById('fbday').value,email:document.getElementById('femail').value.trim(),ciudad:document.getElementById('fciudad').value.trim(),cp:document.getElementById('fcp').value.trim(),direccion:document.getElementById('fdir').value.trim(),notas:document.getElementById('fnotas').value.trim(),hijos:document.getElementById('fhijos').value.trim(),profesion:document.getElementById('fprofesion').value.trim(),suenos:document.getElementById('fsuenos').value.trim(),mascotas:document.getElementById('fmascotas').value.trim(),importante:document.getElementById('fimportante').value.trim(),fecha_registro:new Date().toISOString().split('T')[0]};
   if(!isc){r.piel=document.getElementById('fpiel').value;r.tipo_piel=document.getElementById('ftipo').value;r.productos_fav=document.getElementById('fprods').value.trim();var ts=document.querySelector('.to[class*=" s"]');r.temperatura=ts?ts.dataset.v:'';var es=document.querySelector('#est-sel .copt.sel');r.estado=es?es.dataset.v:'Nueva';var cs=document.querySelector('#cont-sel .copt.sel');r.contacto_pref=cs?cs.dataset.v:'';var fs=document.querySelector('#fuente-sel .copt.sel');r.fuente=fs?fs.dataset.v:'';var etqs=[].slice.call(document.querySelectorAll('#etiq-sel .copt.sel')).map(function(c){return c.dataset.v;});var cu=document.getElementById('fetiq').value.trim();if(cu)etqs.push(cu);r.etiquetas=etqs;}
   else{r.numcons=document.getElementById('fnumcons').value.trim();r.ingreso=document.getElementById('fingreso').value;r.pedido=parseFloat(document.getElementById('fpedido').value)||0;r.calificada=r.pedido>=600;r.pausa=eid?((recs.find(function(x){return x.id===eid;})||{}).pausa||false):false;}
+  var eraEdicion=!!eid;var idGuardado=r.id;
   if(eid){var ix=recs.findIndex(function(x){return x.id===eid;});if(ix>=0)recs[ix]=r;}else recs.push(r);
   sv('mk_clients',recs);syncRec(r);renderC();renderHome();cm('fm');toast('✅ '+nom+' guardada');
+  if(eraEdicion){setTimeout(function(){openProf(idGuardado);},250);}
 }
 function delRec(){if(!eid||!confirm('¿Eliminar?'))return;recs=recs.filter(function(x){return x.id!==eid;});sv('mk_clients',recs);try{fetch(S+'/rest/v1/clientas?id=eq.'+eid,{method:'DELETE',headers:{apikey:K,'Authorization':'Bearer '+K}});}catch(e){}renderC();cm('fm');toast('🗑 Eliminado');}
 
@@ -1340,70 +1313,41 @@ function renderMotiv(){
   if(el)el.textContent='"'+MOTIV[idx]+'"';
 }
 
-/* =================== CALENDARIO DEL MES =================== */
+/* =================== AGENDA (lista Hoy / Semana / Más adelante) =================== */
 function soloFecha(d){if(!d)return '';return String(d).split('T')[0].slice(0,10);}
-
-var calOffset=0;
-function calMes(d){calOffset+=d;renderCalendario();}
-function renderCalendario(){
-  var hoy=new Date();
-  var base=new Date(hoy.getFullYear(),hoy.getMonth()+calOffset,1);
-  var anio=base.getFullYear(),mes=base.getMonth();
-  var tit=document.getElementById('calTitulo');
-  if(tit)tit.textContent=base.toLocaleDateString('es-PR',{month:'long',year:'numeric'});
-  var primerDia=new Date(anio,mes,1).getDay();
-  var diasEnMes=new Date(anio,mes+1,0).getDate();
-  var hoyD=hoy.getDate(),hoyM=hoy.getMonth(),hoyA=hoy.getFullYear();
-  // recopilar marcas
-  var fups=loadFups().filter(function(x){return !x.done;});
-  var cont=document.getElementById('calDias');
-  var h='';
-  for(var i=0;i<primerDia;i++){h+='<div></div>';}
-  for(var dd=1;dd<=diasEnMes;dd++){
-    var esHoy=(dd===hoyD&&mes===hoyM&&anio===hoyA);
-    var iso=anio+'-'+String(mes+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
-    // cumpleaños
-    var hayBday=recs.some(function(r){if(!r.cumpleanos)return false;var p=r.cumpleanos.split('-');return parseInt(p[1])===mes+1&&parseInt(p[2])===dd;});
-    // fecha especial
-    var haySD=getSD(400).some(function(sd){return sd.date.getDate()===dd&&sd.date.getMonth()===mes&&sd.date.getFullYear()===anio;});
-    // seguimiento
-    var hayFup=fups.some(function(fp){return soloFecha(fp.due)===iso;});
-    var dots='';
-    if(hayBday)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--rose);display:inline-block;margin:0 1px"></span>';
-    if(haySD)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--gold);display:inline-block;margin:0 1px"></span>';
-    if(hayFup)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--cool);display:inline-block;margin:0 1px"></span>';
-    h+='<div data-iso="'+iso+'" data-d="'+dd+'" onclick="calDia(this.dataset.iso,this.dataset.d)" style="min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;cursor:pointer;padding:3px 0;'+(esHoy?'background:var(--rose);color:white;font-weight:700':'color:var(--tx)')+';font-size:.78rem">'+dd+'<div style="height:5px;display:flex;align-items:center">'+dots+'</div></div>';
-  }
-  if(cont)cont.innerHTML=h;
-  panelHoy();
-}
-function panelHoy(){
-  var det=document.getElementById('calDetalle');if(!det)return;
+function fechaBonita(iso){var d=new Date(iso+'T12:00:00');return d.toLocaleDateString('es-PR',{weekday:'short',day:'numeric',month:'short'});}
+function renderCalendario(){renderAgenda();}
+function renderAgenda(){
+  var cont=document.getElementById('agenda');if(!cont)return;
   var hoy=hoyISO();
-  var items=[];
-  var hd=new Date();var hm=hd.getMonth()+1,hday=hd.getDate();
-  recs.forEach(function(r){if(r.cumpleanos){var p=soloFecha(r.cumpleanos).split('-');if(parseInt(p[1])===hm&&parseInt(p[2])===hday)items.push(['🎂','Cumpleaños de '+fn(r)]);}});
-  getSD(60).forEach(function(sd){if(sd.dl===0)items.push([sd.i,sd.n]);});
-  var fpsHoy=loadFups().filter(function(x){return !x.done&&soloFecha(x.due)<=hoy;}).sort(function(a,b){return soloFecha(a.due)<soloFecha(b.due)?-1:1;});
-  var h='<div style="font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">📌 Lo de hoy</div>';
-  if(items.length){h+=items.map(function(it){return '<div style="font-size:.8rem;color:var(--cream);padding:5px 0;border-bottom:1px solid var(--b)">'+it[0]+' '+it[1]+'</div>';}).join('');}
-  if(fpsHoy.length){
-    h+='<div style="font-size:.54rem;letter-spacing:2px;text-transform:uppercase;color:var(--cool);margin:12px 0 6px">Seguimientos pendientes</div>';
-    h+=fpsHoy.slice(0,6).map(function(fp){var v=soloFecha(fp.due)<hoy;return '<div style="font-size:.78rem;color:var(--cream);padding:5px 0;border-bottom:1px solid var(--b)">📋 '+fp.clientName+' <span style="color:'+(v?'#f09090':'#f0c080')+';font-size:.66rem">— '+fp.label+'</span></div>';}).join('');
+  var hoyD=new Date();
+  var en7=new Date();en7.setDate(en7.getDate()+7);var en7ISO=en7.toISOString().split('T')[0];
+  var en30=new Date();en30.setDate(en30.getDate()+31);var en30ISO=en30.toISOString().split('T')[0];
+  var eventos=[];
+  loadFups().filter(function(x){return !x.done;}).forEach(function(fp){eventos.push({fecha:soloFecha(fp.due),ico:'📋',texto:fp.clientName,sub:fp.label,tel:telDe(fp.clientName)});});
+  recs.forEach(function(r){if(!r.cumpleanos)return;var p=soloFecha(r.cumpleanos).split('-');if(p.length<3)return;var mm=parseInt(p[1]),dd2=parseInt(p[2]);
+    [0,1].forEach(function(addY){var y=hoyD.getFullYear()+addY;var fi=y+'-'+String(mm).padStart(2,'0')+'-'+String(dd2).padStart(2,'0');if(fi>=hoy&&fi<=en30ISO)eventos.push({fecha:fi,ico:'🎂',texto:'Cumpleaños de '+fn(r),sub:'',tel:r.telefono||''});});
+  });
+  getSD(31).forEach(function(sd){var fi=sd.date.getFullYear()+'-'+String(sd.date.getMonth()+1).padStart(2,'0')+'-'+String(sd.date.getDate()).padStart(2,'0');eventos.push({fecha:fi,ico:sd.i,texto:sd.n,sub:'',tel:''});});
+  eventos.sort(function(a,b){return a.fecha<b.fecha?-1:a.fecha>b.fecha?1:0;});
+  var hoyL=eventos.filter(function(e){return e.fecha<=hoy;});
+  var semana=eventos.filter(function(e){return e.fecha>hoy&&e.fecha<=en7ISO;});
+  var luego=eventos.filter(function(e){return e.fecha>en7ISO&&e.fecha<=en30ISO;});
+  function fila(e){
+    var venc=e.fecha<hoy;
+    var wa=e.tel?'<a href="https://wa.me/'+e.tel.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent('Hola '+e.texto.replace('Cumpleaños de ','')+' 🌸')+'" target="_blank" onclick="event.stopPropagation()" style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.22);color:#5de870;border-radius:8px;padding:5px 9px;font-size:.62rem;font-weight:600;text-decoration:none;flex-shrink:0">WA</a>':'';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b)">'+
+      '<span style="font-size:1rem;flex-shrink:0">'+e.ico+'</span>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:.82rem;color:var(--cream);font-weight:500">'+e.texto+'</div>'+(e.sub?'<div style="font-size:.66rem;color:var(--txm)">'+e.sub+'</div>':'')+'</div>'+
+      '<span style="font-size:.62rem;color:'+(venc?'#f09090':'var(--txd)')+';flex-shrink:0;text-align:right">'+(venc?'Vencido':fechaBonita(e.fecha))+'</span>'+
+      wa+'</div>';
   }
-  if(!items.length&&!fpsHoy.length){h+='<div style="font-size:.76rem;color:var(--txd);padding:8px 0">Nada pendiente hoy. ✨</div>';}
-  det.innerHTML=h;
-}
-function calDia(iso,dd){
-  var partes=iso.split('-');var mes=parseInt(partes[1]),dia=parseInt(partes[2]);
-  var items=[];
-  recs.forEach(function(r){if(r.cumpleanos){var p=soloFecha(r.cumpleanos).split('-');if(parseInt(p[1])===mes&&parseInt(p[2])===dia)items.push('🎂 Cumpleaños de '+fn(r));}});
-  getSD(400).forEach(function(sd){if(sd.date.getDate()===dia&&(sd.date.getMonth()+1)===mes)items.push(sd.i+' '+sd.n);});
-  loadFups().filter(function(x){return !x.done&&soloFecha(x.due)===iso;}).forEach(function(fp){items.push('📋 '+fp.clientName+' — '+fp.label);});
-  var det=document.getElementById('calDetalle');
-  if(!det)return;
-  if(!items.length){det.innerHTML='<div style="text-align:center;font-size:.72rem;color:var(--txd);padding:8px">Día '+dd+': nada agendado</div>';return;}
-  det.innerHTML='<div style="background:var(--s2);border:1px solid var(--b);border-radius:11px;padding:11px 13px"><div style="font-size:.56rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Día '+dd+'</div>'+items.map(function(it){return '<div style="font-size:.76rem;color:var(--cream);padding:3px 0">'+it+'</div>';}).join('')+'</div>';
+  var h='';
+  h+='<div style="font-size:.5rem;letter-spacing:2px;text-transform:uppercase;color:var(--rose);margin-bottom:4px">Hoy y pendiente</div>';
+  h+=hoyL.length?hoyL.map(fila).join(''):'<div style="font-size:.74rem;color:var(--txd);padding:6px 0 12px">Nada pendiente hoy ✨</div>';
+  if(semana.length){h+='<div style="font-size:.5rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin:14px 0 4px">Esta semana</div>'+semana.map(fila).join('');}
+  if(luego.length){h+='<div style="font-size:.5rem;letter-spacing:2px;text-transform:uppercase;color:var(--txd);margin:14px 0 4px">Más adelante</div>'+luego.map(fila).join('');}
+  cont.innerHTML=h;
 }
 
 function init(){
