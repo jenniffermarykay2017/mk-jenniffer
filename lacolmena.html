@@ -165,6 +165,13 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
 .loader.gone{opacity:0;pointer-events:none;display:none}
 .pinkey{aspect-ratio:1;background:var(--s);border:1px solid var(--b2);border-radius:50%;color:var(--cream);font-family:Jost,sans-serif;font-size:1.4rem;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
 .pinkey:active{background:var(--rose);transform:scale(.95)}
+.cal-wrap{display:flex;flex-direction:column;gap:12px}
+.cal-side{display:flex;flex-direction:column}
+@media(min-width:860px){
+  .cal-wrap{flex-direction:row;align-items:stretch}
+  .cal-wrap>div:first-child{flex:0 0 360px;max-width:360px}
+  .cal-side{flex:1;background:var(--s);border:1px solid var(--b);border-radius:16px;padding:16px;overflow-y:auto}
+}
 /* ===== PC + TABLET — NUEVO (Parte 1) ===== */
 @media(min-width:860px){
   .app{max-width:820px;margin-inline:auto;border-inline:1px solid var(--b)}
@@ -239,7 +246,8 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
   </div>
 
   <!-- CALENDARIO DEL MES -->
-  <div style="background:var(--s);border:1px solid var(--b);border-radius:16px;padding:14px;margin-bottom:16px">
+  <div class="cal-wrap" style="margin-bottom:16px">
+   <div style="background:var(--s);border:1px solid var(--b);border-radius:16px;padding:14px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <button onclick="calMes(-1)" style="background:var(--s2);border:1px solid var(--b2);border-radius:50%;width:32px;height:32px;color:var(--cream);font-size:.9rem;cursor:pointer">‹</button>
       <div id="calTitulo" style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--cream);text-transform:capitalize"></div>
@@ -260,7 +268,10 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
       <span style="font-size:.58rem;color:var(--txd)"><span style="color:var(--gold)">●</span> Fecha especial</span>
       <span style="font-size:.58rem;color:var(--txd)"><span style="color:var(--cool)">●</span> Seguimiento</span>
     </div>
-    <div id="calDetalle" style="margin-top:10px"></div>
+   </div>
+   <div class="cal-side">
+    <div id="calDetalle"></div>
+   </div>
   </div>
 
   <div class="goal-card">
@@ -803,7 +814,7 @@ function renderHome(){
   var nc=recs.length;document.getElementById('qa-c').textContent=nc>0?nc+' persona'+(nc>1?'s':''):'CRM';
   var lsArr=inv.filter(function(p){return(p.stock||0)<=(p.alert||2)&&p.stock!==undefined;});
   document.getElementById('qa-i').textContent=lsArr.length>0?'⚠️ '+lsArr.length+' bajo stock':inv.length+' productos';
-  var pendN=loadFups().filter(function(x){return !x.done&&x.due<=hoyISO();}).length;
+  var pendN=loadFups().filter(function(x){return !x.done&&soloFecha(x.due)<=hoyISO();}).length;
   var qs=document.getElementById('qa-s');if(qs)qs.textContent=pendN>0?pendN+' pendiente'+(pendN>1?'s':''):'Al día ✓';
 }
 function renderGoalUI(){
@@ -821,11 +832,11 @@ function renderBanners(){
   var bdays=recs.filter(function(r){if(!r.cumpleanos)return false;var p=r.cumpleanos.split('-');return parseInt(p[1])===m;}).map(function(r){var day=parseInt((r.cumpleanos.split('-')[2])||0);return{name:fn(r),day:day,isToday:day===d,tel:r.telefono||''};}).sort(function(a,b){return a.day-b.day;});
   var eb=document.getElementById('b-bday');
   if(bdays.length){var hb='<div class="banner b-bday"><div style="font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">🎂 Cumpleaños este mes · '+bdays.length+'</div>';hb+=bdays.slice(0,4).map(function(x){return '<div class="b-item"><div><div style="font-size:.82rem;font-weight:500;color:var(--cream)">'+x.name+'</div><div style="font-size:.66rem;color:var(--txd)">Día '+x.day+'</div></div><span class="'+(x.isToday?'bg':'bdg bw')+'">'+(x.isToday?'🎂 ¡Hoy!':'Día '+x.day)+'</span></div>';}).join('');eb.innerHTML=hb+'</div>';}else{eb.innerHTML='';}
-  var fups=loadFups().filter(function(x){return !x.done&&x.due<=hoyISO();}).sort(function(a,b){return a.due<b.due?-1:1;});
+  var fups=loadFups().filter(function(x){return !x.done&&soloFecha(x.due)<=hoyISO();}).sort(function(a,b){return soloFecha(a.due)<soloFecha(b.due)?-1:1;});
   var bt=document.getElementById('b-today');
   if(fups.length){
     var hh='<div class="banner b-today"><div style="font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--warn);margin-bottom:8px">⏰ Seguimientos pendientes · '+fups.length+'</div>';
-    hh+=fups.slice(0,4).map(function(fp){var venc=fp.due<hoyISO();return '<div class="b-item"><div><div style="font-size:.82rem;font-weight:500;color:var(--cream)">'+fp.clientName+'</div><div style="font-size:.66rem;color:var(--txd)">'+fp.label+'</div></div><span class="bdg '+(venc?'bh':'bw')+'">'+(venc?'Vencido':'Hoy')+'</span></div>';}).join('');
+    hh+=fups.slice(0,4).map(function(fp){var venc=soloFecha(fp.due)<hoyISO();return '<div class="b-item"><div><div style="font-size:.82rem;font-weight:500;color:var(--cream)">'+fp.clientName+'</div><div style="font-size:.66rem;color:var(--txd)">'+fp.label+'</div></div><span class="bdg '+(venc?'bh':'bw')+'">'+(venc?'Vencido':'Hoy')+'</span></div>';}).join('');
     if(fups.length>4)hh+='<div style="font-size:.66rem;color:var(--txd);padding-top:4px">+ '+(fups.length-4)+' más...</div>';
     hh+='<button onclick="nav(\'seguimiento\')" style="width:100%;margin-top:8px;background:rgba(224,160,80,.12);border:1px solid rgba(224,160,80,.25);color:#f0c080;border-radius:9px;padding:8px;font-family:Jost,sans-serif;font-size:.74rem;font-weight:600;cursor:pointer">Ver todos →</button>';
     bt.innerHTML=hh+'</div>';
@@ -1230,7 +1241,7 @@ function delFup(id){
   saveFups(fups);renderSeg();renderHome();toast('Eliminado');
 }
 function fechaCalendar(due){
-  // due = 'YYYY-MM-DD' -> formato YYYYMMDD para evento de día completo
+  due=String(due).split('T')[0];
   var d=due.replace(/-/g,'');
   var dt=new Date(due+'T12:00:00');dt.setDate(dt.getDate()+1);
   var fin=dt.toISOString().split('T')[0].replace(/-/g,'');
@@ -1248,9 +1259,9 @@ function calLink(fp){
     '&reminders=POPUP,540';
 }
 function fupItem(fp,modo){
-  var hoy=hoyISO();var vencido=fp.due<hoy;var esHoy=fp.due===hoy;
+  var hoy=hoyISO();var vencido=soloFecha(fp.due)<hoy;var esHoy=soloFecha(fp.due)===hoy;
   var col=vencido?'#f09090':esHoy?'#f0c080':'var(--txd)';
-  var etq=vencido?'Vencido':esHoy?'Hoy':new Date(fp.due+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'short'});
+  var etq=vencido?'Vencido':esHoy?'Hoy':new Date(soloFecha(fp.due)+'T12:00:00').toLocaleDateString('es-PR',{day:'numeric',month:'short'});
   var tel=telDe(fp.clientName);
   var wa=tel?'<a class="wam" href="https://wa.me/'+tel.replace(/[^0-9]/g,'')+'?text='+encodeURIComponent('Hola '+fp.clientName+' 🌸')+'" target="_blank" onclick="event.stopPropagation()">WA</a>':'';
   var cal='<a href="'+calLink(fp)+'" target="_blank" onclick="event.stopPropagation()" style="background:rgba(80,144,208,.12);border:1px solid rgba(80,144,208,.25);color:#a0c8f8;border-radius:9px;padding:7px 9px;font-family:Jost,sans-serif;font-size:.7rem;font-weight:600;text-decoration:none;white-space:nowrap">📅</a>';
@@ -1266,8 +1277,8 @@ function fupItem(fp,modo){
 function renderSeg(){
   var fups=loadFups().filter(function(x){return !x.done;});
   var hoy=hoyISO();
-  var pend=fups.filter(function(x){return x.due<=hoy;}).sort(function(a,b){return a.due<b.due?-1:1;});
-  var prox=fups.filter(function(x){return x.due>hoy;}).sort(function(a,b){return a.due<b.due?-1:1;});
+  var pend=fups.filter(function(x){return soloFecha(x.due)<=hoy;}).sort(function(a,b){return soloFecha(a.due)<soloFecha(b.due)?-1:1;});
+  var prox=fups.filter(function(x){return soloFecha(x.due)>hoy;}).sort(function(a,b){return soloFecha(a.due)<soloFecha(b.due)?-1:1;});
   var el=document.getElementById('seg-list');var h='';
   if(pend.length){h+='<div class="slbl">⏰ Pendientes ahora · '+pend.length+'</div>'+pend.map(function(fp){return fupItem(fp,'p');}).join('');}
   if(prox.length){h+='<div class="slbl" style="margin-top:14px">Próximos · '+prox.length+'</div>'+prox.map(function(fp){return fupItem(fp,'x');}).join('');}
@@ -1330,6 +1341,8 @@ function renderMotiv(){
 }
 
 /* =================== CALENDARIO DEL MES =================== */
+function soloFecha(d){if(!d)return '';return String(d).split('T')[0].slice(0,10);}
+
 var calOffset=0;
 function calMes(d){calOffset+=d;renderCalendario();}
 function renderCalendario(){
@@ -1354,22 +1367,39 @@ function renderCalendario(){
     // fecha especial
     var haySD=getSD(400).some(function(sd){return sd.date.getDate()===dd&&sd.date.getMonth()===mes&&sd.date.getFullYear()===anio;});
     // seguimiento
-    var hayFup=fups.some(function(fp){return fp.due===iso;});
+    var hayFup=fups.some(function(fp){return soloFecha(fp.due)===iso;});
     var dots='';
     if(hayBday)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--rose);display:inline-block;margin:0 1px"></span>';
     if(haySD)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--gold);display:inline-block;margin:0 1px"></span>';
     if(hayFup)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--cool);display:inline-block;margin:0 1px"></span>';
-    h+='<div data-iso="'+iso+'" data-d="'+dd+'" onclick="calDia(this.dataset.iso,this.dataset.d)" style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;cursor:pointer;'+(esHoy?'background:var(--rose);color:white;font-weight:700':'color:var(--tx)')+';font-size:.78rem">'+dd+'<div style="height:5px;display:flex;align-items:center">'+dots+'</div></div>';
+    h+='<div data-iso="'+iso+'" data-d="'+dd+'" onclick="calDia(this.dataset.iso,this.dataset.d)" style="min-height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;cursor:pointer;padding:3px 0;'+(esHoy?'background:var(--rose);color:white;font-weight:700':'color:var(--tx)')+';font-size:.78rem">'+dd+'<div style="height:5px;display:flex;align-items:center">'+dots+'</div></div>';
   }
   if(cont)cont.innerHTML=h;
-  var det=document.getElementById('calDetalle');if(det)det.innerHTML='';
+  panelHoy();
+}
+function panelHoy(){
+  var det=document.getElementById('calDetalle');if(!det)return;
+  var hoy=hoyISO();
+  var items=[];
+  var hd=new Date();var hm=hd.getMonth()+1,hday=hd.getDate();
+  recs.forEach(function(r){if(r.cumpleanos){var p=soloFecha(r.cumpleanos).split('-');if(parseInt(p[1])===hm&&parseInt(p[2])===hday)items.push(['🎂','Cumpleaños de '+fn(r)]);}});
+  getSD(60).forEach(function(sd){if(sd.dl===0)items.push([sd.i,sd.n]);});
+  var fpsHoy=loadFups().filter(function(x){return !x.done&&soloFecha(x.due)<=hoy;}).sort(function(a,b){return soloFecha(a.due)<soloFecha(b.due)?-1:1;});
+  var h='<div style="font-size:.54rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">📌 Lo de hoy</div>';
+  if(items.length){h+=items.map(function(it){return '<div style="font-size:.8rem;color:var(--cream);padding:5px 0;border-bottom:1px solid var(--b)">'+it[0]+' '+it[1]+'</div>';}).join('');}
+  if(fpsHoy.length){
+    h+='<div style="font-size:.54rem;letter-spacing:2px;text-transform:uppercase;color:var(--cool);margin:12px 0 6px">Seguimientos pendientes</div>';
+    h+=fpsHoy.slice(0,6).map(function(fp){var v=soloFecha(fp.due)<hoy;return '<div style="font-size:.78rem;color:var(--cream);padding:5px 0;border-bottom:1px solid var(--b)">📋 '+fp.clientName+' <span style="color:'+(v?'#f09090':'#f0c080')+';font-size:.66rem">— '+fp.label+'</span></div>';}).join('');
+  }
+  if(!items.length&&!fpsHoy.length){h+='<div style="font-size:.76rem;color:var(--txd);padding:8px 0">Nada pendiente hoy. ✨</div>';}
+  det.innerHTML=h;
 }
 function calDia(iso,dd){
   var partes=iso.split('-');var mes=parseInt(partes[1]),dia=parseInt(partes[2]);
   var items=[];
-  recs.forEach(function(r){if(r.cumpleanos){var p=r.cumpleanos.split('-');if(parseInt(p[1])===mes&&parseInt(p[2])===dia)items.push('🎂 Cumpleaños de '+fn(r));}});
+  recs.forEach(function(r){if(r.cumpleanos){var p=soloFecha(r.cumpleanos).split('-');if(parseInt(p[1])===mes&&parseInt(p[2])===dia)items.push('🎂 Cumpleaños de '+fn(r));}});
   getSD(400).forEach(function(sd){if(sd.date.getDate()===dia&&(sd.date.getMonth()+1)===mes)items.push(sd.i+' '+sd.n);});
-  loadFups().filter(function(x){return !x.done&&x.due===iso;}).forEach(function(fp){items.push('📋 '+fp.clientName+' — '+fp.label);});
+  loadFups().filter(function(x){return !x.done&&soloFecha(x.due)===iso;}).forEach(function(fp){items.push('📋 '+fp.clientName+' — '+fp.label);});
   var det=document.getElementById('calDetalle');
   if(!det)return;
   if(!items.length){det.innerHTML='<div style="text-align:center;font-size:.72rem;color:var(--txd);padding:8px">Día '+dd+': nada agendado</div>';return;}
