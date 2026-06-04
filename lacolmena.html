@@ -555,6 +555,8 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
           <span class="copt" data-v="Facebook" onclick="sel1(this,'fuente-sel')">Facebook</span>
           <span class="copt" data-v="TikTok" onclick="sel1(this,'fuente-sel')">TikTok</span>
           <span class="copt" data-v="Referido" onclick="sel1(this,'fuente-sel')">Referido</span>
+          <span class="copt" data-v="Amiga/Conocida" onclick="sel1(this,'fuente-sel')">Amiga/Conocida</span>
+          <span class="copt" data-v="En frío" onclick="sel1(this,'fuente-sel')">En frío</span>
           <span class="copt" data-v="Quiz piel" onclick="sel1(this,'fuente-sel')">Quiz piel</span>
           <span class="copt" data-v="WhatsApp" onclick="sel1(this,'fuente-sel')">WhatsApp</span>
           <span class="copt" data-v="Zoom" onclick="sel1(this,'fuente-sel')">Zoom</span>
@@ -570,12 +572,60 @@ html,body{height:100%;overflow:hidden;font-family:"Jost",sans-serif;background:v
         </div>
       </div>
       <div class="fsec">🗺️ Mapa Humano</div>
-      <div style="font-size:.66rem;color:var(--txm);line-height:1.6;margin-bottom:9px">Lo que de verdad importa de ella. Para que en 6 meses recuerdes quién es — y crear lealtad real.</div>
-      <input class="finp" id="fhijos" placeholder="👶 Hijos (nombres y edades)">
-      <input class="finp" id="fprofesion" placeholder="💼 Profesión / a qué se dedica">
-      <input class="finp" id="fsuenos" placeholder="✨ Sueños y metas (ej: pagar universidad, viajar)">
-      <input class="finp" id="fmascotas" placeholder="🐾 Mascotas (nombres)">
-      <input class="finp" id="fimportante" placeholder="💗 Lo más importante en su vida ahora">
+      <div style="font-size:.66rem;color:var(--txm);line-height:1.6;margin-bottom:11px">Lo que de verdad importa de ella. Toca los botones para escoger rápido, y escribe detalles si quieres.</div>
+
+      <label style="font-size:.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:5px">👶 Hijos</label>
+      <div style="margin-bottom:6px">
+        <span class="copt" onclick="addChip('fhijos','Sin hijos')">Sin hijos</span>
+        <span class="copt" onclick="addChip('fhijos','1 hijo/a')">1 hijo/a</span>
+        <span class="copt" onclick="addChip('fhijos','2 hijos')">2 hijos</span>
+        <span class="copt" onclick="addChip('fhijos','3+ hijos')">3+ hijos</span>
+        <span class="copt" onclick="addChip('fhijos','Bebé')">Bebé</span>
+      </div>
+      <input class="finp" id="fhijos" placeholder="Nombres y edades (opcional)">
+
+      <label style="font-size:.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:5px">💼 Profesión</label>
+      <div style="margin-bottom:6px">
+        <span class="copt" onclick="addChip('fprofesion','Ama de casa')">Ama de casa</span>
+        <span class="copt" onclick="addChip('fprofesion','Enfermera')">Enfermera</span>
+        <span class="copt" onclick="addChip('fprofesion','Maestra')">Maestra</span>
+        <span class="copt" onclick="addChip('fprofesion','Secretaria')">Secretaria</span>
+        <span class="copt" onclick="addChip('fprofesion','Estudiante')">Estudiante</span>
+        <span class="copt" onclick="addChip('fprofesion','Empresaria')">Empresaria</span>
+        <span class="copt" onclick="addChip('fprofesion','Retirada')">Retirada</span>
+      </div>
+      <input class="finp" id="fprofesion" placeholder="Otra / detalles (opcional)">
+
+      <label style="font-size:.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:5px">✨ Sueños y metas</label>
+      <div style="margin-bottom:6px">
+        <span class="copt" onclick="addChip('fsuenos','Casa propia')">Casa propia</span>
+        <span class="copt" onclick="addChip('fsuenos','Viajar')">Viajar</span>
+        <span class="copt" onclick="addChip('fsuenos','Universidad hijos')">Universidad hijos</span>
+        <span class="copt" onclick="addChip('fsuenos','Negocio propio')">Negocio propio</span>
+        <span class="copt" onclick="addChip('fsuenos','Salud')">Salud</span>
+        <span class="copt" onclick="addChip('fsuenos','Tiempo en familia')">Tiempo en familia</span>
+      </div>
+      <input class="finp" id="fsuenos" placeholder="Otros sueños / detalles (opcional)">
+
+      <label style="font-size:.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:5px">🐾 Mascotas</label>
+      <div style="margin-bottom:6px">
+        <span class="copt" onclick="addChip('fmascotas','Sin mascotas')">Sin mascotas</span>
+        <span class="copt" onclick="addChip('fmascotas','Perro')">Perro 🐶</span>
+        <span class="copt" onclick="addChip('fmascotas','Gato')">Gato 🐱</span>
+        <span class="copt" onclick="addChip('fmascotas','Varias')">Varias</span>
+      </div>
+      <input class="finp" id="fmascotas" placeholder="Nombres (opcional)">
+
+      <label style="font-size:.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--txd);display:block;margin-bottom:5px">💗 Lo más importante ahora</label>
+      <div style="margin-bottom:6px">
+        <span class="copt" onclick="addChip('fimportante','Su familia')">Su familia</span>
+        <span class="copt" onclick="addChip('fimportante','Su salud')">Su salud</span>
+        <span class="copt" onclick="addChip('fimportante','Sus hijos')">Sus hijos</span>
+        <span class="copt" onclick="addChip('fimportante','Su trabajo')">Su trabajo</span>
+        <span class="copt" onclick="addChip('fimportante','Sentirse bien')">Sentirse bien</span>
+        <span class="copt" onclick="addChip('fimportante','Su fe')">Su fe</span>
+      </div>
+      <input class="finp" id="fimportante" placeholder="Detalles (opcional)">
       <div class="fsec">Notas privadas</div>
       <textarea class="fta" id="fnotas" placeholder="Su historia, lo que la motiva, notas privadas..."></textarea>
     </div>
@@ -912,6 +962,15 @@ function clrF(){['fnom','fape','ftel','fbday','femail','fciudad','fcp','fdir','f
 function selt(el){document.querySelectorAll('.to').forEach(function(t){t.className='to';});el.classList.add('s'+el.dataset.v[0]);}
 function sel1(el,g){document.querySelectorAll('#'+g+' .copt').forEach(function(c){c.classList.remove('sel');});el.classList.add('sel');}
 function selm(el){el.classList.toggle('sel');}
+function addChip(campo,texto){
+  var el=document.getElementById(campo);if(!el)return;
+  var actual=el.value.trim();
+  // si ya contiene ese texto, no lo repite
+  if(actual.split(/[,;]/).map(function(x){return x.trim();}).indexOf(texto)>=0)return;
+  el.value=actual?(actual+', '+texto):texto;
+  // marcar visualmente el botón
+  if(window.event&&window.event.target){var b=window.event.target;b.classList.toggle('sel');}
+}
 function saveRec(){
   var nom=document.getElementById('fnom').value.trim();if(!nom){toast('Escribe el nombre 🌸');return;}
   var isc=document.getElementById('fmode').value==='e';var id=eid||uid();
